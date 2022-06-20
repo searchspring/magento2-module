@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SearchSpring\Feed\Api\Data\TaskInterface"
+                type="SearchSpring\Feed\Model\Task"/>
+    <preference for="SearchSpring\Feed\Api\Data\TaskErrorInterface"
+                type="SearchSpring\Feed\Model\Data\TaskError"/>
+    <preference for="SearchSpring\Feed\Api\Data\TaskSearchResultsInterface"
+                type="SearchSpring\Feed\Model\TaskSearchResults"/>
+    <preference for="SearchSpring\Feed\Api\Data\FeedInterface"
+                type="SearchSpring\Feed\Model\Feed"/>
+    <preference for="SearchSpring\Feed\Api\Data\FeedSearchResultsInterface"
+                type="SearchSpring\Feed\Model\FeedSearchResults"/>
+    <preference for="SearchSpring\Feed\Api\Data\FeedSpecificationInterface"
+                type="SearchSpring\Feed\Model\Task\Specification\Feed"/>
+    <preference for="SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface"
+                type="SearchSpring\Feed\Model\Task\Specification\MediaGallery"/>
+    <preference for="SearchSpring\Feed\Api\TaskRepositoryInterface"
+                type="SearchSpring\Feed\Model\TaskRepository"/>
+    <preference for="SearchSpring\Feed\Api\CreateTaskInterface"
+                type="SearchSpring\Feed\Model\CreateTask"/>
+    <preference for="SearchSpring\Feed\Api\FetchTaskResultInterface"
+                type="SearchSpring\Feed\Model\FetchTaskResult"/>
+    <preference for="SearchSpring\Feed\Api\FeedRepositoryInterface"
+                type="SearchSpring\Feed\Model\FeedRepository"/>
+    <preference for="SearchSpring\Feed\Api\GenerateFeedInterface"
+                type="SearchSpring\Feed\Model\GenerateFeed"/>
+</config>

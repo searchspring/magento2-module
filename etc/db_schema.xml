@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="searchspring_task" resource="default" engine="innodb" comment="Searchspring Task">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="100" comment="Task Type"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="100" comment="Task Status"/>
+        <column xsi:type="mediumtext" name="payload" nullable="true" comment="Task Payload"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Task Created At"/>
+        <column xsi:type="timestamp" name="started_at" on_update="false" nullable="true" comment="Task Execution Started At"/>
+        <column xsi:type="timestamp" name="ended_at" on_update="false" nullable="true" comment="Task Execution Ended At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="searchspring_task_error" resource="default" engine="innodb" comment="Searchspring Task Error">
+        <column xsi:type="int" name="task_id" unsigned="true" nullable="false" comment="Task ID"/>
+        <column xsi:type="int" name="code" nullable="false" comment="Error Code"/>
+        <column xsi:type="text" name="message" nullable="false" comment="Error Message"/>
+        <constraint xsi:type="unique" referenceId="SEARCHSPRING_TASK_ERROR_TASK_ID">
+            <column name="task_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="SEARCHSPRING_TASK_ERROR_TASK_ID_SEARCHSPRING_TASK_ENTITY_ID"
+                    table="searchspring_task_error"
+                    column="task_id"
+                    referenceTable="searchspring_task"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <table name="searchspring_feed" resource="default" engine="innodb" comment="Searchspring Feed">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="task_id" unsigned="true" nullable="false" comment="Task Id"/>
+        <column xsi:type="varchar" name="directory_type" nullable="false" length="100" comment="Directory Type"/>
+        <column xsi:type="varchar" name="file_name" nullable="false" length="255" comment="Filename"/>
+        <column xsi:type="smallint" name="fetched" nullable="false" default="0" comment="Was Fetched"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Task Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="SEARCHSPRING_FEED_TASK_ID">
+            <column name="task_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="SEARCHSPRING_FEED_TASK_ID_SEARCHSPRING_TASK_ENTITY_ID"
+                    table="searchspring_feed"
+                    column="task_id"
+                    referenceTable="searchspring_task"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+    </table>
+</schema>

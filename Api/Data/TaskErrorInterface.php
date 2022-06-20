@@ -6,6 +6,8 @@ namespace SearchSpring\Feed\Api\Data;
 
 interface TaskErrorInterface
 {
+    const CODE = 'code';
+    const MESSAGE = 'message';
     /**
      * @return int|null
      */
