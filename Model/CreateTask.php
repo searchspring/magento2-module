@@ -10,6 +10,7 @@ use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
 use SearchSpring\Feed\Model\Task\TypeList;
+use SearchSpring\Feed\Model\Task\UniqueCheckerPool;
 use SearchSpring\Feed\Model\Task\ValidatorPool;
 
 class CreateTask implements CreateTaskInterface
@@ -30,6 +31,10 @@ class CreateTask implements CreateTaskInterface
      * @var TypeList
      */
     private $typeList;
+    /**
+     * @var UniqueCheckerPool
+     */
+    private $uniqueCheckerPool;
 
     /**
      * CreateTask constructor.
@@ -37,17 +42,20 @@ class CreateTask implements CreateTaskInterface
      * @param TaskInterfaceFactory $taskFactory
      * @param ValidatorPool $validatorPool
      * @param TypeList $typeList
+     * @param UniqueCheckerPool $uniqueCheckerPool
      */
     public function __construct(
         TaskRepositoryInterface $taskRepository,
         TaskInterfaceFactory $taskFactory,
         ValidatorPool $validatorPool,
-        TypeList $typeList
+        TypeList $typeList,
+        UniqueCheckerPool $uniqueCheckerPool
     ) {
         $this->taskRepository = $taskRepository;
         $this->taskFactory = $taskFactory;
         $this->validatorPool = $validatorPool;
         $this->typeList = $typeList;
+        $this->uniqueCheckerPool = $uniqueCheckerPool;
     }
 
     /**
@@ -67,6 +75,11 @@ class CreateTask implements CreateTaskInterface
             if (!$validationResult->isValid()) {
                 throw new \Exception();
             }
+        }
+
+        $uniqueChecker = $this->uniqueCheckerPool->get($type);
+        if ($uniqueChecker && !$uniqueChecker->check($payload)) {
+            throw new \Exception();
         }
 
         /** @var TaskInterface $task */

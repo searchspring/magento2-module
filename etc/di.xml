@@ -25,4 +25,35 @@
                 type="SearchSpring\Feed\Model\FeedRepository"/>
     <preference for="SearchSpring\Feed\Api\GenerateFeedInterface"
                 type="SearchSpring\Feed\Model\GenerateFeed"/>
+    <preference for="SearchSpring\Feed\Api\ExecutePendingTasksInterface"
+                type="SearchSpring\Feed\Model\ExecutePendingTasks"/>
+    <preference for="SearchSpring\Feed\Api\ExecuteTaskInterface"
+                type="SearchSpring\Feed\Model\ExecuteTask"/>
+
+    <type name="SearchSpring\Feed\Model\Task\TypeList">
+        <arguments>
+            <argument name="types" xsi:type="array">
+                <item name="feed_generation" xsi:type="string">Feed Generation</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Task\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="feed_generation" xsi:type="array">SearchSpringFeedTaskValidatorFeedGeneration</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Task\UniqueCheckerPool">
+        <arguments>
+            <argument name="checkers" xsi:type="array">
+                <item name="feed_generation" xsi:type="object">SearchSpring\Feed\Model\Task\GenerateFeed\UniqueChecker</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SearchSpringFeedTaskValidatorFeedGeneration" type="SearchSpring\Feed\Model\Task\Validator\ValidatorComposite">
+    </virtualType>
 </config>
