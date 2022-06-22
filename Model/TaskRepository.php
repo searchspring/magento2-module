@@ -6,7 +6,7 @@ namespace SearchSpring\Feed\Model;
 
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -35,9 +35,9 @@ class TaskRepository implements TaskRepositoryInterface
      */
     private $collectionFactory;
     /**
-     * @var SearchCriteriaBuilderFactory
+     * @var SearchCriteriaBuilder
      */
-    private $searchCriteriaBuilderFactory;
+    private $searchCriteriaBuilder;
     /**
      * @var TaskSearchResultsInterfaceFactory
      */
@@ -56,7 +56,7 @@ class TaskRepository implements TaskRepositoryInterface
      * @param TaskFactory $taskFactory
      * @param TaskResource $taskResource
      * @param CollectionFactory $collectionFactory
-     * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param TaskSearchResultsInterfaceFactory $searchResultsFactory
      * @param CollectionProcessorInterface $collectionProcessor
      * @param JoinProcessorInterface $joinProcessor
@@ -65,7 +65,7 @@ class TaskRepository implements TaskRepositoryInterface
         TaskFactory $taskFactory,
         TaskResource $taskResource,
         CollectionFactory $collectionFactory,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
         TaskSearchResultsInterfaceFactory $searchResultsFactory,
         CollectionProcessorInterface $collectionProcessor,
         JoinProcessorInterface $joinProcessor
@@ -73,7 +73,7 @@ class TaskRepository implements TaskRepositoryInterface
         $this->taskFactory = $taskFactory;
         $this->taskResource = $taskResource;
         $this->collectionFactory = $collectionFactory;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->collectionProcessor = $collectionProcessor;
         $this->joinProcessor = $joinProcessor;
@@ -104,7 +104,7 @@ class TaskRepository implements TaskRepositoryInterface
     public function getList(SearchCriteriaInterface $searchCriteria = null): TaskSearchResultsInterface
     {
         if (!$searchCriteria) {
-            $searchCriteria = $this->searchCriteriaBuilderFactory->create()->create();
+            $searchCriteria = $this->searchCriteriaBuilder->create();
         }
 
         /** @var Collection $collection */

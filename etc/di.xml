@@ -29,6 +29,8 @@
                 type="SearchSpring\Feed\Model\ExecutePendingTasks"/>
     <preference for="SearchSpring\Feed\Api\ExecuteTaskInterface"
                 type="SearchSpring\Feed\Model\ExecuteTask"/>
+    <preference for="SearchSpring\Feed\Api\GetStoresInfoInterface"
+                type="SearchSpring\Feed\Model\GetStoresInfo"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>

@@ -4,13 +4,59 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use Magento\Framework\Api\AttributeValueFactory;
+use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractExtensibleModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Registry;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
+use SearchSpring\Feed\Api\TastExtensionInterface;
 use SearchSpring\Feed\Model\ResourceModel\Task as TaskResource;
+use SearchSpring\Feed\Model\ResourceModel\Task\Error\LoadErrors;
 
 class Task extends AbstractExtensibleModel implements TaskInterface
 {
+    /**
+     * @var DateTime
+     */
+    private $dateTime;
+    /**
+     * @var LoadErrors
+     */
+    private $loadErrors;
+
+    /**
+     * Task constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param ExtensionAttributesFactory $extensionFactory
+     * @param AttributeValueFactory $customAttributeFactory
+     * @param DateTime $dateTime
+     * @param LoadErrors $loadErrors
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        ExtensionAttributesFactory $extensionFactory,
+        AttributeValueFactory $customAttributeFactory,
+        DateTime $dateTime,
+        LoadErrors $loadErrors,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $resource, $resourceCollection, $data);
+        $this->dateTime = $dateTime;
+        $this->loadErrors = $loadErrors;
+    }
+
     /**
      *
      */
@@ -158,19 +204,58 @@ class Task extends AbstractExtensibleModel implements TaskInterface
     }
 
     /**
-     * @return \SearchSpring\Feed\Api\TastExtensionInterface|null
+     * @return TastExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\TastExtensionInterface
+    public function getExtensionAttributes(): ?TastExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
 
     /**
-     * @param \SearchSpring\Feed\Api\TastExtensionInterface $extensionAttributes
+     * @param TastExtensionInterface $extensionAttributes
      * @return TaskInterface
      */
-    public function setExtensionAttributes(\SearchSpring\Feed\Api\TastExtensionInterface $extensionAttributes): TaskInterface
+    public function setExtensionAttributes(TastExtensionInterface $extensionAttributes): TaskInterface
     {
         return $this->_setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * @return AbstractExtensibleModel
+     */
+    public function beforeSave()
+    {
+        if (!$this->getCreatedAt()) {
+            $this->setCreatedAt($this->dateTime->gmtDate());
+        }
+        return parent::beforeSave();
+    }
+
+    /**
+     * @return AbstractExtensibleModel
+     */
+    public function afterLoad()
+    {
+        $this->loadError();
+        return parent::afterLoad();
+    }
+
+    /**
+     *
+     */
+    private function loadError() : void
+    {
+        if (!$this->getEntityId()) {
+            return;
+        }
+
+        $entityId = $this->getEntityId();
+        $errors = $this->loadErrors->execute([$entityId]);
+        if (empty($errors)) {
+            return;
+        }
+
+        $error = current($errors);
+        $this->setError($error);
     }
 }
