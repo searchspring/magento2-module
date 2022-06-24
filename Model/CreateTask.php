@@ -62,9 +62,14 @@ class CreateTask implements CreateTaskInterface
      * @param string $type
      * @param array $payload
      * @return TaskInterface
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function execute(string $type, array $payload): TaskInterface
+    public function execute(string $type, $payload): TaskInterface
     {
+        if (!is_array($payload)) {
+            throw new \Exception();
+        }
+
         if (!$this->typeList->exist($type)) {
             throw new \Exception();
         }

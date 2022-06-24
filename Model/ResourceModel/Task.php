@@ -7,6 +7,7 @@ namespace SearchSpring\Feed\Model\ResourceModel;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\RelationComposite;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\Snapshot;
+use Magento\Framework\Serialize\SerializerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Model\ResourceModel\Task\Error\DeleteErrors;
 use SearchSpring\Feed\Model\ResourceModel\Task\Error\SaveError;
@@ -32,6 +33,7 @@ class Task extends AbstractDb
      * @param RelationComposite $entityRelationComposite
      * @param DeleteErrors $deleteErrors
      * @param SaveError $saveError
+     * @param SerializerInterface $serializer
      * @param null $connectionName
      */
     public function __construct(
@@ -40,11 +42,13 @@ class Task extends AbstractDb
         RelationComposite $entityRelationComposite,
         DeleteErrors $deleteErrors,
         SaveError $saveError,
+        SerializerInterface $serializer,
         $connectionName = null
     ) {
         parent::__construct($context, $entitySnapshot, $entityRelationComposite, $connectionName);
         $this->deleteErrors = $deleteErrors;
         $this->saveError = $saveError;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -55,6 +59,17 @@ class Task extends AbstractDb
     protected function _construct()
     {
         $this->_init(self::TABLE, TaskInterface::ENTITY_ID);
+    }
+
+    /**
+     * @param TaskModel $object
+     * @return AbstractDb
+     */
+    protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
+    {
+        $payload = $object->getPayload();
+        $object->setData(TaskInterface::PAYLOAD, $this->serializer->serialize($payload));
+        return parent::_beforeSave($object);
     }
 
     /**

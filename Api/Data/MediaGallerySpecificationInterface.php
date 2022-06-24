@@ -70,15 +70,15 @@ interface MediaGallerySpecificationInterface extends ExtensibleDataInterface
 
 
     /**
-     * @return \SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface|null
+     * @return \SearchSpring\Feed\Api\Data\MediaGallerySpecificationExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface;
+    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\Data\MediaGallerySpecificationExtensionInterface;
 
     /**
-     * @param \SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface $extensionAttributes
+     * @param \SearchSpring\Feed\Api\Data\MediaGallerySpecificationExtensionInterface $extensionAttributes
      * @return MediaGallerySpecificationInterface
      */
     public function setExtensionAttributes(
-        \SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface $extensionAttributes
+        \SearchSpring\Feed\Api\Data\MediaGallerySpecificationExtensionInterface $extensionAttributes
     ): self;
 }

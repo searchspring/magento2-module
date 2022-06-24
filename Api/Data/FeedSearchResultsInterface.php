@@ -11,11 +11,11 @@ interface FeedSearchResultsInterface extends SearchResultsInterface
     /**
      * @return FeedInterface[]
      */
-    public function getItems() : array;
+    public function getItems();
 
     /**
      * @param FeedInterface[] $items
      * @return FeedSearchResultsInterface
      */
-    public function setItems(array $items) : FeedSearchResultsInterface;
+    public function setItems(array $items);
 }

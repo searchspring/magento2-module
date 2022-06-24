@@ -13,7 +13,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use SearchSpring\Feed\Api\Data\FeedInterface;
-use SearchSpring\Feed\Api\FeedExtensionInterface;
+use SearchSpring\Feed\Api\Data\FeedExtensionInterface;
 use SearchSpring\Feed\Model\ResourceModel\Feed as FeedResource;
 
 class Feed extends AbstractExtensibleModel implements FeedInterface

@@ -8,6 +8,7 @@ use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\AbstractExtensibleObject;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface;
+use SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface;
 
 class Feed extends AbstractExtensibleObject implements FeedSpecificationInterface
 {
@@ -282,18 +283,18 @@ class Feed extends AbstractExtensibleObject implements FeedSpecificationInterfac
     }
 
     /**
-     * @return \SearchSpring\Feed\Api\FeedSpecificationExtensionInterface|null
+     * @return FeedSpecificationExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\FeedSpecificationExtensionInterface
+    public function getExtensionAttributes(): ?FeedSpecificationExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
 
     /**
-     * @param \SearchSpring\Feed\Api\FeedSpecificationExtensionInterface $extensionAttributes
+     * @param FeedSpecificationExtensionInterface $extensionAttributes
      * @return FeedSpecificationInterface
      */
-    public function setExtensionAttributes(\SearchSpring\Feed\Api\FeedSpecificationExtensionInterface $extensionAttributes): FeedSpecificationInterface
+    public function setExtensionAttributes(FeedSpecificationExtensionInterface $extensionAttributes): FeedSpecificationInterface
     {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

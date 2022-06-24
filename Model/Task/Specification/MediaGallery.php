@@ -6,6 +6,7 @@ namespace SearchSpring\Feed\Model\Task\Specification;
 
 use Magento\Framework\Api\AbstractExtensibleObject;
 use SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface;
+use SearchSpring\Feed\Api\Data\MediaGallerySpecificationExtensionInterface;
 
 class MediaGallery extends AbstractExtensibleObject implements MediaGallerySpecificationInterface
 {
@@ -104,18 +105,18 @@ class MediaGallery extends AbstractExtensibleObject implements MediaGallerySpeci
     }
 
     /**
-     * @return \SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface|null
+     * @return MediaGallerySpecificationExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface
+    public function getExtensionAttributes(): ?MediaGallerySpecificationExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
 
     /**
-     * @param \SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface $extensionAttributes
+     * @param MediaGallerySpecificationExtensionInterface $extensionAttributes
      * @return MediaGallerySpecificationInterface
      */
-    public function setExtensionAttributes(\SearchSpring\Feed\Api\MediaGallerySpecificationExtensionInterface $extensionAttributes): MediaGallerySpecificationInterface
+    public function setExtensionAttributes(MediaGallerySpecificationExtensionInterface $extensionAttributes): MediaGallerySpecificationInterface
     {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

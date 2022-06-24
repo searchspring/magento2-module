@@ -10,8 +10,8 @@ interface CreateTaskInterface
 {
     /**
      * @param string $type
-     * @param array $payload
+     * @param mixed $payload
      * @return TaskInterface
      */
-    public function execute(string $type, array $payload) : TaskInterface;
+    public function execute(string $type, $payload) : TaskInterface;
 }

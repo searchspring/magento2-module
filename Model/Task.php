@@ -11,10 +11,11 @@ use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
-use SearchSpring\Feed\Api\TastExtensionInterface;
+use SearchSpring\Feed\Api\Data\TaskExtensionInterface;
 use SearchSpring\Feed\Model\ResourceModel\Task as TaskResource;
 use SearchSpring\Feed\Model\ResourceModel\Task\Error\LoadErrors;
 
@@ -28,6 +29,10 @@ class Task extends AbstractExtensibleModel implements TaskInterface
      * @var LoadErrors
      */
     private $loadErrors;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
      * Task constructor.
@@ -37,6 +42,7 @@ class Task extends AbstractExtensibleModel implements TaskInterface
      * @param AttributeValueFactory $customAttributeFactory
      * @param DateTime $dateTime
      * @param LoadErrors $loadErrors
+     * @param SerializerInterface $serializer
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -48,6 +54,7 @@ class Task extends AbstractExtensibleModel implements TaskInterface
         AttributeValueFactory $customAttributeFactory,
         DateTime $dateTime,
         LoadErrors $loadErrors,
+        SerializerInterface $serializer,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -55,6 +62,7 @@ class Task extends AbstractExtensibleModel implements TaskInterface
         parent::__construct($context, $registry, $extensionFactory, $customAttributeFactory, $resource, $resourceCollection, $data);
         $this->dateTime = $dateTime;
         $this->loadErrors = $loadErrors;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -123,6 +131,11 @@ class Task extends AbstractExtensibleModel implements TaskInterface
      */
     public function getPayload(): array
     {
+        $payload = $this->getData(self::PAYLOAD);
+        if (is_string($payload)) {
+            $this->setPayload($this->serializer->unserialize($payload));
+        }
+
         return $this->getData(self::PAYLOAD) ?? [];
     }
 
@@ -204,18 +217,18 @@ class Task extends AbstractExtensibleModel implements TaskInterface
     }
 
     /**
-     * @return TastExtensionInterface|null
+     * @return TaskExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?TastExtensionInterface
+    public function getExtensionAttributes(): ?TaskExtensionInterface
     {
         return $this->_getExtensionAttributes();
     }
 
     /**
-     * @param TastExtensionInterface $extensionAttributes
+     * @param TaskExtensionInterface $extensionAttributes
      * @return TaskInterface
      */
-    public function setExtensionAttributes(TastExtensionInterface $extensionAttributes): TaskInterface
+    public function setExtensionAttributes(TaskExtensionInterface $extensionAttributes): TaskInterface
     {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

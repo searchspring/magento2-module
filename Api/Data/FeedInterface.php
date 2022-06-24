@@ -100,15 +100,15 @@ interface FeedInterface extends ExtensibleDataInterface
     public function setCreatedAt(string $date) : self;
 
     /**
-     * @return \SearchSpring\Feed\Api\FeedExtensionInterface|null
+     * @return \SearchSpring\Feed\Api\Data\FeedExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\FeedExtensionInterface;
+    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\Data\FeedExtensionInterface;
 
     /**
-     * @param \SearchSpring\Feed\Api\FeedExtensionInterface $extensionAttributes
+     * @param \SearchSpring\Feed\Api\Data\FeedExtensionInterface $extensionAttributes
      * @return FeedInterface
      */
     public function setExtensionAttributes(
-        \SearchSpring\Feed\Api\FeedExtensionInterface $extensionAttributes
+        \SearchSpring\Feed\Api\Data\FeedExtensionInterface $extensionAttributes
     ): self;
 }

@@ -50,7 +50,7 @@ class ValidatorComposite implements ValidatorInterface
                 }
 
                 $errors = array_merge($errors, $validationResult->getErrors());
-                $shouldBreak = $sortedValidator['breakOnFailure'] ?? false;
+                $shouldBreak = $sortedValidator['breakOnFailure'] ?? true;
                 if ($shouldBreak) {
                     break;
                 }

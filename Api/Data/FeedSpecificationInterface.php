@@ -233,15 +233,15 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
     public function setMediaGallerySpecification(MediaGallerySpecificationInterface $specification) : self;
 
     /**
-     * @return \SearchSpring\Feed\Api\FeedSpecificationExtensionInterface|null
+     * @return \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\FeedSpecificationExtensionInterface;
+    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface;
 
     /**
-     * @param \SearchSpring\Feed\Api\FeedSpecificationExtensionInterface $extensionAttributes
+     * @param \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface $extensionAttributes
      * @return FeedSpecificationInterface
      */
     public function setExtensionAttributes(
-        \SearchSpring\Feed\Api\FeedSpecificationExtensionInterface $extensionAttributes
+        \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface $extensionAttributes
     ): self;
 }

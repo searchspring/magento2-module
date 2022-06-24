@@ -7,6 +7,7 @@ namespace SearchSpring\Feed\Model\ResourceModel\Task\Error;
 use Magento\Framework\App\ResourceConnection;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterfaceFactory;
+use SearchSpring\Feed\Model\ResourceModel\Task;
 
 class LoadErrors
 {
@@ -44,7 +45,8 @@ class LoadErrors
         }
         $taskIds = array_map('intval', $taskIds);
         $connection = $this->resourceConnection->getConnection();
-        $select = $connection->select()->where('task_id in (?)', $taskIds);
+        $select = $connection->select()->from(Task::ERROR_TABLE)
+            ->where('task_id in (?)', $taskIds);
         $errors = $connection->fetchAll($select);
         $result = [];
         foreach ($errors as $error) {

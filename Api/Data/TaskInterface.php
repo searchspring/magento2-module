@@ -130,15 +130,15 @@ interface TaskInterface extends ExtensibleDataInterface
     public function setError(TaskErrorInterface $error) : self;
 
     /**
-     * @return \SearchSpring\Feed\Api\TastExtensionInterface|null
+     * @return \SearchSpring\Feed\Api\Data\TaskExtensionInterface|null
      */
-    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\TastExtensionInterface;
+    public function getExtensionAttributes(): ?\SearchSpring\Feed\Api\Data\TaskExtensionInterface;
 
     /**
-     * @param \SearchSpring\Feed\Api\TastExtensionInterface $extensionAttributes
+     * @param \SearchSpring\Feed\Api\Data\TaskExtensionInterface $extensionAttributes
      * @return TaskInterface
      */
     public function setExtensionAttributes(
-        \SearchSpring\Feed\Api\TastExtensionInterface $extensionAttributes
+        \SearchSpring\Feed\Api\Data\TaskExtensionInterface $extensionAttributes
     ): self;
 }

@@ -18,6 +18,7 @@ interface TaskRepositoryInterface
      * @param int $id
      * @return TaskInterface
      * @throws NoSuchEntityException
+     * @return TaskInterface
      */
     public function get(int $id) : TaskInterface;
 
@@ -25,6 +26,7 @@ interface TaskRepositoryInterface
      * @param SearchCriteriaInterface|null $searchCriteria
      * @return TaskSearchResultsInterface
      * @throws LocalizedException
+     * @return TaskSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria = null) : TaskSearchResultsInterface;
 
@@ -32,12 +34,14 @@ interface TaskRepositoryInterface
      * @param TaskInterface $task
      * @return TaskInterface
      * @throws CouldNotSaveException
+     * @return TaskInterface
      */
     public function save(TaskInterface $task) : TaskInterface;
 
     /**
      * @param TaskInterface $task
      * @throws CouldNotDeleteException
+     * @return void
      */
     public function delete(TaskInterface $task) : void;
 
@@ -45,6 +49,7 @@ interface TaskRepositoryInterface
      * @param int $id
      * @throws CouldNotDeleteException
      * @throws NoSuchEntityException
+     * @return void
      */
     public function deleteById(int $id) : void;
 }

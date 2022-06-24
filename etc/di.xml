@@ -43,7 +43,7 @@
     <type name="SearchSpring\Feed\Model\Task\ValidatorPool">
         <arguments>
             <argument name="validators" xsi:type="array">
-                <item name="feed_generation" xsi:type="array">SearchSpringFeedTaskValidatorFeedGeneration</item>
+                <item name="feed_generation" xsi:type="object">SearchSpringFeedTaskValidatorFeedGeneration</item>
             </argument>
         </arguments>
     </type>
@@ -57,5 +57,48 @@
     </type>
 
     <virtualType name="SearchSpringFeedTaskValidatorFeedGeneration" type="SearchSpring\Feed\Model\Task\Validator\ValidatorComposite">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="store" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Task\Validator\StoreValidator</item>
+                </item>
+                <item name="bool" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpringFeedTaskValidatorFeedGenerationBool</item>
+                </item>
+                <item name="int" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpringFeedTaskValidatorFeedGenerationInt</item>
+                </item>
+                <item name="customer_id" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Task\Validator\CustomerValidator</item>
+                </item>
+                <item name="format" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Feed\Validator\FormatValidator</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationBool" type="SearchSpring\Feed\Model\Task\Validator\BoolValidator">
+        <arguments>
+            <argument name="fields" xsi:type="array">
+                <item name="includeMenuCategories" xsi:type="string">includeMenuCategories</item>
+                <item name="keepAspectRatio" xsi:type="string">keepAspectRatio</item>
+                <item name="includeUrlHierarchy" xsi:type="string">includeUrlHierarchy</item>
+                <item name="includeJSONConfig" xsi:type="string">includeJSONConfig</item>
+                <item name="includeChildPrices" xsi:type="string">includeChildPrices</item>
+                <item name="includeTierPricing" xsi:type="string">includeTierPricing</item>
+                <item name="includeMediaGallery" xsi:type="string">includeMediaGallery</item>
+                <item name="includeOutOfStock" xsi:type="string">includeOutOfStock</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationInt" type="SearchSpring\Feed\Model\Task\Validator\IntValidator">
+        <arguments>
+            <argument name="fields" xsi:type="array">
+                <item name="thumbWidth" xsi:type="string">thumbWidth</item>
+                <item name="thumbHeight" xsi:type="string">thumbHeight</item>
+            </argument>
+        </arguments>
     </virtualType>
 </config>

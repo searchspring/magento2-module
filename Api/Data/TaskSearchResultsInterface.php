@@ -11,11 +11,11 @@ interface TaskSearchResultsInterface extends SearchResultsInterface
     /**
      * @return TaskInterface[]
      */
-    public function getItems() : array;
+    public function getItems();
 
     /**
      * @param TaskInterface[] $items
      * @return TaskSearchResultsInterface
      */
-    public function setItems(array $items) : TaskSearchResultsInterface;
+    public function setItems(array $items);
 }
