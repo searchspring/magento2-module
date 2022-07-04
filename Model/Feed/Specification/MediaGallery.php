@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Model\Task\Specification;
+namespace SearchSpring\Feed\Model\Feed\Specification;
 
 use Magento\Framework\Api\AbstractExtensibleObject;
 use SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface;

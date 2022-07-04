@@ -12,9 +12,9 @@
     <preference for="SearchSpring\Feed\Api\Data\FeedSearchResultsInterface"
                 type="SearchSpring\Feed\Model\FeedSearchResults"/>
     <preference for="SearchSpring\Feed\Api\Data\FeedSpecificationInterface"
-                type="SearchSpring\Feed\Model\Task\Specification\Feed"/>
+                type="SearchSpring\Feed\Model\Feed\Specification\Feed"/>
     <preference for="SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface"
-                type="SearchSpring\Feed\Model\Task\Specification\MediaGallery"/>
+                type="SearchSpring\Feed\Model\Feed\Specification\MediaGallery"/>
     <preference for="SearchSpring\Feed\Api\TaskRepositoryInterface"
                 type="SearchSpring\Feed\Model\TaskRepository"/>
     <preference for="SearchSpring\Feed\Api\CreateTaskInterface"
@@ -31,6 +31,10 @@
                 type="SearchSpring\Feed\Model\ExecuteTask"/>
     <preference for="SearchSpring\Feed\Api\GetStoresInfoInterface"
                 type="SearchSpring\Feed\Model\GetStoresInfo"/>
+    <preference for="SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface"
+                type="SearchSpring\Feed\Model\Feed\SpecificationBuilder"/>
+    <preference for="SearchSpring\Feed\Model\Feed\CollectionProviderInterface"
+                type="SearchSpring\Feed\Model\Feed\CollectionProvider"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -101,4 +105,23 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="SearchSpring\Feed\Model\Feed\CollectionProvider">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="status" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\StatusModifier</item>
+                <item name="visibility" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\VisibilityModifier</item>
+                <item name="stock" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\StockModifier</item>
+                <item name="attributes" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\AttributesModifier</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Task\ExecutorPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="feed_generation" xsi:type="object">SearchSpring\Feed\Model\Task\GenerateFeed\Executor</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

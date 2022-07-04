@@ -1,0 +1,149 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SearchSpring\Feed\Model\Feed;
+
+use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Api\Data\FeedSpecificationInterfaceFactory;
+use SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface;
+use SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterfaceFactory;
+use SearchSpring\Feed\Api\MetadataInterface;
+
+class SpecificationBuilder implements SpecificationBuilderInterface
+{
+    /**
+     * @var FeedSpecificationInterfaceFactory
+     */
+    private $feedSpecificationFactory;
+    /**
+     * @var MediaGallerySpecificationInterfaceFactory
+     */
+    private $mediaGallerySpecificationFactory;
+    /**
+     * @var array
+     */
+    private $keyMap = [
+        'store' => FeedSpecificationInterface::STORE_CODE,
+        'hierarchySeparator' => FeedSpecificationInterface::HIERARCHY_SEPARATOR,
+        'multiValuedSeparator' => FeedSpecificationInterface::MULTI_VALUED_SEPARATOR,
+        'includeUrlHierarchy' => FeedSpecificationInterface::INCLUDE_URL_HIERARCHY,
+        'includeMenuCategories' => FeedSpecificationInterface::INCLUDE_MENU_CATEGORIES,
+        'includeJSONConfig' => FeedSpecificationInterface::INCLUDE_JSON_CONFIG,
+        'includeChildPrices' => FeedSpecificationInterface::INCLUDE_CHILD_PRICES,
+        'includeTierPricing' => FeedSpecificationInterface::INCLUDE_TIER_PRICES,
+        'customerId' => FeedSpecificationInterface::CUSTOMER_ID,
+        'childFields' => FeedSpecificationInterface::CHILD_FIELDS,
+        'includeOutOfStock' => FeedSpecificationInterface::INCLUDE_OUT_OF_STOCK,
+        'ignoreFields' => FeedSpecificationInterface::IGNORE_FIELDS,
+        'format' => FeedSpecificationInterface::FORMAT,
+        'thumbWidth' => MediaGallerySpecificationInterface::THUMB_WIDTH,
+        'thumbHeight' => MediaGallerySpecificationInterface::THUMB_HEIGHT,
+        'keepAspectRatio' => MediaGallerySpecificationInterface::KEEP_ASPECT_RATIO,
+        'imageTypes' => MediaGallerySpecificationInterface::IMAGE_TYPES,
+        'includeMediaGallery' => MediaGallerySpecificationInterface::INCLUDE_MEDIA_GALLERY
+    ];
+    /**
+     * @var array
+     */
+    private $defaultValues = [
+        'feed' => [
+            FeedSpecificationInterface::STORE_CODE => 'default',
+            FeedSpecificationInterface::HIERARCHY_SEPARATOR => '/',
+            FeedSpecificationInterface::MULTI_VALUED_SEPARATOR => '|',
+            FeedSpecificationInterface::INCLUDE_URL_HIERARCHY => false,
+            FeedSpecificationInterface::INCLUDE_MENU_CATEGORIES => false,
+            FeedSpecificationInterface::INCLUDE_JSON_CONFIG => false,
+            FeedSpecificationInterface::INCLUDE_CHILD_PRICES => false,
+            FeedSpecificationInterface::INCLUDE_TIER_PRICES => false,
+            FeedSpecificationInterface::CUSTOMER_ID => null,
+            FeedSpecificationInterface::CHILD_FIELDS => [],
+            FeedSpecificationInterface::INCLUDE_OUT_OF_STOCK => false,
+            FeedSpecificationInterface::IGNORE_FIELDS => [],
+            FeedSpecificationInterface::FORMAT => MetadataInterface::FORMAT_CSV,
+        ],
+        'media_gallery' => [
+            MediaGallerySpecificationInterface::THUMB_WIDTH => 250,
+            MediaGallerySpecificationInterface::THUMB_HEIGHT => 250,
+            MediaGallerySpecificationInterface::KEEP_ASPECT_RATIO => 1,
+            MediaGallerySpecificationInterface::IMAGE_TYPES => [],
+            MediaGallerySpecificationInterface::INCLUDE_MEDIA_GALLERY => 0
+        ]
+    ];
+
+    /**
+     * SpecificationBuilder constructor.
+     * @param FeedSpecificationInterfaceFactory $feedSpecificationFactory
+     * @param MediaGallerySpecificationInterfaceFactory $mediaGallerySpecificationFactory
+     * @param array $keyMap
+     * @param array $defaultValues
+     */
+    public function __construct(
+        FeedSpecificationInterfaceFactory $feedSpecificationFactory,
+        MediaGallerySpecificationInterfaceFactory $mediaGallerySpecificationFactory,
+        array $keyMap = [],
+        array $defaultValues = []
+    ) {
+        $this->feedSpecificationFactory = $feedSpecificationFactory;
+        $this->mediaGallerySpecificationFactory = $mediaGallerySpecificationFactory;
+        $this->keyMap = array_merge_recursive($this->keyMap, $keyMap);
+        $this->defaultValues = array_merge_recursive($this->defaultValues, $defaultValues);
+    }
+
+    /**
+     * @param array $data
+     * @return FeedSpecificationInterface
+     */
+    public function build(array $data): FeedSpecificationInterface
+    {
+        $data = $this->convertKeys($data);
+        $mediaGallery = $this->buildMediaGallery($data);
+        $data = $this->addDefaultValues($data, $this->defaultValues['feed']);
+        /** @var FeedSpecificationInterface $specification */
+        $specification = $this->feedSpecificationFactory->create(['data' => $data]);
+        $specification->setMediaGallerySpecification($mediaGallery);
+
+        return $specification;
+    }
+
+    /**
+     * @param array $data
+     * @return MediaGallerySpecificationInterface
+     */
+    private function buildMediaGallery(array $data) : MediaGallerySpecificationInterface
+    {
+        $defaultValues = $this->defaultValues['media_gallery'];
+        $data = $this->addDefaultValues($data, $defaultValues);
+        return $this->mediaGallerySpecificationFactory->create(['data' => $data]);
+    }
+
+    /**
+     * @param array $data
+     * @param array $defaultValues
+     * @return array
+     */
+    private function addDefaultValues(array $data, array $defaultValues) : array
+    {
+        foreach ($defaultValues as $key => $value) {
+            if (!array_key_exists($key, $data)) {
+                $data[$key] = $value;
+            }
+        }
+
+        return $data;
+    }
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function convertKeys(array $data) : array
+    {
+        $result = [];
+        foreach ($data as $key => $value) {
+            $newKey = $this->keyMap[$key] ?? $key;
+            $result[$newKey] = $value;
+        }
+
+        return $result;
+    }
+}
