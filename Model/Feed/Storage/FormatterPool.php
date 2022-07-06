@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Model\Feed;
+namespace SearchSpring\Feed\Model\Feed\Storage;
 
 class FormatterPool
 {

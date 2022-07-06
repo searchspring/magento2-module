@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use SearchSpring\Feed\Api\Data\TaskResultInterface;
+use SearchSpring\Feed\Api\Data\TaskResultInterfaceFactory;
 use SearchSpring\Feed\Api\FetchTaskResultInterface;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
@@ -19,18 +21,25 @@ class FetchTaskResult implements FetchTaskResultInterface
      * @var ResultFetcherPool
      */
     private $resultFetcherPool;
+    /**
+     * @var TaskResultInterfaceFactory
+     */
+    private $taskResultFactory;
 
     /**
      * FetchTaskResult constructor.
      * @param TaskRepositoryInterface $taskRepository
      * @param ResultFetcherPool $resultFetcherPool
+     * @param TaskResultInterfaceFactory $taskResultFactory
      */
     public function __construct(
         TaskRepositoryInterface $taskRepository,
-        ResultFetcherPool $resultFetcherPool
+        ResultFetcherPool $resultFetcherPool,
+        TaskResultInterfaceFactory $taskResultFactory
     ) {
         $this->taskRepository = $taskRepository;
         $this->resultFetcherPool = $resultFetcherPool;
+        $this->taskResultFactory = $taskResultFactory;
     }
 
     /**
@@ -38,7 +47,7 @@ class FetchTaskResult implements FetchTaskResultInterface
      * @return mixed
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function execute(int $id)
+    public function execute(int $id) : TaskResultInterface
     {
         $task = $this->taskRepository->get($id);
         if (!$task->getStatus() === MetadataInterface::TASK_STATUS_SUCCESS) {
@@ -46,6 +55,12 @@ class FetchTaskResult implements FetchTaskResultInterface
         }
 
         $fetcher = $this->resultFetcherPool->get($task->getType());
-        return $fetcher->fetch($task);
+        $result = $fetcher->fetch($task);
+        /** @var TaskResultInterface $taskResult */
+        $taskResult = $this->taskResultFactory->create();
+        $taskResult->setTask($task)
+            ->setResult($result);
+
+        return $taskResult;
     }
 }

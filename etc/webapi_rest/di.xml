@@ -5,6 +5,7 @@
         <arguments>
             <argument name="processors" xsi:type="array">
                 <item name="SearchSpring\Feed\Model\Task" xsi:type="object">SearchSpring\Feed\Model\Task\Webapi\TaskOutputProcessor\Proxy</item>
+                <item name="SearchSpring\Feed\Model\Data\TaskResult" xsi:type="object">SearchSpring\Feed\Model\Task\Webapi\TaskResultOutputProcessor\Proxy</item>
             </argument>
         </arguments>
     </type>

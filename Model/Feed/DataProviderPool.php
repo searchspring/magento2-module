@@ -23,7 +23,7 @@ class DataProviderPool
 
     /**
      * @param array $ignoredFields
-     * @return array
+     * @return DataProviderInterface[]
      */
     public function get(array $ignoredFields = []) : array
     {

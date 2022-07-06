@@ -23,7 +23,11 @@ interface FeedInterface extends ExtensibleDataInterface
     /**
      *
      */
-    const FILE_NAME = 'file_name';
+    const FORMAT = 'format';
+    /**
+     *
+     */
+    const FILE_PATH = 'file_path';
     /**
      *
      */
@@ -69,13 +73,13 @@ interface FeedInterface extends ExtensibleDataInterface
     /**
      * @return string|null
      */
-    public function getFileName() : ?string;
+    public function getFilePath() : ?string;
 
     /**
-     * @param string $name
+     * @param string $path
      * @return FeedInterface
      */
-    public function setFileName(string $name) : self;
+    public function setFilePath(string $path) : self;
 
     /**
      * @return bool|null
@@ -98,6 +102,17 @@ interface FeedInterface extends ExtensibleDataInterface
      * @return FeedInterface
      */
     public function setCreatedAt(string $date) : self;
+
+    /**
+     * @return string|null
+     */
+    public function getFormat() : ?string;
+
+    /**
+     * @param string $format
+     * @return FeedInterface
+     */
+    public function setFormat(string $format) : self;
 
     /**
      * @return \SearchSpring\Feed\Api\Data\FeedExtensionInterface|null

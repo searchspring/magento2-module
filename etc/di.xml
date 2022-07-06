@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SearchSpring\Feed\Api\Data\TaskResultInterface"
+                type="SearchSpring\Feed\Model\Data\TaskResult"/>
     <preference for="SearchSpring\Feed\Api\Data\TaskInterface"
                 type="SearchSpring\Feed\Model\Task"/>
     <preference for="SearchSpring\Feed\Api\Data\TaskErrorInterface"
@@ -35,6 +37,10 @@
                 type="SearchSpring\Feed\Model\Feed\SpecificationBuilder"/>
     <preference for="SearchSpring\Feed\Model\Feed\CollectionProviderInterface"
                 type="SearchSpring\Feed\Model\Feed\CollectionProvider"/>
+    <preference for="SearchSpring\Feed\Model\Feed\CollectionConfigInterface"
+                type="SearchSpring\Feed\Model\Feed\CollectionConfig"/>
+    <preference for="SearchSpring\Feed\Model\Feed\StorageInterface"
+                type="SearchSpring\Feed\Model\Feed\Storage"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -121,6 +127,40 @@
         <arguments>
             <argument name="executors" xsi:type="array">
                 <item name="feed_generation" xsi:type="object">SearchSpring\Feed\Model\Task\GenerateFeed\Executor</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\Storage\WriterPool">
+        <arguments>
+            <argument name="writers" xsi:type="array">
+                <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Writer\Csv</item>
+                <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Writer\Json</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\Storage\FormatterPool">
+        <arguments>
+            <argument name="formatters" xsi:type="array">
+                <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Csv</item>
+                <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Json</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Task\ResultFetcherPool">
+        <arguments>
+            <argument name="fetchers" xsi:type="array">
+                <item name="feed_generation" xsi:type="object">SearchSpring\Feed\Model\Task\GenerateFeed\ResultFetcher</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProviderPool">
+        <arguments>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="__all_attributes__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\AttributesProvider</item>
             </argument>
         </arguments>
     </type>
