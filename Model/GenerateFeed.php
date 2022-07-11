@@ -13,6 +13,7 @@ use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderPool;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
+use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -37,11 +38,9 @@ class GenerateFeed implements GenerateFeedInterface
      */
     private $feedFactory;
     /**
-     * @var array
+     * @var SystemFieldsList
      */
-    private $itemSystemFields = [
-        'product_model'
-    ];
+    private $systemFieldsList;
 
     /**
      * GenerateFeed constructor.
@@ -50,7 +49,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param CollectionConfigInterface $collectionConfig
      * @param StorageInterface $storage
      * @param FeedInterfaceFactory $feedFactory
-     * @param array $itemSystemFields
+     * @param SystemFieldsList $systemFieldsList
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -58,14 +57,14 @@ class GenerateFeed implements GenerateFeedInterface
         CollectionConfigInterface $collectionConfig,
         StorageInterface $storage,
         FeedInterfaceFactory $feedFactory,
-        array $itemSystemFields = []
+        SystemFieldsList $systemFieldsList
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
         $this->collectionConfig = $collectionConfig;
         $this->storage = $storage;
         $this->feedFactory = $feedFactory;
-        $this->itemSystemFields = array_merge($this->itemSystemFields, $itemSystemFields);
+        $this->systemFieldsList = $systemFieldsList;
     }
 
     /**
@@ -122,6 +121,7 @@ class GenerateFeed implements GenerateFeedInterface
             ];
         }
 
+        $this->systemFieldsList->add('product_model');
         $ignoredFields = $feedSpecification->getIgnoreFields();
         $dataProviders = $this->dataProviderPool->get($ignoredFields);
         foreach ($dataProviders as $dataProvider) {
@@ -138,8 +138,9 @@ class GenerateFeed implements GenerateFeedInterface
      */
     private function cleanupItemsData(array $items) : array
     {
+        $systemFields = $this->systemFieldsList->get();
         foreach ($items as &$item) {
-            foreach ($this->itemSystemFields as $field) {
+            foreach ($systemFields as $field) {
                 if (isset($item[$field])) {
                     unset($item[$field]);
                 }
