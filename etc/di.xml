@@ -41,6 +41,8 @@
                 type="SearchSpring\Feed\Model\Feed\CollectionConfig"/>
     <preference for="SearchSpring\Feed\Model\Feed\StorageInterface"
                 type="SearchSpring\Feed\Model\Feed\Storage"/>
+    <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface"
+                type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -167,6 +169,21 @@
                 <item name="saleable" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\SaleableProvider</item>
                 <item name="url" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\UrlProvider</item>
                 <item name="__rating__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\RatingProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver">
+        <arguments>
+            <argument name="resolvers" xsi:type="array">
+                <item name="msi" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">100</item>
+                    <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockResolver</item>
+                </item>
+                <item name="legacy" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">1000</item>
+                    <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockResolver</item>
+                </item>
             </argument>
         </arguments>
     </type>
