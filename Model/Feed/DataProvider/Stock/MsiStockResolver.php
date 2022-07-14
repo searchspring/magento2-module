@@ -19,10 +19,6 @@ class MsiStockResolver implements StockResolverInterface
         'Magento_InventoryReservationsApi',
         'Magento_InventorySalesApi'
     ];
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
 
     /**
      * MsiStockResolver constructor.
@@ -32,11 +28,9 @@ class MsiStockResolver implements StockResolverInterface
      */
     public function __construct(
         Manager $moduleManager,
-        ObjectManager $objectManager,
         array $moduleList = []
     ) {
         $this->moduleManager = $moduleManager;
-        $this->objectManager = $objectManager;
         $this->moduleList = array_merge($this->moduleList, $moduleList);
     }
 
@@ -58,6 +52,6 @@ class MsiStockResolver implements StockResolverInterface
             throw new NoSuchEntityException(__('MSI is not installed'));
         }
 
-        return $this->objectManager->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider');
+        return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider');
     }
 }

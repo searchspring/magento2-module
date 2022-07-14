@@ -11,6 +11,7 @@ use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\GenerateFeedInterface;
 use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
+use SearchSpring\Feed\Model\Feed\ContextManagerInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderPool;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
@@ -41,6 +42,10 @@ class GenerateFeed implements GenerateFeedInterface
      * @var SystemFieldsList
      */
     private $systemFieldsList;
+    /**
+     * @var ContextManagerInterface
+     */
+    private $contextManager;
 
     /**
      * GenerateFeed constructor.
@@ -50,6 +55,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param StorageInterface $storage
      * @param FeedInterfaceFactory $feedFactory
      * @param SystemFieldsList $systemFieldsList
+     * @param ContextManagerInterface $contextManager
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -57,7 +63,8 @@ class GenerateFeed implements GenerateFeedInterface
         CollectionConfigInterface $collectionConfig,
         StorageInterface $storage,
         FeedInterfaceFactory $feedFactory,
-        SystemFieldsList $systemFieldsList
+        SystemFieldsList $systemFieldsList,
+        ContextManagerInterface $contextManager
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -65,6 +72,7 @@ class GenerateFeed implements GenerateFeedInterface
         $this->storage = $storage;
         $this->feedFactory = $feedFactory;
         $this->systemFieldsList = $systemFieldsList;
+        $this->contextManager = $contextManager;
     }
 
     /**
@@ -79,6 +87,7 @@ class GenerateFeed implements GenerateFeedInterface
             throw new \Exception();
         }
 
+        $this->contextManager->setContextFromSpecification($feedSpecification);
         $collection = $this->collectionProvider->getCollection($feedSpecification);
         $pageSize = $this->collectionConfig->getPageSize();
         $collection->setPageSize($pageSize);
@@ -99,6 +108,7 @@ class GenerateFeed implements GenerateFeedInterface
             ->setFormat($format);
 
         $this->storage->save($data, $feed, $feedSpecification);
+        $this->contextManager->resetContext();
         return $feed;
     }
 

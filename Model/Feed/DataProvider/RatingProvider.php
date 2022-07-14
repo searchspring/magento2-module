@@ -81,7 +81,7 @@ class RatingProvider implements DataProviderInterface
      */
     private function convertRatingSum(Summary $summary) : float
     {
-        return 5 * ((int) $summary->getRatingSummary() / $summary->getReviewsCount()/100);
+        return 5 * ((int) $summary->getRatingSummary() / 100);
     }
 
     /**

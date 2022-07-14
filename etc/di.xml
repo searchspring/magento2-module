@@ -41,6 +41,8 @@
                 type="SearchSpring\Feed\Model\Feed\CollectionConfig"/>
     <preference for="SearchSpring\Feed\Model\Feed\StorageInterface"
                 type="SearchSpring\Feed\Model\Feed\Storage"/>
+    <preference for="SearchSpring\Feed\Model\Feed\ContextManagerInterface"
+                type="SearchSpring\Feed\Model\Feed\ContextManager"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
 

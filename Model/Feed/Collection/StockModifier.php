@@ -32,7 +32,9 @@ class StockModifier implements ModifierInterface
      */
     public function modify(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
     {
-        $this->stockHelper->addIsInStockFilterToCollection($collection);
+        if (!$feedSpecification->getIncludeOutOfStock()) {
+            $this->stockHelper->addIsInStockFilterToCollection($collection);
+        }
 
         return $collection;
     }
