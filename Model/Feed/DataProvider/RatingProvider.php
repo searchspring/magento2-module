@@ -112,4 +112,12 @@ class RatingProvider implements DataProviderInterface
 
         return $result;
     }
+
+    /**
+     *
+     */
+    public function reset(): void
+    {
+        // do nothing
+    }
 }

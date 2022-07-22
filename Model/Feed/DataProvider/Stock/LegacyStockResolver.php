@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+
 class LegacyStockResolver implements StockResolverInterface
 {
     /**

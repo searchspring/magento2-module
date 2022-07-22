@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\Collection;
 
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\CatalogInventory\Helper\Stock;
+use Magento\CatalogInventory\Model\ResourceModel\Stock\Status;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 
 class StockModifier implements ModifierInterface
 {
     /**
-     * @var Stock
+     * @var Status
      */
-    private $stockHelper;
+    private $status;
 
     /**
      * StockModifier constructor.
-     * @param Stock $stockHelper
+     * @param Status $status
      */
     public function __construct(
-        Stock $stockHelper
+        Status $status
     ) {
-        $this->stockHelper = $stockHelper;
+        $this->status = $status;
     }
 
     /**
@@ -32,8 +32,14 @@ class StockModifier implements ModifierInterface
      */
     public function modify(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
     {
-        if (!$feedSpecification->getIncludeOutOfStock()) {
-            $this->stockHelper->addIsInStockFilterToCollection($collection);
+        $includeOutOfStock = $feedSpecification->getIncludeOutOfStock();
+        $stockFlag = 'has_stock_status_filter';
+        if (!$collection->hasFlag($stockFlag)) {
+            $this->status->addStockDataToCollection(
+                $collection,
+                !$includeOutOfStock
+            );
+            $collection->setFlag($stockFlag, true);
         }
 
         return $collection;

@@ -171,6 +171,7 @@
                 <item name="saleable" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\SaleableProvider</item>
                 <item name="url" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\UrlProvider</item>
                 <item name="__rating__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\RatingProvider</item>
+                <item name="__categories__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\CategoriesProvider</item>
             </argument>
         </arguments>
     </type>
@@ -186,6 +187,15 @@
                     <item name="sortOrder" xsi:type="number">1000</item>
                     <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockResolver</item>
                 </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\ContextManager">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="store" xsi:type="object">SearchSpring\Feed\Model\Feed\Context\StoreContextManager</item>
+                <item name="customer" xsi:type="object">SearchSpring\Feed\Model\Feed\Context\CustomerContextManager</item>
             </argument>
         </arguments>
     </type>

@@ -30,4 +30,12 @@ class SaleableProvider implements DataProviderInterface
 
         return $products;
     }
+
+    /**
+     *
+     */
+    public function reset(): void
+    {
+        // do nothing
+    }
 }

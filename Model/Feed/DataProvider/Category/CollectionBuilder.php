@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Category;
 
+use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 
 class CollectionBuilder
@@ -26,21 +28,34 @@ class CollectionBuilder
     }
 
     /**
-     * @param array $productIds
+     * @param array $categoryIds
      * @param FeedSpecificationInterface $feedSpecification
-     * @param array $excludedCategoryIds
      * @return Collection
+     * @throws LocalizedException
      */
     public function buildCollection(
-        array $productIds,
-        FeedSpecificationInterface $feedSpecification,
-        array $excludedCategoryIds
+        array $categoryIds,
+        FeedSpecificationInterface $feedSpecification
     ) : Collection {
-        $productCategories = $this->resolveProductsCategories($productIds);
-    }
+        $collection = $this->collectionFactory->create();
+        $collection->setStore($feedSpecification->getStoreCode());
+        $selectAttributes = [
+            CategoryInterface::KEY_NAME,
+            CategoryInterface::KEY_IS_ACTIVE,
+            CategoryInterface::KEY_PATH
+        ];
+        if ($feedSpecification->getIncludeMenuCategories()) {
+            $selectAttributes[] = CategoryInterface::KEY_INCLUDE_IN_MENU;
+        }
 
-    private function resolveProductsCategories(array $productIds) : array
-    {
+        if ($feedSpecification->getIncludeUrlHierarchy()) {
+            $collection->addUrlRewriteToResult();
+        }
 
+        $collection->addAttributeToSelect($selectAttributes);
+        $collection->addAttributeToFilter(CategoryInterface::KEY_IS_ACTIVE, 1)
+            ->addAttributeToFilter('entity_id', ['in' => $categoryIds]);
+
+        return $collection;
     }
 }

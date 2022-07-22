@@ -14,4 +14,9 @@ interface DataProviderInterface
      * @return array
      */
     public function getData(array $products, FeedSpecificationInterface $feedSpecification) : array;
+
+    /**
+     *
+     */
+    public function reset() : void;
 }

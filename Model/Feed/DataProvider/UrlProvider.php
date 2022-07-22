@@ -30,4 +30,12 @@ class UrlProvider implements DataProviderInterface
 
         return $products;
     }
+
+    /**
+     *
+     */
+    public function reset(): void
+    {
+        // do nothing
+    }
 }

@@ -156,4 +156,12 @@ class AttributesProvider implements DataProviderInterface
             $this->attributes[$attribute->getAttributeCode()] = $attribute;
         }
     }
+
+    /**
+     *
+     */
+    public function reset(): void
+    {
+        $this->attributes = [];
+    }
 }

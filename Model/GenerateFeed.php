@@ -12,6 +12,7 @@ use SearchSpring\Feed\Api\GenerateFeedInterface;
 use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
 use SearchSpring\Feed\Model\Feed\ContextManagerInterface;
+use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderPool;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
@@ -87,6 +88,7 @@ class GenerateFeed implements GenerateFeedInterface
             throw new \Exception();
         }
 
+        $this->resetDataProviders($feedSpecification);
         $this->contextManager->setContextFromSpecification($feedSpecification);
         $collection = $this->collectionProvider->getCollection($feedSpecification);
         $pageSize = $this->collectionConfig->getPageSize();
@@ -113,6 +115,27 @@ class GenerateFeed implements GenerateFeedInterface
     }
 
     /**
+     * @param FeedSpecificationInterface $feedSpecification
+     */
+    private function resetDataProviders(FeedSpecificationInterface $feedSpecification) : void
+    {
+        $dataProviders = $this->getDataProviders($feedSpecification);
+        foreach ($dataProviders as $dataProvider) {
+            $dataProvider->reset();
+        }
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return DataProviderInterface[]
+     */
+    private function getDataProviders(FeedSpecificationInterface $feedSpecification) : array
+    {
+        $ignoredFields = $feedSpecification->getIgnoreFields();
+        return $this->dataProviderPool->get($ignoredFields);
+    }
+
+    /**
      * @param Product[] $items
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
@@ -132,8 +155,7 @@ class GenerateFeed implements GenerateFeedInterface
         }
 
         $this->systemFieldsList->add('product_model');
-        $ignoredFields = $feedSpecification->getIgnoreFields();
-        $dataProviders = $this->dataProviderPool->get($ignoredFields);
+        $dataProviders = $this->getDataProviders($feedSpecification);
         foreach ($dataProviders as $dataProvider) {
             $data = $dataProvider->getData($data, $feedSpecification);
         }

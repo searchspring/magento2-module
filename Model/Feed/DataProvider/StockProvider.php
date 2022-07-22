@@ -73,4 +73,12 @@ class StockProvider implements DataProviderInterface
 
         return $products;
     }
+
+    /**
+     *
+     */
+    public function reset(): void
+    {
+        // do nothing
+    }
 }
