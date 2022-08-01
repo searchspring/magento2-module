@@ -36,14 +36,43 @@ class CollectionProvider implements CollectionProviderInterface
     /**
      * @param FeedSpecificationInterface $specification
      * @return Collection
+     * @throws \Exception
      */
     public function getCollection(FeedSpecificationInterface $specification): Collection
     {
         $collection = $this->collectionFactory->create();
-        foreach ($this->modifiers as $modifier) {
+        $modifiers = $this->sort($this->modifiers);
+        foreach ($modifiers as $key => $modifierData) {
+            /** @var ModifierInterface $modifier */
+            $modifier = $modifierData['objectInstance'] ?? null;
+            if (!$modifier) {
+                throw new \Exception((string) __('No objectInstance for modifier %1', $key));
+            }
             $collection = $modifier->modify($collection, $specification);
         }
 
         return $collection;
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function sort(array $data)
+    {
+        usort($data, function (array $a, array $b) {
+            return $this->getSortOrder($a) <=> $this->getSortOrder($b);
+        });
+
+        return $data;
+    }
+
+    /**
+     * @param array $variable
+     * @return int
+     */
+    private function getSortOrder(array $variable)
+    {
+        return !empty($variable['sortOrder']) ? (int) $variable['sortOrder'] : 0;
     }
 }

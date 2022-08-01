@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use SearchSpring\Feed\Api\Data\FeedInterface;
 use SearchSpring\Feed\Api\Data\FeedInterfaceFactory;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\GenerateFeedInterface;
+use SearchSpring\Feed\Model\Feed\Collection\ProcessorPool;
 use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
 use SearchSpring\Feed\Model\Feed\ContextManagerInterface;
@@ -47,6 +49,10 @@ class GenerateFeed implements GenerateFeedInterface
      * @var ContextManagerInterface
      */
     private $contextManager;
+    /**
+     * @var ProcessorPool
+     */
+    private $afterLoadProcessorPool;
 
     /**
      * GenerateFeed constructor.
@@ -57,6 +63,7 @@ class GenerateFeed implements GenerateFeedInterface
      * @param FeedInterfaceFactory $feedFactory
      * @param SystemFieldsList $systemFieldsList
      * @param ContextManagerInterface $contextManager
+     * @param ProcessorPool $afterLoadProcessorPool
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -65,7 +72,8 @@ class GenerateFeed implements GenerateFeedInterface
         StorageInterface $storage,
         FeedInterfaceFactory $feedFactory,
         SystemFieldsList $systemFieldsList,
-        ContextManagerInterface $contextManager
+        ContextManagerInterface $contextManager,
+        ProcessorPool $afterLoadProcessorPool
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -74,6 +82,7 @@ class GenerateFeed implements GenerateFeedInterface
         $this->feedFactory = $feedFactory;
         $this->systemFieldsList = $systemFieldsList;
         $this->contextManager = $contextManager;
+        $this->afterLoadProcessorPool = $afterLoadProcessorPool;
     }
 
     /**
@@ -99,6 +108,8 @@ class GenerateFeed implements GenerateFeedInterface
         while ($currentPageNumber <= $pageCount) {
             $collection->clear();
             $collection->setCurPage($currentPageNumber);
+            $collection->load();
+            $this->processAfterLoad($collection, $feedSpecification);
             $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification);
             $data = array_merge($data, $itemsData);
             $currentPageNumber++;
@@ -112,6 +123,17 @@ class GenerateFeed implements GenerateFeedInterface
         $this->storage->save($data, $feed, $feedSpecification);
         $this->contextManager->resetContext();
         return $feed;
+    }
+
+    /**
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $feedSpecification
+     */
+    private function processAfterLoad(Collection $collection, FeedSpecificationInterface $feedSpecification) : void
+    {
+        foreach ($this->afterLoadProcessorPool->getAll() as $processor) {
+            $processor->process($collection, $feedSpecification);
+        }
     }
 
     /**

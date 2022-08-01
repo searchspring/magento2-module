@@ -13,6 +13,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 
@@ -87,21 +88,7 @@ class AttributesProvider implements DataProviderInterface
             }
             /** @var Attribute $attribute */
             $attribute = $this->attributes[$key];
-            if ($attribute->usesSource()) {
-                $value = $attribute->getSource()->getOptionText($fieldValue);
-            } else {
-                $value = $fieldValue;
-            }
-
-            if (is_object($value)) {
-                if ($value instanceof Phrase) {
-                    $value = $value->getText();
-                } else {
-                    throw new Exception("Unknown value object type " . get_class($value));
-                }
-            }
-
-            $result[$key] = $value;
+            $result[$key] = ValueProcessor::getValue($attribute, $fieldValue);
         }
 
         return $result;
