@@ -186,6 +186,7 @@
             <argument name="dataProviders" xsi:type="array">
                 <item name="__all_attributes__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\AttributesProvider</item>
                 <item name="__configurable_child__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\ConfigurableProductsProvider</item>
+                <item name="__grouped_child__" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\GroupedProductsProvider</item>
                 <item name="prices" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\PricesProvider</item>
                 <item name="stock" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\StockProvider</item>
                 <item name="saleable" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\SaleableProvider</item>

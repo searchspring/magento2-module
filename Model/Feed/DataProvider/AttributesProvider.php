@@ -35,21 +35,28 @@ class AttributesProvider implements DataProviderInterface
      * @var ProductAttributeRepositoryInterface
      */
     private $productAttributeRepository;
+    /**
+     * @var ValueProcessor
+     */
+    private $valueProcessor;
 
     /**
      * AttributesProvider constructor.
      * @param SystemFieldsList $systemFieldsList
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductAttributeRepositoryInterface $productAttributeRepository
+     * @param ValueProcessor $valueProcessor
      */
     public function __construct(
         SystemFieldsList $systemFieldsList,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductAttributeRepositoryInterface $productAttributeRepository
+        ProductAttributeRepositoryInterface $productAttributeRepository,
+        ValueProcessor $valueProcessor
     ) {
         $this->systemFieldsList = $systemFieldsList;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->productAttributeRepository = $productAttributeRepository;
+        $this->valueProcessor = $valueProcessor;
     }
 
     /**
@@ -88,7 +95,7 @@ class AttributesProvider implements DataProviderInterface
             }
             /** @var Attribute $attribute */
             $attribute = $this->attributes[$key];
-            $result[$key] = ValueProcessor::getValue($attribute, $fieldValue);
+            $result[$key] = $this->valueProcessor->getValue($attribute, $fieldValue);
         }
 
         return $result;
@@ -150,5 +157,6 @@ class AttributesProvider implements DataProviderInterface
     public function reset(): void
     {
         $this->attributes = [];
+        $this->valueProcessor->reset();
     }
 }

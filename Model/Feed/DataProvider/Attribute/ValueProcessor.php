@@ -11,6 +11,7 @@ use Magento\Framework\Phrase;
 
 class ValueProcessor
 {
+    private $cache = [];
     /**
      * @param Attribute $attribute
      * @param $value
@@ -18,8 +19,17 @@ class ValueProcessor
      * @throws LocalizedException
      * @throws Exception
      */
-    public static function getValue(Attribute $attribute, $value)
+    public function getValue(Attribute $attribute, $value)
     {
+        $key = null;
+        $code = $attribute->getAttributeCode();
+        if (!is_object($value) && !is_array($value)) {
+            $key = $code . '_' . $value;
+            if (isset($this->cache[$key])) {
+                return $this->cache[$key];
+            }
+        }
+
         $result = null;
         if ($attribute->usesSource()) {
             $result = $attribute->getSource()->getOptionText($value);
@@ -35,6 +45,18 @@ class ValueProcessor
             }
         }
 
+        if ($key) {
+            $this->cache[$key] = $result;
+        }
+
         return $result;
+    }
+
+    /**
+     *
+     */
+    public function reset() : void
+    {
+        $this->cache = [];
     }
 }
