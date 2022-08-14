@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use Exception;
+use Magento\Framework\Exception\CouldNotSaveException;
 use SearchSpring\Feed\Api\CreateTaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Exception\UniqueTaskException;
+use SearchSpring\Feed\Exception\ValidationException;
 use SearchSpring\Feed\Model\Task\TypeList;
 use SearchSpring\Feed\Model\Task\UniqueCheckerPool;
 use SearchSpring\Feed\Model\Task\ValidatorPool;
@@ -62,29 +66,36 @@ class CreateTask implements CreateTaskInterface
      * @param string $type
      * @param array $payload
      * @return TaskInterface
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws CouldNotSaveException
+     * @throws ValidationException
+     * @throws Exception
      */
     public function execute(string $type, $payload): TaskInterface
     {
         if (!is_array($payload)) {
-            throw new \Exception();
+            throw new Exception((string) __('$payload must be array'));
         }
 
         if (!$this->typeList->exist($type)) {
-            throw new \Exception();
+            $availableTaskTypes = implode(', ', $this->typeList->getAll());
+            $message = [
+                (string) __('Invalid task type \'%1\', available task types: %2', $type, $availableTaskTypes)
+            ];
+            throw new ValidationException($message);
         }
 
         $validator = $this->validatorPool->get($type);
         if ($validator) {
             $validationResult = $validator->validate($payload);
             if (!$validationResult->isValid()) {
-                throw new \Exception();
+                $errors = $validationResult->getErrors();
+                throw new ValidationException($errors);
             }
         }
 
         $uniqueChecker = $this->uniqueCheckerPool->get($type);
         if ($uniqueChecker && !$uniqueChecker->check($payload)) {
-            throw new \Exception();
+            throw new UniqueTaskException();
         }
 
         /** @var TaskInterface $task */

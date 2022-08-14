@@ -94,7 +94,7 @@ class GenerateFeed implements GenerateFeedInterface
     {
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
-            throw new \Exception();
+            throw new \Exception((string) __('%1 is not supported format'));
         }
 
         $this->resetDataProviders($feedSpecification);
@@ -118,6 +118,7 @@ class GenerateFeed implements GenerateFeedInterface
         /** @var FeedInterface $feed */
         $feed = $this->feedFactory->create();
         $feed->setFetched(false)
+            ->setFileDeleted(false)
             ->setFormat($format);
 
         $this->storage->save($data, $feed, $feedSpecification);

@@ -35,6 +35,10 @@ interface FeedInterface extends ExtensibleDataInterface
     /**
      *
      */
+    const FILE_DELETED = 'file_deleted';
+    /**
+     *
+     */
     const CREATED_AT = 'created_at';
 
     /**
@@ -113,6 +117,17 @@ interface FeedInterface extends ExtensibleDataInterface
      * @return FeedInterface
      */
     public function setFormat(string $format) : self;
+
+    /**
+     * @return bool|null
+     */
+    public function getFileDeleted() : ?bool;
+
+    /**
+     * @param bool $flag
+     * @return FeedInterface
+     */
+    public function setFileDeleted(bool $flag) : self;
 
     /**
      * @return \SearchSpring\Feed\Api\Data\FeedExtensionInterface|null

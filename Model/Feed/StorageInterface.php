@@ -30,6 +30,11 @@ interface StorageInterface
 
     /**
      * @param FeedInterface $feed
+     */
+    public function delete(FeedInterface $feed) : void;
+
+    /**
+     * @param FeedInterface $feed
      * @return string
      */
     public function getRawContent(FeedInterface $feed) : string;

@@ -41,7 +41,7 @@ class LoadErrors
     public function execute(array $taskIds) : array
     {
         if (empty($taskIds)) {
-            throw new \Exception();
+            throw new \Exception((string) __('$taskIds cannot be empty'));
         }
         $taskIds = array_map('intval', $taskIds);
         $connection = $this->resourceConnection->getConnection();

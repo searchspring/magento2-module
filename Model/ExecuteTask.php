@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use Exception;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterfaceFactory;
@@ -11,6 +13,7 @@ use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\ExecuteTaskInterface;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Exception\GenericException;
 use SearchSpring\Feed\Model\Task\ExecutorPool;
 
 class ExecuteTask implements ExecuteTaskInterface
@@ -54,6 +57,7 @@ class ExecuteTask implements ExecuteTaskInterface
     /**
      * @param TaskInterface $task
      * @return mixed
+     * @throws CouldNotSaveException
      */
     public function execute(TaskInterface $task)
     {
@@ -66,11 +70,12 @@ class ExecuteTask implements ExecuteTaskInterface
         try {
             $result = $executor->execute($task);
             $task->setStatus(MetadataInterface::TASK_STATUS_SUCCESS);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             /** @var TaskErrorInterface $error */
             $error = $this->taskErrorFactory->create();
-            $error->setCode(0)
-                ->setMessage($exception->getMessage());
+            $code = $exception instanceof GenericException ? $exception->getCode() : GenericException::CODE;
+            $error->setMessage($exception->getMessage())
+                ->setCode($code);
             $task->setStatus(MetadataInterface::TASK_STATUS_ERROR)
                 ->setError($error);
         }

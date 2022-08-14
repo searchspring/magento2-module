@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Task\GenerateFeed;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
@@ -37,6 +38,7 @@ class UniqueChecker implements UniqueCheckerInterface
     /**
      * @param array $payload
      * @return bool
+     * @throws LocalizedException
      */
     public function check(array $payload): bool
     {
@@ -88,7 +90,7 @@ class UniqueChecker implements UniqueCheckerInterface
 
     /**
      * @return TaskInterface[]
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private function getSuitableTasks() : array
     {

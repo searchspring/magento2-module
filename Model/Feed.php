@@ -205,4 +205,23 @@ class Feed extends AbstractExtensibleModel implements FeedInterface
     {
         return $this->setData(self::FORMAT, $format);
     }
+
+    /**
+     * @return bool
+     */
+    public function getFileDeleted(): ?bool
+    {
+        return !is_null($this->getData(self::FILE_DELETED))
+            ? (bool) $this->getData(self::FILE_DELETED)
+            : null;
+    }
+
+    /**
+     * @param bool $flag
+     * @return FeedInterface
+     */
+    public function setFileDeleted(bool $flag): FeedInterface
+    {
+        return $this->setData(self::FILE_DELETED, $flag);
+    }
 }

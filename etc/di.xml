@@ -27,6 +27,10 @@
                 type="SearchSpring\Feed\Model\FeedRepository"/>
     <preference for="SearchSpring\Feed\Api\GenerateFeedInterface"
                 type="SearchSpring\Feed\Model\GenerateFeed"/>
+    <preference for="SearchSpring\Feed\Api\RemoveFeedInterface"
+                type="SearchSpring\Feed\Model\RemoveFeed"/>
+    <preference for="SearchSpring\Feed\Api\RemoveFetchedFeedsInterface"
+                type="SearchSpring\Feed\Model\RemoveFetchedFeeds"/>
     <preference for="SearchSpring\Feed\Api\ExecutePendingTasksInterface"
                 type="SearchSpring\Feed\Model\ExecutePendingTasks"/>
     <preference for="SearchSpring\Feed\Api\ExecuteTaskInterface"
@@ -45,6 +49,8 @@
                 type="SearchSpring\Feed\Model\Feed\ContextManager"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
+    <preference for="SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface"
+                type="SearchSpring\Feed\Model\Webapi\DefaultExceptionConverter"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -238,4 +244,37 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <virtualType name="SearchSpringFeedBaseLogHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/searchspring_feed.log</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedSystemLogHandler" type="Magento\Framework\Logger\Handler\System">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/searchspring_feed.log</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">SearchSpringFeedBaseLogHandler</item>
+                <item name="system" xsi:type="object">SearchSpringFeedSystemLogHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="SearchSpring\Feed\Model\ExecutePendingTasks">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\RemoveFetchedFeeds">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
 </config>

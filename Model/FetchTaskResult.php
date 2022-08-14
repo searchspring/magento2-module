@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use Magento\Framework\Exception\NoSuchEntityException;
 use SearchSpring\Feed\Api\Data\TaskResultInterface;
 use SearchSpring\Feed\Api\Data\TaskResultInterfaceFactory;
 use SearchSpring\Feed\Api\FetchTaskResultInterface;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Exception\CouldNotFetchResultException;
 use SearchSpring\Feed\Model\Task\ResultFetcherPool;
 
 class FetchTaskResult implements FetchTaskResultInterface
@@ -45,13 +47,15 @@ class FetchTaskResult implements FetchTaskResultInterface
     /**
      * @param int $id
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
+     * @throws CouldNotFetchResultException
+     * @throws \Exception
      */
     public function execute(int $id) : TaskResultInterface
     {
         $task = $this->taskRepository->get($id);
-        if (!$task->getStatus() === MetadataInterface::TASK_STATUS_SUCCESS) {
-            throw new \Exception();
+        if ($task->getStatus() !== MetadataInterface::TASK_STATUS_SUCCESS) {
+            throw new CouldNotFetchResultException($task->getStatus());
         }
 
         $fetcher = $this->resultFetcherPool->get($task->getType());

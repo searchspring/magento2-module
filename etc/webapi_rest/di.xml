@@ -9,4 +9,44 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="SearchSpring\Feed\Api\CreateTaskInterface">
+        <plugin name="SearchSpring_Feed::convert_exceptions" type="SearchSpring\Feed\Plugin\Rest\CreateTaskConvertException"/>
+    </type>
+
+    <type name="SearchSpring\Feed\Api\TaskRepositoryInterface">
+        <plugin name="SearchSpring_Feed::convert_exceptions" type="SearchSpring\Feed\Plugin\Rest\GetTaskConvertException"/>
+    </type>
+
+    <type name="SearchSpring\Feed\Api\GetStoresInfoInterface">
+        <plugin name="SearchSpring_Feed::convert_exceptions" type="SearchSpring\Feed\Plugin\Rest\GetStoreInfoConvertException"/>
+    </type>
+
+    <type name="SearchSpring\Feed\Api\FetchTaskResultInterface">
+        <plugin name="SearchSpring_Feed::convert_exceptions" type="SearchSpring\Feed\Plugin\Rest\FetchTaskResultConvertException"/>
+    </type>
+
+    <type name="SearchSpring\Feed\Plugin\Rest\CreateTaskConvertException">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Plugin\Rest\GetTaskConvertException">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Plugin\Rest\GetStoreInfoConvertException">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Plugin\Rest\FetchTaskResultConvertException">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
 </config>

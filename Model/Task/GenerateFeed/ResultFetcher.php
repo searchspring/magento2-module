@@ -8,6 +8,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\FeedRepositoryInterface;
+use SearchSpring\Feed\Exception\FeedFileDeletedException;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Task\ResultFetcherInterface;
 
@@ -40,17 +41,23 @@ class ResultFetcher implements ResultFetcherInterface
      * @return mixed
      * @throws NoSuchEntityException
      * @throws CouldNotSaveException
+     * @throws FeedFileDeletedException
      */
     public function fetch(TaskInterface $task)
     {
         $feed = $this->feedRepository->getByTaskId($task->getEntityId());
+        if ($feed->getFileDeleted()) {
+            throw new FeedFileDeletedException();
+        }
+
         $wasFetched = $feed->getFetched();
         $rawData = $this->storage->getRawContent($feed);
         $filename = basename($feed->getFilePath());
         $result = [
             'format' => $feed->getFormat(),
             'name' => $filename,
-            'data' => base64_encode($rawData)
+            'data' => base64_encode($rawData),
+            'file_deleted' => $feed->getFileDeleted()
         ];
 
         if (!$wasFetched) {

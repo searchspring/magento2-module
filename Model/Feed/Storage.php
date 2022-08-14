@@ -6,6 +6,7 @@ namespace SearchSpring\Feed\Model\Feed;
 
 use Exception;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Stdlib\DateTime\DateTime;
@@ -77,11 +78,11 @@ class Storage implements StorageInterface
     {
         $format = $feedSpecification->getFormat();
         if (!$format) {
-            throw new Exception();
+            throw new Exception((string) __('format cannot be empty'));
         }
 
         if (!$this->isSupportedFormat($format)) {
-            throw new Exception();
+            throw new Exception((string) __('%1 is not supported format'));
         }
 
         $formatter = $this->formatterPool->get($format);
@@ -107,9 +108,16 @@ class Storage implements StorageInterface
     /**
      * @param FeedInterface $feed
      * @throws FileSystemException
+     * @throws CouldNotDeleteException
      */
     public function archive(FeedInterface $feed): void
     {
+        if (!$feed->getDirectoryType() || !$feed->getFilePath()) {
+            throw new CouldNotDeleteException(
+                __('Directory path and/or file type cannot be empty for archive operation')
+            );
+        }
+
         $directory = $this->filesystem->getDirectoryWrite($feed->getDirectoryType());
         $fileName = basename($feed->getFilePath());
         $newPath = $this->generateArchiveFilePath($fileName);
@@ -148,5 +156,22 @@ class Storage implements StorageInterface
     private function generateArchiveFilePath(string $filename) : string
     {
         return $this->directory . '/archive/' . $filename;
+    }
+
+    /**
+     * @param FeedInterface $feed
+     * @throws FileSystemException
+     * @throws CouldNotDeleteException
+     */
+    public function delete(FeedInterface $feed): void
+    {
+        if (!$feed->getDirectoryType() || !$feed->getFilePath()) {
+            throw new CouldNotDeleteException(
+                __('Directory path and/or file type cannot be empty for delete operation')
+            );
+        }
+
+        $directory = $this->filesystem->getDirectoryWrite($feed->getDirectoryType());
+        $directory->delete($feed->getFilePath());
     }
 }

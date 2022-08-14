@@ -28,7 +28,7 @@ class ExecutorPool
     public function get(string $code) : ExecutorInterface
     {
         if (!isset($this->executors[$code])) {
-            throw new \Exception();
+            throw new \Exception((string) __('No task executor for type %1', $code));
         }
 
         return $this->executors[$code];

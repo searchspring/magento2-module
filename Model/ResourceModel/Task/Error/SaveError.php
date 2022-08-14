@@ -40,8 +40,8 @@ class SaveError
     public function execute(int $taskId, TaskErrorInterface $error) : void
     {
         $connection = $this->resourceConnection->getConnection();
-        if (!$error->getCode() || $error->getMessage()) {
-            throw new \Exception();
+        if (!$error->getCode() || !$error->getMessage()) {
+            throw new \Exception((string) __('error or code cannot be null'));
         }
 
         $connection->beginTransaction();
