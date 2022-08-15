@@ -8,7 +8,9 @@ use Exception;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
+use Magento\Framework\Math\Random;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use SearchSpring\Feed\Api\Data\FeedInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
@@ -41,6 +43,10 @@ class Storage implements StorageInterface
      * @var Filesystem
      */
     private $filesystem;
+    /**
+     * @var Random
+     */
+    private $random;
 
     /**
      * Storage constructor.
@@ -48,6 +54,7 @@ class Storage implements StorageInterface
      * @param WriterPool $writerPool
      * @param DateTime $dateTime
      * @param Filesystem $filesystem
+     * @param Random $random
      * @param string $directory
      * @param string $systemDirectory
      */
@@ -56,6 +63,7 @@ class Storage implements StorageInterface
         WriterPool $writerPool,
         DateTime $dateTime,
         Filesystem $filesystem,
+        Random $random,
         string $directory = 'searchspring',
         string $systemDirectory = DirectoryList::VAR_DIR
     ) {
@@ -65,6 +73,7 @@ class Storage implements StorageInterface
         $this->directory = $directory;
         $this->systemDirectory = $systemDirectory;
         $this->filesystem = $filesystem;
+        $this->random = $random;
     }
 
     /**
@@ -139,14 +148,23 @@ class Storage implements StorageInterface
     /**
      * @param FeedSpecificationInterface $feedSpecification
      * @return string
+     * @throws FileSystemException
+     * @throws LocalizedException
      */
     private function generateFilePath(FeedSpecificationInterface $feedSpecification) : string
     {
         $format = $feedSpecification->getFormat();
         $store = $feedSpecification->getStoreCode();
         $dateTime = str_replace([' ', ':'], '-', $this->dateTime->gmtDate());
+        $directory = $this->filesystem->getDirectoryWrite($this->systemDirectory);
+        $pathWithoutExtension = $this->directory . '/feed_' . $store . '_' . $dateTime;
+        $pathWithExtension = $pathWithoutExtension . '.' . $format;
+        if ($directory->isExist($pathWithExtension)) {
+            $pathWithoutExtension .= $this->random->getRandomString(10);
+            $pathWithExtension = $pathWithoutExtension . '.' . $format;
+        }
 
-        return $this->directory . '/feed_' . $store . '_' . $dateTime . '.' . $format;
+        return $pathWithExtension;
     }
 
     /**
