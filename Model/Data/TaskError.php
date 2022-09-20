@@ -33,7 +33,7 @@ class TaskError extends AbstractSimpleObject implements TaskErrorInterface
      */
     public function getMessage(): ?string
     {
-        return $this->_get(self::CODE);
+        return $this->_get(self::MESSAGE);
     }
 
     /**

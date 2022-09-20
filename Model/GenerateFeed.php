@@ -6,8 +6,6 @@ namespace SearchSpring\Feed\Model;
 
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use SearchSpring\Feed\Api\Data\FeedInterface;
-use SearchSpring\Feed\Api\Data\FeedInterfaceFactory;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\GenerateFeedInterface;
 use SearchSpring\Feed\Model\Feed\Collection\ProcessorPool;
@@ -38,10 +36,6 @@ class GenerateFeed implements GenerateFeedInterface
      */
     private $storage;
     /**
-     * @var FeedInterfaceFactory
-     */
-    private $feedFactory;
-    /**
      * @var SystemFieldsList
      */
     private $systemFieldsList;
@@ -60,7 +54,6 @@ class GenerateFeed implements GenerateFeedInterface
      * @param DataProviderPool $dataProviderPool
      * @param CollectionConfigInterface $collectionConfig
      * @param StorageInterface $storage
-     * @param FeedInterfaceFactory $feedFactory
      * @param SystemFieldsList $systemFieldsList
      * @param ContextManagerInterface $contextManager
      * @param ProcessorPool $afterLoadProcessorPool
@@ -70,7 +63,6 @@ class GenerateFeed implements GenerateFeedInterface
         DataProviderPool $dataProviderPool,
         CollectionConfigInterface $collectionConfig,
         StorageInterface $storage,
-        FeedInterfaceFactory $feedFactory,
         SystemFieldsList $systemFieldsList,
         ContextManagerInterface $contextManager,
         ProcessorPool $afterLoadProcessorPool
@@ -79,7 +71,6 @@ class GenerateFeed implements GenerateFeedInterface
         $this->dataProviderPool = $dataProviderPool;
         $this->collectionConfig = $collectionConfig;
         $this->storage = $storage;
-        $this->feedFactory = $feedFactory;
         $this->systemFieldsList = $systemFieldsList;
         $this->contextManager = $contextManager;
         $this->afterLoadProcessorPool = $afterLoadProcessorPool;
@@ -87,10 +78,9 @@ class GenerateFeed implements GenerateFeedInterface
 
     /**
      * @param FeedSpecificationInterface $feedSpecification
-     * @return FeedInterface
      * @throws \Exception
      */
-    public function execute(FeedSpecificationInterface $feedSpecification): FeedInterface
+    public function execute(FeedSpecificationInterface $feedSpecification): void
     {
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
@@ -115,15 +105,9 @@ class GenerateFeed implements GenerateFeedInterface
             $currentPageNumber++;
         }
 
-        /** @var FeedInterface $feed */
-        $feed = $this->feedFactory->create();
-        $feed->setFetched(false)
-            ->setFileDeleted(false)
-            ->setFormat($format);
-
-        $this->storage->save($data, $feed, $feedSpecification);
+        $this->storage->save($data, $feedSpecification);
         $this->contextManager->resetContext();
-        return $feed;
+        return;
     }
 
     /**

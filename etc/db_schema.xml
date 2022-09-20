@@ -31,29 +31,4 @@
                     referenceColumn="entity_id"
                     onDelete="CASCADE"/>
     </table>
-
-    <table name="searchspring_feed" resource="default" engine="innodb" comment="Searchspring Feed">
-        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="int" name="task_id" unsigned="true" nullable="false" comment="Task Id"/>
-        <column xsi:type="varchar" name="directory_type" nullable="false" length="100" comment="Directory Type"/>
-        <column xsi:type="varchar" name="format" nullable="false" length="100" comment="File Format"/>
-        <column xsi:type="varchar" name="file_path" nullable="false" length="255" comment="File Path"/>
-        <column xsi:type="smallint" name="fetched" nullable="false" default="0" comment="Was Fetched"/>
-        <column xsi:type="smallint" name="file_deleted" nullable="false" default="0" comment="Was File Deleted"/>
-        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
-                comment="Task Created At"/>
-        <constraint xsi:type="primary" referenceId="PRIMARY">
-            <column name="entity_id"/>
-        </constraint>
-        <constraint xsi:type="unique" referenceId="SEARCHSPRING_FEED_TASK_ID">
-            <column name="task_id"/>
-        </constraint>
-        <constraint xsi:type="foreign"
-                    referenceId="SEARCHSPRING_FEED_TASK_ID_SEARCHSPRING_TASK_ENTITY_ID"
-                    table="searchspring_feed"
-                    column="task_id"
-                    referenceTable="searchspring_task"
-                    referenceColumn="entity_id"
-                    onDelete="CASCADE"/>
-    </table>
 </schema>

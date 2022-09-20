@@ -20,10 +20,4 @@
             <resource ref="SearchSpring_Feed::task" />
         </resources>
     </route>
-    <route url="/V1/searchspring/task/:id/result" method="GET">
-        <service class="SearchSpring\Feed\Api\FetchTaskResultInterface" method="execute" />
-        <resources>
-            <resource ref="SearchSpring_Feed::task" />
-        </resources>
-    </route>
 </routes>

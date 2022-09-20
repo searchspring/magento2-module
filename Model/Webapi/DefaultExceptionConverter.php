@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Webapi;
 
 use Magento\Framework\Webapi\Exception;
-use SearchSpring\Feed\Exception\CouldNotFetchResultException;
 use SearchSpring\Feed\Exception\GenericException;
 use SearchSpring\Feed\Exception\NoSuchEntityException;
 use SearchSpring\Feed\Exception\UniqueTaskException;
@@ -20,7 +19,6 @@ class DefaultExceptionConverter implements ExceptionConverterInterface
     const TYPE_UNIQUE = 'unique';
     const TYPE_GENERAL = 'general';
     const TYPE_NO_SUCH_ENTITY = 'no_such_entity';
-    const TYPE_COULD_NOT_FETCH_RESULT = 'could_not_fetch_result';
     /**
      * @var array
      */
@@ -29,13 +27,11 @@ class DefaultExceptionConverter implements ExceptionConverterInterface
         self::TYPE_UNIQUE => 400,
         self::TYPE_GENERAL => 500,
         self::TYPE_NO_SUCH_ENTITY => 404,
-        self::TYPE_COULD_NOT_FETCH_RESULT => 400
     ];
     /**
      * @var array
      */
     private $typeMap = [
-        CouldNotFetchResultException::class => self::TYPE_COULD_NOT_FETCH_RESULT,
         ValidationException::class => self::TYPE_VALIDATION,
         UniqueTaskException::class => self::TYPE_UNIQUE,
         NoSuchEntityException::class => self::TYPE_NO_SUCH_ENTITY,

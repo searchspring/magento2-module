@@ -70,7 +70,7 @@ class ExecuteTask implements ExecuteTaskInterface
         try {
             $result = $executor->execute($task);
             $task->setStatus(MetadataInterface::TASK_STATUS_SUCCESS);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             /** @var TaskErrorInterface $error */
             $error = $this->taskErrorFactory->create();
             $code = $exception instanceof GenericException ? $exception->getCode() : GenericException::CODE;

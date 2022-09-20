@@ -69,6 +69,11 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      *
      */
     const MEDIA_GALLERY_SPECIFICATION = 'media_gallery_specification';
+
+    /**
+     *
+     */
+    const PRE_SIGNED_URL = 'presigned_url';
     /**
      * @return string|null
      */
@@ -231,6 +236,17 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      * @return FeedSpecificationInterface
      */
     public function setMediaGallerySpecification(MediaGallerySpecificationInterface $specification) : self;
+
+    /**
+     * @return string|null
+     */
+    public function getPreSignedUrl() : ?string;
+
+    /**
+     * @param string $url
+     * @return FeedSpecificationInterface
+     */
+    public function setPreSignedUrl(string $url) : self;
 
     /**
      * @return \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface|null

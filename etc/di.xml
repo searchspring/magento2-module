@@ -9,10 +9,6 @@
                 type="SearchSpring\Feed\Model\Data\TaskError"/>
     <preference for="SearchSpring\Feed\Api\Data\TaskSearchResultsInterface"
                 type="SearchSpring\Feed\Model\TaskSearchResults"/>
-    <preference for="SearchSpring\Feed\Api\Data\FeedInterface"
-                type="SearchSpring\Feed\Model\Feed"/>
-    <preference for="SearchSpring\Feed\Api\Data\FeedSearchResultsInterface"
-                type="SearchSpring\Feed\Model\FeedSearchResults"/>
     <preference for="SearchSpring\Feed\Api\Data\FeedSpecificationInterface"
                 type="SearchSpring\Feed\Model\Feed\Specification\Feed"/>
     <preference for="SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface"
@@ -21,16 +17,8 @@
                 type="SearchSpring\Feed\Model\TaskRepository"/>
     <preference for="SearchSpring\Feed\Api\CreateTaskInterface"
                 type="SearchSpring\Feed\Model\CreateTask"/>
-    <preference for="SearchSpring\Feed\Api\FetchTaskResultInterface"
-                type="SearchSpring\Feed\Model\FetchTaskResult"/>
-    <preference for="SearchSpring\Feed\Api\FeedRepositoryInterface"
-                type="SearchSpring\Feed\Model\FeedRepository"/>
     <preference for="SearchSpring\Feed\Api\GenerateFeedInterface"
                 type="SearchSpring\Feed\Model\GenerateFeed"/>
-    <preference for="SearchSpring\Feed\Api\RemoveFeedInterface"
-                type="SearchSpring\Feed\Model\RemoveFeed"/>
-    <preference for="SearchSpring\Feed\Api\RemoveFetchedFeedsInterface"
-                type="SearchSpring\Feed\Model\RemoveFetchedFeeds"/>
     <preference for="SearchSpring\Feed\Api\ExecutePendingTasksInterface"
                 type="SearchSpring\Feed\Model\ExecutePendingTasks"/>
     <preference for="SearchSpring\Feed\Api\ExecuteTaskInterface"
@@ -44,13 +32,17 @@
     <preference for="SearchSpring\Feed\Model\Feed\CollectionConfigInterface"
                 type="SearchSpring\Feed\Model\Feed\CollectionConfig"/>
     <preference for="SearchSpring\Feed\Model\Feed\StorageInterface"
-                type="SearchSpring\Feed\Model\Feed\Storage"/>
+                type="SearchSpring\Feed\Model\Feed\Storage\PreSignedUrlStorage"/>
     <preference for="SearchSpring\Feed\Model\Feed\ContextManagerInterface"
                 type="SearchSpring\Feed\Model\Feed\ContextManager"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
     <preference for="SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface"
                 type="SearchSpring\Feed\Model\Webapi\DefaultExceptionConverter"/>
+    <preference for="SearchSpring\Feed\Model\Aws\Client\ClientInterface"
+                type="SearchSpring\Feed\Model\Aws\Client\Client"/>
+    <preference for="SearchSpring\Feed\Model\Aws\Client\ResponseInterface"
+                type="SearchSpring\Feed\Model\Aws\Client\Response"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -82,6 +74,12 @@
                 <item name="store" xsi:type="array">
                     <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Task\Validator\StoreValidator</item>
                 </item>
+                <item name="not_empty" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpringFeedTaskValidatorFeedGenerationNotEmpty</item>
+                </item>
+                <item name="url_required" xsi:type="array">
+                    <item name="objectInstance" xsi:type="object">SearchSpringFeedTaskValidatorFeedGenerationUrlRequired</item>
+                </item>
                 <item name="bool" xsi:type="array">
                     <item name="objectInstance" xsi:type="object">SearchSpringFeedTaskValidatorFeedGenerationBool</item>
                 </item>
@@ -95,6 +93,23 @@
                     <item name="objectInstance" xsi:type="object">SearchSpring\Feed\Model\Feed\Validator\FormatValidator</item>
                 </item>
             </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationNotEmpty" type="SearchSpring\Feed\Model\Task\Validator\NotEmptyValidator">
+        <arguments>
+            <argument name="fields" xsi:type="array">
+                <item name="PreSignedUrl" xsi:type="string">PreSignedUrl</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationUrlRequired" type="SearchSpring\Feed\Model\Task\Validator\UrlValidator">
+        <arguments>
+            <argument name="fields" xsi:type="array">
+                <item name="PreSignedUrl" xsi:type="string">PreSignedUrl</item>
+            </argument>
+            <argument name="fieldRequired" xsi:type="boolean">true</argument>
         </arguments>
     </virtualType>
 
@@ -161,28 +176,11 @@
         </arguments>
     </type>
 
-    <type name="SearchSpring\Feed\Model\Feed\Storage\WriterPool">
-        <arguments>
-            <argument name="writers" xsi:type="array">
-                <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Writer\Csv</item>
-                <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Writer\Json</item>
-            </argument>
-        </arguments>
-    </type>
-
     <type name="SearchSpring\Feed\Model\Feed\Storage\FormatterPool">
         <arguments>
             <argument name="formatters" xsi:type="array">
                 <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Csv</item>
                 <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Json</item>
-            </argument>
-        </arguments>
-    </type>
-
-    <type name="SearchSpring\Feed\Model\Task\ResultFetcherPool">
-        <arguments>
-            <argument name="fetchers" xsi:type="array">
-                <item name="feed_generation" xsi:type="object">SearchSpring\Feed\Model\Task\GenerateFeed\ResultFetcher</item>
             </argument>
         </arguments>
     </type>
@@ -267,12 +265,6 @@
     </virtualType>
 
     <type name="SearchSpring\Feed\Model\ExecutePendingTasks">
-        <arguments>
-            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
-        </arguments>
-    </type>
-
-    <type name="SearchSpring\Feed\Model\RemoveFetchedFeeds">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>

@@ -11,7 +11,7 @@ interface FormatterInterface
     /**
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
-     * @return array
+     * @return string
      */
-    public function format(array $data, FeedSpecificationInterface $feedSpecification) : array;
+    public function format(array $data, FeedSpecificationInterface $feedSpecification) : string;
 }

@@ -10,8 +10,5 @@
         <job name="searchspring_task_execution" instance="SearchSpring\Feed\Cron\ExecuteTasks" method="execute">
             <schedule>* * * * *</schedule>
         </job>
-        <job name="searchspring_fetched_feed_remove" instance="SearchSpring\Feed\Cron\RemoveFetchedFeeds" method="execute">
-            <schedule>0 0 * * *</schedule>
-        </job>
     </group>
 </config>

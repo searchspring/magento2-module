@@ -119,12 +119,12 @@ interface TaskInterface extends ExtensibleDataInterface
     public function setEndedAt(string $date) : self;
 
     /**
-     * @return TaskErrorInterface|null
+     * @return \SearchSpring\Feed\Api\Data\TaskErrorInterface|null
      */
     public function getError() : ?TaskErrorInterface;
 
     /**
-     * @param TaskErrorInterface $error
+     * @param \SearchSpring\Feed\Api\Data\TaskErrorInterface $error
      * @return TaskInterface
      */
     public function setError(TaskErrorInterface $error) : self;

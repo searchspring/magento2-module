@@ -298,4 +298,21 @@ class Feed extends AbstractExtensibleObject implements FeedSpecificationInterfac
     {
         return $this->_setExtensionAttributes($extensionAttributes);
     }
+
+    /**
+     * @return string|null
+     */
+    public function getPreSignedUrl(): ?string
+    {
+        return $this->_get(self::PRE_SIGNED_URL);
+    }
+
+    /**
+     * @param string $url
+     * @return FeedSpecificationInterface
+     */
+    public function setPreSignedUrl(string $url): FeedSpecificationInterface
+    {
+        return $this->setData(self::PRE_SIGNED_URL, $url);
+    }
 }

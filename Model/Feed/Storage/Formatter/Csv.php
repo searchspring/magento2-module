@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\Storage\Formatter;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Math\Random;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\Storage\FormatterInterface;
@@ -14,29 +19,56 @@ class Csv implements FormatterInterface
      * @var JsonSerializer
      */
     private $json;
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+    /**
+     * @var Random
+     */
+    private $random;
 
     /**
      * Csv constructor.
      * @param JsonSerializer $json
+     * @param Filesystem $filesystem
+     * @param Random $random
      */
     public function __construct(
-        JsonSerializer $json
+        JsonSerializer $json,
+        Filesystem $filesystem,
+        Random $random
     ) {
         $this->json = $json;
+        $this->filesystem = $filesystem;
+        $this->random = $random;
     }
 
     /**
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
-     * @return array
+     * @return string
+     * @throws FileSystemException
+     * @throws LocalizedException
      */
-    public function format(array $data, FeedSpecificationInterface $feedSpecification): array
+    public function format(array $data, FeedSpecificationInterface $feedSpecification): string
     {
         $columns = $this->getColumns($data);
-        $result[] = $columns;
+        $formattedData[] = $columns;
         foreach ($data as $item) {
-            $result[] = $this->formatRow($item, $columns, $feedSpecification);
+            $formattedData[] = $this->formatRow($item, $columns, $feedSpecification);
         }
+
+        $directory = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
+        $filename = $this->random->getRandomString(32);
+        $file = $directory->openFile($filename);
+        foreach ($formattedData as $item) {
+            $file->writeCsv($item);
+        }
+
+        $result = $file->readAll();
+        $file->close();
+        $directory->delete($filename);
 
         return $result;
     }
