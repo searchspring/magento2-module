@@ -42,7 +42,7 @@ class SpecificationBuilder implements SpecificationBuilderInterface
         'keepAspectRatio' => MediaGallerySpecificationInterface::KEEP_ASPECT_RATIO,
         'imageTypes' => MediaGallerySpecificationInterface::IMAGE_TYPES,
         'includeMediaGallery' => MediaGallerySpecificationInterface::INCLUDE_MEDIA_GALLERY,
-        'PreSignedUrl' => FeedSpecificationInterface::PRE_SIGNED_URL
+        'preSignedUrl' => FeedSpecificationInterface::PRE_SIGNED_URL
     ];
     /**
      * @var array

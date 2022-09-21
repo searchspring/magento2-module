@@ -99,7 +99,7 @@
     <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationNotEmpty" type="SearchSpring\Feed\Model\Task\Validator\NotEmptyValidator">
         <arguments>
             <argument name="fields" xsi:type="array">
-                <item name="PreSignedUrl" xsi:type="string">PreSignedUrl</item>
+                <item name="preSignedUrl" xsi:type="string">preSignedUrl</item>
             </argument>
         </arguments>
     </virtualType>
@@ -107,7 +107,7 @@
     <virtualType name="SearchSpringFeedTaskValidatorFeedGenerationUrlRequired" type="SearchSpring\Feed\Model\Task\Validator\UrlValidator">
         <arguments>
             <argument name="fields" xsi:type="array">
-                <item name="PreSignedUrl" xsi:type="string">PreSignedUrl</item>
+                <item name="preSignedUrl" xsi:type="string">preSignedUrl</item>
             </argument>
             <argument name="fieldRequired" xsi:type="boolean">true</argument>
         </arguments>
