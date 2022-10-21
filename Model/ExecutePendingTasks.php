@@ -64,7 +64,7 @@ class ExecutePendingTasks implements ExecutePendingTasksInterface
         $result = [];
         foreach ($taskList->getItems() as $task) {
             try {
-                $result[] = $this->executeTask->execute($task);
+                $result[$task->getEntityId()] = $this->executeTask->execute($task);
             } catch (\Throwable $exception) {
                 $this->logger->error($exception->getMessage(), ['trace' => $exception->getTraceAsString()]);
             }
