@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Aws;
 
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
-use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Exception\ClientException;
 use SearchSpring\Feed\Model\Aws\Client\ClientInterface;
 use SearchSpring\Feed\Model\Aws\Client\ResponseInterface;
@@ -16,13 +15,6 @@ class PreSignedUrl
      * @var ClientInterface
      */
     private $client;
-    /**
-     * @var array
-     */
-    private $contentTypeMap = [
-        MetadataInterface::FORMAT_CSV => 'text/csv',
-        MetadataInterface::FORMAT_JSON => 'application/json'
-    ];
     /**
      * @var array
      */
@@ -43,7 +35,6 @@ class PreSignedUrl
     /**
      * PreSignedUrl constructor.
      * @param ClientInterface $client
-     * @param array $contentTypeMap
      * @param array $retryCodes
      * @param array $successCodes
      * @param int $retryCount
@@ -51,14 +42,12 @@ class PreSignedUrl
      */
     public function __construct(
         ClientInterface $client,
-        array $contentTypeMap = [],
         array $retryCodes = [],
         array $successCodes = [],
         int $retryCount = 5,
         int $repeatDelay = 30
     ) {
         $this->client = $client;
-        $this->contentTypeMap = array_merge($this->contentTypeMap, $contentTypeMap);
         $this->retryCodes = array_merge($this->retryCodes, $retryCodes);
         $this->successCodes = array_merge($this->successCodes, $successCodes);
         $this->retryCount = $retryCount;
@@ -77,13 +66,7 @@ class PreSignedUrl
             throw new \Exception();
         }
 
-        $format = $feedSpecification->getFormat();
-        $headers = [];
-//        if (isset($this->contentTypeMap[$format])) {
-//            $headers['Content-Type'] = $this->contentTypeMap[$format];
-//        }
-
-        $this->doRequest($url, $headers, $content);
+        $this->doRequest($url, [], $content);
     }
 
     /**

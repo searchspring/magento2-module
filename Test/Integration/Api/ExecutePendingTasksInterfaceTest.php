@@ -65,6 +65,7 @@ class ExecutePendingTasksInterfaceTest extends TestCase
         $this->assertCount(1, $result);
         $task = $this->taskRepository->get($task->getEntityId());
         $this->assertEquals(MetadataInterface::TASK_STATUS_SUCCESS, $task->getStatus());
+        $this->taskRepository->delete($task);
     }
     /**
      * @magentoAppIsolation enabled
