@@ -46,7 +46,7 @@ class PreSignedUrlStorage implements StorageInterface
         }
 
         if (!$this->isSupportedFormat($format)) {
-            throw new Exception((string) __('%1 is not supported format'));
+            throw new Exception((string) __('%1 is not supported format', $format));
         }
 
         $formatter = $this->formatterPool->get($format);

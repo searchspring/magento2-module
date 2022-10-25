@@ -13,7 +13,9 @@ $payload = [
 /** @var TaskInterface $task */
 $task = $objectManager->create(TaskInterface::class);
 $task->setPayload($payload)
+    ->setEntityId(1)
     ->setType(MetadataInterface::FEED_GENERATION_TASK_CODE)
-    ->setStatus(MetadataInterface::TASK_STATUS_PENDING);
+    ->setStatus(MetadataInterface::TASK_STATUS_PENDING)
+    ->setIsObjectNew(true);
 
 $taskRepository->save($task);

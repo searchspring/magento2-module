@@ -12,7 +12,7 @@ $objectManager = Bootstrap::getObjectManager();
 $taskRepository = $objectManager->get(TaskRepositoryInterface::class);
 /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
 $searchCriteriaBuilder = $objectManager->get(SearchCriteriaBuilder::class);
-$searchCriteria = $searchCriteriaBuilder->addFilter(TaskInterface::STATUS,MetadataInterface::TASK_STATUS_PENDING)
+$searchCriteria = $searchCriteriaBuilder->addFilter(TaskInterface::ENTITY_ID,1)
     ->create();
 foreach ($taskRepository->getList($searchCriteria)->getItems() as $task) {
     $taskRepository->delete($task);

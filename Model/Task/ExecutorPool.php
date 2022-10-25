@@ -24,6 +24,7 @@ class ExecutorPool
     /**
      * @param string $code
      * @return ExecutorInterface
+     * @throws \Exception
      */
     public function get(string $code) : ExecutorInterface
     {
