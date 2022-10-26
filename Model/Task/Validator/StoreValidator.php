@@ -57,6 +57,8 @@ class StoreValidator implements ValidatorInterface
         $errors = [];
         if (!isset($payload[$this->field]) && !$this->fieldRequired) {
             return $this->createValidationResult->create($errors);
+        } elseif (!isset($payload[$this->field]) && $this->fieldRequired) {
+            return $this->createValidationResult->create([(string) __('%1 field is required', $this->field)]);
         }
 
         $value = $payload[$this->field];

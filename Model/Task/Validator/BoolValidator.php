@@ -48,9 +48,12 @@ class BoolValidator implements ValidatorInterface
         foreach ($this->fields as $field) {
             if (!isset($payload[$field]) && !$this->fieldRequired) {
                 continue;
+            } elseif (!isset($payload[$field]) && $this->fieldRequired) {
+                $errors[] = (string) __('%1 field is required', $field);
+                continue;
             }
 
-            $value = $payload[$field];
+            $value = $payload[$field] ?? null;
             if (!is_bool($value) && $value !== 0 && $value !== 1 && $value !== '0' && $value !== '1') {
                 $errors[] = (string)__('"%1" field value must be "0" or "1"', $field);
             }

@@ -56,9 +56,12 @@ class UrlValidator implements ValidatorInterface
         foreach ($this->fields as $field) {
             if (!isset($payload[$field]) && !$this->fieldRequired) {
                 continue;
+            } elseif (!isset($payload[$field]) && $this->fieldRequired) {
+                $errors[] = (string) __('%1 field is required', $field);
+                continue;
             }
 
-            $value = $payload[$field];
+            $value = $payload[$field] ?? null;
             if (!$this->urlValidator->isValid((string) $value, ['http', 'https'])) {
                 $errors[] = (string)__('"%1" field value must be valid url address', $field);
             }
