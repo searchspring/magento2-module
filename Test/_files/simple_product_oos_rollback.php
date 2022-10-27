@@ -28,23 +28,7 @@ $registry->register('isSecureArea', true);
 $productIds = [];
 
 try {
-    $product = $productRepository->get('searchspring_simple_1', false, null, true);
-    $productRepository->delete($product);
-    $productIds[] = $product->getId();
-    $criteria = $stockStatusCriteriaFactory->create();
-    $criteria->setProductsFilter($product->getId());
-
-    $result = $stockStatusRepository->getList($criteria);
-    if ($result->getTotalCount()) {
-        $stockStatus = current($result->getItems());
-        $stockStatusRepository->delete($stockStatus);
-    }
-} catch (NoSuchEntityException $exception) {
-    //Product already removed
-}
-
-try {
-    $product = $productRepository->get('searchspring_simple_2', false, null, true);
+    $product = $productRepository->get('searchspring_simple_oos', false, null, true);
     $productRepository->delete($product);
     $productIds[] = $product->getId();
     $criteria = $stockStatusCriteriaFactory->create();

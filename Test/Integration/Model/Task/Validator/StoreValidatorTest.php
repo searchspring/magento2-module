@@ -67,7 +67,8 @@ class StoreValidatorTest extends TestCase
         $result = $this->storeValidator->validate($payload);
         $this->assertFalse($result->isValid());
         $this->assertNotEmpty($result->getErrors());
-        $error = array_pop($result->getErrors());
+        $errors = $result->getErrors();
+        $error = array_pop($errors);
         $this->assertEquals((string) __('Store "%1" doesn\'t exist', $storeCode), $error);
     }
     /**
@@ -81,7 +82,8 @@ class StoreValidatorTest extends TestCase
         $result = $this->storeValidator->validate($payload);
         $this->assertFalse($result->isValid());
         $this->assertNotEmpty($result->getErrors());
-        $error = array_pop($result->getErrors());
+        $errors = $result->getErrors();
+        $error = array_pop($errors);
         $this->assertEquals((string) __('Store "%1" is not active', $storeCode), $error);
     }
 }
