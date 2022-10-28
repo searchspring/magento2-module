@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Test\Integration\Model\Feed\Collection;
 
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\TestFramework\Helper\Bootstrap;
 use PHPUnit\Framework\TestCase;
@@ -38,14 +39,42 @@ class TierPriceProcessorTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_tierprice.php
+     */
     public function testProcess() : void
     {
-
+        $specification = $this->specificationBuilder->build(['includeTierPricing' => true]);
+        $collection = $this->getCollection();
+        $this->tierPriceProcessor->process($collection, $specification);
+        $this->assertTrue($collection->getFlag('tier_price_added'));
+        foreach ($collection as $item) {
+            /** @var $item Product */
+            if ($item->getSku() === 'searchspring_simple_1') {
+                $this->assertNotEmpty($item->getTierPrices());
+                $this->assertNotEmpty($item->getData('tier_price'));
+            } else {
+                $this->assertEmpty($item->getTierPrices());
+                $this->assertEmpty($item->getData('tier_price'));
+            }
+        }
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_tierprice.php
+     */
     public function testProcessWithAddTierPriceDataIsFalse() : void
     {
-
+        $specification = $this->specificationBuilder->build(['includeTierPricing' => false]);
+        $collection = $this->getCollection();
+        $this->tierPriceProcessor->process($collection, $specification);
+        $this->assertNull($collection->getFlag('tier_price_added'));
+        foreach ($collection as $item) {
+            /** @var $item Product */
+            $this->assertNull($item->getData('tier_price'));
+        }
     }
 
     /**

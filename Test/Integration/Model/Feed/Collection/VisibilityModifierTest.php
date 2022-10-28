@@ -38,9 +38,29 @@ class VisibilityModifierTest extends TestCase
         parent::setUp();
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_product_not_visible.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_product_visibility_catalog.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_product_visibility_search.php
+     */
     public function testModify() : void
     {
+        $specification = $this->specificationBuilder->build([]);
+        $collection = $this->getCollection();
+        $this->visibilityModifier->modify($collection, $specification);
+        $skus = [];
+        foreach ($collection as $item) {
+            $skus[] = $item->getSku();
+        }
 
+        $this->assertTrue(!in_array('searchspring_simple_not_visible', $skus));
+        $this->assertTrue(in_array('searchspring_simple_visibility_catalog', $skus));
+        $this->assertTrue(in_array('searchspring_simple_visibility_search', $skus));
+        $this->assertTrue(in_array('searchspring_simple_1', $skus));
+        $this->assertTrue(in_array('searchspring_simple_2', $skus));
     }
 
     /**
