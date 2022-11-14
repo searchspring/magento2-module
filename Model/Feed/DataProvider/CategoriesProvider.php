@@ -61,7 +61,7 @@ class CategoriesProvider implements DataProviderInterface
         }
 
         if (empty($productIds)) {
-            return [];
+            return $products;
         }
 
         $ignoredFields = $feedSpecification->getIgnoreFields();
@@ -121,12 +121,12 @@ class CategoriesProvider implements DataProviderInterface
                 continue;
             }
 
-            $ids[] = (int) $productCategory['category_id'];
             $category = $this->categoriesData[$categoryId] ?? null;
             if (!$category) {
                 continue;
             }
 
+            $ids[] = (int) $productCategory['category_id'];
             $categoryNames[] = $category['name'];
             $categoryHierarchy = array_merge($categoryHierarchy, $category['hierarchy']);
             if (isset($category['include_menu']) ?? $category['include_menu']) {

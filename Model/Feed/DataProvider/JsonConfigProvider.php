@@ -61,14 +61,16 @@ class JsonConfigProvider implements DataProviderInterface
             if(ConfigurableType::TYPE_CODE === $productModel->getTypeId()) {
                 if (!in_array('json_config', $ignoredFields)) {
                     $configurableBlock = $this->getConfigurableBlock();
+                    $configurableBlock->unsetData();
                     $configurableBlock->setProduct($productModel);
                     $product['json_config'] = $configurableBlock->getJsonConfig();
                 }
 
                 if (!in_array('swatch_json_config', $ignoredFields)) {
-                    $configurableBlock = $this->getSwatchesBlock();
-                    $configurableBlock->setProduct($productModel);
-                    $product['swatch_json_config'] = $configurableBlock->getJsonSwatchConfig();
+                    $swatchesBlock = $this->getSwatchesBlock();
+                    $swatchesBlock->unsetData();
+                    $swatchesBlock->setProduct($productModel);
+                    $product['swatch_json_config'] = $swatchesBlock->getJsonSwatchConfig();
                 }
             }
         }
