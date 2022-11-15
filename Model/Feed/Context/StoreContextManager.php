@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\Context;
 
+use Magento\Framework\App\Area;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
@@ -46,7 +47,7 @@ class StoreContextManager implements ContextManagerInterface
         }
 
         $store = $this->storeManager->getStore($storeCode);
-        $this->emulation->startEnvironmentEmulation((int) $store->getId());
+        $this->emulation->startEnvironmentEmulation((int) $store->getId(), Area::AREA_FRONTEND, true);
     }
 
     /**
