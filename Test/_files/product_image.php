@@ -21,7 +21,7 @@ $targetTmpDirPath = $mediaConfig->getBaseTmpMediaPath() . str_replace('/', DIREC
 $mediaDirectory->create($targetDirPath);
 $mediaDirectory->create($targetTmpDirPath);
 
-$images = ['magento_image.jpg', 'magento_small_image.jpg', 'magento_thumbnail.jpg'];
+$images = ['magento_image.jpg', 'magento_small_image.jpg', 'magento_thumbnail.jpg', 'magento_image_additional.jpg', 'magento_image_additional_disabled.jpg'];
 foreach ($images as $image) {
     $targetTmpFilePath = $mediaDirectory->getAbsolutePath() . $targetTmpDirPath . $image;
 

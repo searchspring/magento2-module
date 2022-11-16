@@ -45,6 +45,20 @@ foreach ($productRepository->getList($searchCriteria)->getItems() as $product) {
                 'disabled' => 0,
                 'media_type' => 'image'
             ],
+            [
+                'file' => '/m/a/magento_image_additional.jpg',
+                'position' => 4,
+                'label' => 'Additional Image Alt Text',
+                'disabled' => 0,
+                'media_type' => 'image'
+            ],
+            [
+                'file' => '/m/a/magento_image_additional_disabled.jpg',
+                'position' => 5,
+                'label' => 'Disabled Image Alt Text',
+                'disabled' => 1,
+                'media_type' => 'image'
+            ],
         ]])
         ->setCanSaveCustomOptions(true);
     $product->save();
