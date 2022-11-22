@@ -37,6 +37,8 @@
                 type="SearchSpring\Feed\Model\Feed\ContextManager"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
+    <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolverInterface"
+                type="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolver"/>
     <preference for="SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface"
                 type="SearchSpring\Feed\Model\Webapi\DefaultExceptionConverter"/>
     <preference for="SearchSpring\Feed\Model\Aws\Client\ClientInterface"
@@ -219,6 +221,15 @@
         </arguments>
     </type>
 
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolver">
+        <arguments>
+            <argument name="priceProviders" xsi:type="array">
+                <item name="configurable" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\Price\ConfigurablePriceProvider</item>
+            </argument>
+            <argument name="basePriceProvider" xsi:type="object">SearchSpring\Feed\Model\Feed\DataProvider\Price\BasePriceProvider</argument>
+        </arguments>
+    </type>
+
     <type name="SearchSpring\Feed\Model\Feed\ContextManager">
         <arguments>
             <argument name="processors" xsi:type="array">
@@ -267,6 +278,26 @@
     <type name="SearchSpring\Feed\Model\ExecutePendingTasks">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\ExecuteTask">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SearchSpringFeedGenerateFeedConfigurableChildStorage" type="SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage" />
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\ConfigurableProductsProvider">
+        <arguments>
+            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Price\ConfigurablePriceProvider">
+        <arguments>
+            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
         </arguments>
     </type>
 </config>

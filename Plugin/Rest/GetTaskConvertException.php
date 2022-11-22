@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Plugin\Rest;
 
+use Magento\Framework\Exception\NoSuchEntityException as OriginalNoSuchEntityException;
 use Magento\Framework\Webapi\Exception;
 use Psr\Log\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
@@ -47,9 +48,9 @@ class GetTaskConvertException
     {
         try {
             $result = $proceed($id);
-        } catch (NoSuchEntityException $exception) {
+        } catch (OriginalNoSuchEntityException $exception) {
             $this->logger->error($exception->getMessage(), ['trace' => $exception->getTraceAsString()]);
-            $newException = new NoSuchEntityException($exception->getMessage(), 0, $exception);
+            $newException = new NoSuchEntityException($exception->getMessage(), NoSuchEntityException::CODE, $exception);
             $convertedException = $this->exceptionConverter->convert($newException);
             throw $convertedException;
         } catch (Throwable $exception) {

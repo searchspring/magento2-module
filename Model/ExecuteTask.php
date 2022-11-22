@@ -7,6 +7,7 @@ namespace SearchSpring\Feed\Model;
 use Exception;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
+use Psr\Log\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterfaceFactory;
 use SearchSpring\Feed\Api\Data\TaskInterface;
@@ -34,6 +35,10 @@ class ExecuteTask implements ExecuteTaskInterface
      * @var TaskErrorInterfaceFactory
      */
     private $taskErrorFactory;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * ExecuteTask constructor.
@@ -41,17 +46,20 @@ class ExecuteTask implements ExecuteTaskInterface
      * @param TaskRepositoryInterface $taskRepository
      * @param DateTime $dateTime
      * @param TaskErrorInterfaceFactory $taskErrorFactory
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ExecutorPool $executorPool,
         TaskRepositoryInterface $taskRepository,
         DateTime $dateTime,
-        TaskErrorInterfaceFactory $taskErrorFactory
+        TaskErrorInterfaceFactory $taskErrorFactory,
+        LoggerInterface $logger
     ) {
         $this->executorPool = $executorPool;
         $this->taskRepository = $taskRepository;
         $this->dateTime = $dateTime;
         $this->taskErrorFactory = $taskErrorFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -74,6 +82,7 @@ class ExecuteTask implements ExecuteTaskInterface
             /** @var TaskErrorInterface $error */
             $error = $this->taskErrorFactory->create();
             $code = $exception instanceof GenericException ? $exception->getCode() : GenericException::CODE;
+            $this->logger->error($exception->getMessage(), ['trace' => $exception->getTraceAsString()]);
             $error->setMessage($exception->getMessage())
                 ->setCode($code);
             $task->setStatus(MetadataInterface::TASK_STATUS_ERROR)

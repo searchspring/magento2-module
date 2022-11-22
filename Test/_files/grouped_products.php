@@ -25,7 +25,7 @@ foreach ($productIds as $productId) {
         ->setAttributeSetId(4)
         ->setName('SearchSpring Grouped Test Simple ' . $productId)
         ->setSku('searchspring_grouped_test_simple_' . $productId)
-        ->setPrice(100)
+        ->setPrice((int) $productId)
         ->setVisibility(Visibility::VISIBILITY_BOTH)
         ->setStatus(Status::STATUS_ENABLED)
         ->setStockData(['use_config_manage_stock' => 1, 'qty' => 100, 'is_qty_decimal' => 0, 'is_in_stock' => 1])
@@ -39,7 +39,6 @@ foreach ($productIds as $productId) {
 $product = $objectManager->create(Product::class);
 
 $product->setTypeId(Grouped::TYPE_CODE)
-    ->setId(1)
     ->setWebsiteIds([1])
     ->setAttributeSetId(4)
     ->setName('SearchSpring Grouped Test Grouped Product')
@@ -75,7 +74,7 @@ foreach ($productIds as $productId) {
         ->setAttributeSetId(4)
         ->setName('SearchSpring Grouped 2 Test Simple ' . $productId)
         ->setSku('searchspring_grouped_test_simple_' . $productId)
-        ->setPrice(100)
+        ->setPrice((int) $productId)
         ->setVisibility(Visibility::VISIBILITY_BOTH)
         ->setStatus(Status::STATUS_ENABLED)
         ->setStockData(['use_config_manage_stock' => 1, 'qty' => 100, 'is_qty_decimal' => 0, 'is_in_stock' => 1])
@@ -89,10 +88,9 @@ foreach ($productIds as $productId) {
 $product = $objectManager->create(Product::class);
 
 $product->setTypeId(Grouped::TYPE_CODE)
-    ->setId(1)
     ->setWebsiteIds([1])
     ->setAttributeSetId(4)
-    ->setName('SearchSpring Grouped Test Grouped Product')
+    ->setName('SearchSpring Grouped Test Grouped Product 2')
     ->setSku('searchspring_grouped_test_grouped_2')
     ->setVisibility(Visibility::VISIBILITY_BOTH)
     ->setStatus(Status::STATUS_ENABLED)

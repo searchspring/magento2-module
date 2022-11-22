@@ -48,18 +48,16 @@ class GetChildCollection
             $collection->setProductFilter($product);
         }
 
-        if (!in_array(ProductInterface::STATUS, $attributeCodes)) {
-            $attributeCodes[] = ProductInterface::STATUS;
-        }
+        $defaultAttributes = [
+            ProductInterface::STATUS,
+            ProductInterface::SKU,
+            ProductInterface::NAME,
+            'special_price',
+            'special_to_date',
+            'special_from_date'
+        ];
 
-        if (!in_array(ProductInterface::SKU, $attributeCodes)) {
-            $attributeCodes[] = ProductInterface::SKU;
-        }
-
-        if (!in_array(ProductInterface::NAME, $attributeCodes)) {
-            $attributeCodes[] = ProductInterface::NAME;
-        }
-
+        $attributeCodes = array_unique(array_merge($attributeCodes, $defaultAttributes));
         $collection->addAttributeToSelect($attributeCodes);
         $collection->addAttributeToFilter(
             ProductInterface::STATUS,

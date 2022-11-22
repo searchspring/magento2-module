@@ -15,6 +15,7 @@ use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ChildAttributesProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
+use SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage;
 use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetAttributesCollection;
 use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
@@ -46,6 +47,10 @@ class ConfigurableProductsProvider implements DataProviderInterface
      * @var ValueProcessor
      */
     private $valueProcessor;
+    /**
+     * @var ChildStorage
+     */
+    private $childStorage;
 
     /**
      * ConfigurableProductsProvider constructor.
@@ -55,6 +60,7 @@ class ConfigurableProductsProvider implements DataProviderInterface
      * @param ChildAttributesProvider $childAttributesProvider
      * @param GetChildProductsData $getChildProductsData
      * @param ValueProcessor $valueProcessor
+     * @param ChildStorage $childStorage
      */
     public function __construct(
         GetAttributesCollection $getAttributesCollection,
@@ -62,7 +68,8 @@ class ConfigurableProductsProvider implements DataProviderInterface
         MetadataPool $metadataPool,
         ChildAttributesProvider $childAttributesProvider,
         GetChildProductsData $getChildProductsData,
-        ValueProcessor $valueProcessor
+        ValueProcessor $valueProcessor,
+        ChildStorage $childStorage
     ) {
         $this->getAttributesCollection = $getAttributesCollection;
         $this->getChildCollection = $getChildCollection;
@@ -70,6 +77,7 @@ class ConfigurableProductsProvider implements DataProviderInterface
         $this->childAttributesProvider = $childAttributesProvider;
         $this->getChildProductsData = $getChildProductsData;
         $this->valueProcessor = $valueProcessor;
+        $this->childStorage = $childStorage;
     }
 
     /**
@@ -93,6 +101,7 @@ class ConfigurableProductsProvider implements DataProviderInterface
         }, $childAttributes);
         $childProductsCollection = $this->getChildCollection->execute($configurableProducts, $childAttributeCodes);
         $childProducts = $this->processChildProducts($childProductsCollection->getItems());
+        $this->childStorage->set($childProducts);
         foreach ($products as &$product) {
             /** @var Product $productModel */
             $productModel = $product['product_model'] ?? null;
@@ -230,5 +239,6 @@ class ConfigurableProductsProvider implements DataProviderInterface
     {
         $this->childAttributesProvider->reset();
         $this->valueProcessor->reset();
+        $this->childStorage->reset();
     }
 }

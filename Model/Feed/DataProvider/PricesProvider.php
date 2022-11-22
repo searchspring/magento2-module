@@ -9,6 +9,7 @@ use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Framework\Serialize\Serializer\Json;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolverInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 
 class PricesProvider implements DataProviderInterface
@@ -20,15 +21,22 @@ class PricesProvider implements DataProviderInterface
      * @var Json
      */
     private $json;
+    /**
+     * @var ProviderResolverInterface
+     */
+    private $priceProviderResolver;
 
     /**
      * PricesProvider constructor.
      * @param Json $json
+     * @param ProviderResolverInterface $priceProviderResolver
      */
     public function __construct(
-        Json $json
+        Json $json,
+        ProviderResolverInterface $priceProviderResolver
     ) {
         $this->json = $json;
+        $this->priceProviderResolver = $priceProviderResolver;
     }
 
     /**
@@ -46,28 +54,8 @@ class PricesProvider implements DataProviderInterface
                 continue;
             }
 
-            if (!in_array(self::FINAL_PRICE_KEY, $ignoredFields)) {
-                $product[self::FINAL_PRICE_KEY] = $productModel
-                    ->getPriceInfo()
-                    ->getPrice(FinalPrice::PRICE_CODE)
-                    ->getMinimalPrice()
-                    ->getValue();
-            }
-
-            if (!in_array(self::REGULAR_PRICE_KEY, $ignoredFields)) {
-                $product[self::REGULAR_PRICE_KEY] = $productModel
-                    ->getPriceInfo()
-                    ->getPrice(RegularPrice::PRICE_CODE)
-                    ->getValue();
-            }
-
-            if (!in_array(self::MAX_PRICE_KEY, $ignoredFields)) {
-                $product[self::MAX_PRICE_KEY] = $productModel
-                    ->getPriceInfo()
-                    ->getPrice(self::FINAL_PRICE_KEY)
-                    ->getMaximalPrice()
-                    ->getValue();
-            }
+            $priceProvider = $this->priceProviderResolver->resolve($productModel);
+            $product = array_merge($product, $priceProvider->getPrices($productModel, $ignoredFields));
 
             if ($feedSpecification->getIncludeTierPricing() && !in_array('tier_pricing', $ignoredFields)) {
                 $product['tier_pricing'] = $this->json->serialize($productModel->getTierPrice());
