@@ -3,13 +3,19 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route url="/V1/searchspring/info/html" method="GET">
-        <service class="SearchSpring\Feed\Api\GetStoresInfoInterface" method="getAsHtml"/>
+        <service class="SearchSpring\Feed\Api\GetStoresInfoInterface" method="getAsHtml" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/info/json" method="GET">
+        <service class="SearchSpring\Feed\Api\GetStoresInfoInterface" method="getAsJson" />
         <resources>
             <resource ref="SearchSpring_Feed::general" />
         </resources>
     </route>
     <route url="/V1/searchspring/task" method="POST">
-        <service class="SearchSpring\Feed\Api\CreateTaskInterface" method="execute"/>
+        <service class="SearchSpring\Feed\Api\CreateTaskInterface" method="execute" />
         <resources>
             <resource ref="SearchSpring_Feed::task" />
         </resources>

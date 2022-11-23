@@ -10,4 +10,9 @@ interface GetStoresInfoInterface
      * @return string
      */
     public function getAsHtml() : string;
+
+    /**
+     * @return array
+     */
+    public function getAsJson(): array;
 }
