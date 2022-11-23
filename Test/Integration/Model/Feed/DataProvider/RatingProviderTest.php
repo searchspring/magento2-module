@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Test\Integration\Model\Feed\DataProvider;
 
-use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Catalog\Model\Product;
 use Magento\TestFramework\Helper\Bootstrap;
 use PHPUnit\Framework\TestCase;
+use SearchSpring\Feed\Model\Feed\ContextManagerInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\RatingProvider;
 use SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface;
 
 /**
@@ -28,22 +30,139 @@ class RatingProviderTest extends TestCase
      * @var GetProducts
      */
     private $getProducts;
+    /**
+     * @var RatingProvider
+     */
+    private $ratingProvider;
+    /**
+     * @var ContextManagerInterface
+     */
+    private $contextManager;
 
     protected function setUp(): void
     {
         $this->objectManager = Bootstrap::getObjectManager();
         $this->specificationBuilder = $this->objectManager->get(SpecificationBuilderInterface::class);
         $this->getProducts = $this->objectManager->get(GetProducts::class);
+        $this->ratingProvider = $this->objectManager->get(RatingProvider::class);
+        $this->contextManager = $this->objectManager->get(ContextManagerInterface::class);
         parent::setUp();
     }
 
+    /**
+     *
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_with_rating.php
+     *
+     * @throws \Exception
+     */
     public function testGetData() : void
     {
-
+        $specification = $this->specificationBuilder->build([]);
+        $products = $this->getProducts->get($specification);
+        $data = $this->ratingProvider->getData($products, $specification);
+        $config = [
+            'searchspring_simple_1' => [
+                'rating' => 1.5,
+                'rating_count' => 2
+            ],
+            'searchspring_simple_2' => [
+                'rating' => 4,
+                'rating_count' => 3
+            ]
+        ];
+        $this->assertRating($data, $config);
+        $this->ratingProvider->reset();
     }
 
+    /**
+     *
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_with_rating_multistore.php
+     *
+     * @throws \Exception
+     */
+    public function testGetDataMultistore() : void
+    {
+        $specification = $this->specificationBuilder->build([]);
+        $products = $this->getProducts->get($specification);
+        $data = $this->ratingProvider->getData($products, $specification);
+        $config = [
+            'searchspring_simple_1' => [
+                'rating' => 1.5,
+                'rating_count' => 2
+            ],
+            'searchspring_simple_2' => [
+                'rating' => 4,
+                'rating_count' => 3
+            ]
+        ];
+        $this->assertRating($data, $config);
+        $specification = $this->specificationBuilder->build(['store' => 'fixturestore']);
+        $this->contextManager->setContextFromSpecification($specification);
+        $products = $this->getProducts->get($specification);
+        $data = $this->ratingProvider->getData($products, $specification);
+        $config = [
+            'searchspring_simple_1' => [
+                'rating' => 4,
+                'rating_count' => 3
+            ],
+            'searchspring_simple_2' => [
+                'rating' => 1.5,
+                'rating_count' => 2
+            ]
+        ];
+        $this->assertRating($data, $config);
+        $this->contextManager->resetContext();
+        $this->ratingProvider->reset();
+    }
+
+    /**
+     *
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation disabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_with_rating.php
+     *
+     * @throws \Exception
+     */
     public function testReset() : void
     {
+        $specification = $this->specificationBuilder->build([]);
+        $products = $this->getProducts->get($specification);
+        $this->ratingProvider->getData($products, $specification);
+        $this->ratingProvider->reset();
+        $this->assertTrue(true);
+    }
 
+    /**
+     * @param array $items
+     * @param array $config
+     */
+    private function assertRating(array $items, array $config) : void
+    {
+        foreach ($items as $item) {
+            /** @var Product $productModel */
+            $productModel = $item['product_model'] ?? null;
+            if (!$productModel) {
+                continue;
+            }
+
+            $sku = $productModel->getSku();
+            $ratingConfig = $config[$sku] ?? [];
+            if (empty($ratingConfig)) {
+                continue;
+            } else {
+                foreach ($ratingConfig as $key => $value) {
+                    if (is_null($ratingConfig[$key])) {
+                        $this->assertArrayNotHasKey($key, $item, 'sku: ' . $sku);
+                    } else {
+                        $this->assertArrayHasKey($key, $item, 'sku: ' . $sku);
+                        $this->assertEquals($value, $item[$key], 'sku: ' . $sku . '; key: ' . $key);
+                    }
+                }
+            }
+        }
     }
 }

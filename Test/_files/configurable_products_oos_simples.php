@@ -46,7 +46,7 @@ $optionsFactory = $objectManager->get(Factory::class);
 
 $attributeValues = [];
 $associatedProductIds = [];
-$productIds = [100, 200, 300, 400];
+$productIds = [110, 210, 310, 410];
 array_shift($firstAttributeOptions); //remove the first option which is empty
 
 foreach ($firstAttributeOptions as $option) {
@@ -56,13 +56,13 @@ foreach ($firstAttributeOptions as $option) {
     $product->setTypeId(Type::TYPE_SIMPLE)
         ->setAttributeSetId($attributeSetId)
         ->setWebsiteIds([$baseWebsite->getId()])
-        ->setName('SearchSpring Test Configurable Option Disabled Simple' . $option->getLabel())
-        ->setSku('searchspring_configurable_test_disabled_simple_' . $productId)
+        ->setName('SearchSpring Test Configurable Option OOS Simple' . $option->getLabel())
+        ->setSku('searchspring_configurable_test_oos_simple_' . $productId)
         ->setPrice($productId)
         ->setTestConfigurableFirst($option->getValue())
         ->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE)
-        ->setStatus(Status::STATUS_DISABLED)
-        ->setStockData(['use_config_manage_stock' => 1, 'qty' => 100, 'is_qty_decimal' => 0, 'is_in_stock' => 1])
+        ->setStatus(Status::STATUS_ENABLED)
+        ->setStockData(['use_config_manage_stock' => 1, 'qty' => 100, 'is_qty_decimal' => 0, 'is_in_stock' => 0])
         ->setData('boolean_attribute', true)
         ->setData('decimal_attribute', $productId);
     $simple1 = $productRepository->save($product);
@@ -95,8 +95,8 @@ $product->setExtensionAttributes($extensionConfigurableAttributes);
 $product->setTypeId(Configurable::TYPE_CODE)
     ->setAttributeSetId($attributeSetId)
     ->setWebsiteIds([$baseWebsite->getId()])
-    ->setName('SearchSpring Configurable Product Test Disabled Simple')
-    ->setSku('searchspring_configurable_test_disabled_simple_configurable')
+    ->setName('SearchSpring Configurable Product Test OOS Simples')
+    ->setSku('searchspring_configurable_test_oos_simple_configurable')
     ->setVisibility(Visibility::VISIBILITY_BOTH)
     ->setStatus(Status::STATUS_ENABLED)
     ->setStockData(['use_config_manage_stock' => 1, 'is_in_stock' => 1]);
