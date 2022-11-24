@@ -24,6 +24,7 @@ $product->setTypeId('simple')
             'qty' => 100,
             'is_in_stock' => 1,
             'manage_stock' => 1,
+            'use_config_manage_stock' => 0
         ]
     )
     ->setWebsiteIds([$storeManager->getStore()->getWebsiteId()])

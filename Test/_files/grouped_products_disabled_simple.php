@@ -7,6 +7,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\GroupedProduct\Model\Inventory\ChangeParentStockStatus;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\TestFramework\Helper\Bootstrap;
 
@@ -63,3 +64,10 @@ foreach ($linkedProducts as $linkedProduct) {
 $product->setProductLinks($newLinks);
 
 $productRepository->save($product);
+
+
+/** @var ChangeParentStockStatus $stockProcessor */
+$stockProcessor = $objectManager->get(ChangeParentStockStatus::class);
+foreach ($linkedProducts as $linkedProduct) {
+    $stockProcessor->execute((int) $linkedProduct->getId());
+}

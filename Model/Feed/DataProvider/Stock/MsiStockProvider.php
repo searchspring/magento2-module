@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
+use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\ResourceModel\Product;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockConfigurationInterface;
@@ -57,6 +58,10 @@ class MsiStockProvider implements StockProviderInterface
      * @var StockConfigurationInterface
      */
     private $stockConfiguration;
+    /**
+     * @var Type
+     */
+    private $typeManager;
 
     /**
      * MsiStockProvider constructor.
@@ -66,6 +71,7 @@ class MsiStockProvider implements StockProviderInterface
      * @param StockItemCriteriaInterfaceFactory $legacyStockItemCriteriaFactory
      * @param StockItemRepositoryInterface $legacyStockItemRepository
      * @param StockConfigurationInterface $stockConfiguration
+     * @param Type $typeManager
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -73,7 +79,8 @@ class MsiStockProvider implements StockProviderInterface
         Product $productResource,
         StockItemCriteriaInterfaceFactory $legacyStockItemCriteriaFactory,
         StockItemRepositoryInterface $legacyStockItemRepository,
-        StockConfigurationInterface $stockConfiguration
+        StockConfigurationInterface $stockConfiguration,
+        Type $typeManager
     ) {
         $this->storeManager = $storeManager;
         $this->websiteRepository = $websiteRepository;
@@ -81,6 +88,7 @@ class MsiStockProvider implements StockProviderInterface
         $this->legacyStockItemCriteriaFactory = $legacyStockItemCriteriaFactory;
         $this->legacyStockItemRepository = $legacyStockItemRepository;
         $this->stockConfiguration = $stockConfiguration;
+        $this->typeManager = $typeManager;
     }
 
     /**
@@ -176,6 +184,16 @@ class MsiStockProvider implements StockProviderInterface
 
         if (!$configuration->getManageStock()) {
             return true;
+        }
+
+        $isSalable = $stockData['is_salable'] ?? null;
+        // composite products (configurable, grouped, bundle) always have 0 qty
+        if (!is_null($isSalable) && in_array($configuration->getTypeId(),  $this->typeManager->getCompositeTypes())) {
+            return (bool) $isSalable;
+        }
+
+        if (!is_null($isSalable) && $isSalable == 0) {
+            return false;
         }
 
         return $this->getQty($stockData, $reservation) > $configuration->getMinQty();

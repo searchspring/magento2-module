@@ -9,6 +9,7 @@ use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\ConfigurableProduct\Helper\Product\Options\Factory;
+use Magento\ConfigurableProduct\Model\Inventory\ChangeParentStockStatus;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Eav\Api\Data\AttributeOptionInterface;
 use Magento\Eav\Setup\EavSetup;
@@ -102,3 +103,7 @@ $product->setTypeId(Configurable::TYPE_CODE)
     ->setStockData(['use_config_manage_stock' => 1, 'is_in_stock' => 1]);
 $productRepository->cleanCache();
 $productRepository->save($product);
+
+/** @var ChangeParentStockStatus $stockProcessor */
+$stockProcessor = $objectManager->get(ChangeParentStockStatus::class);
+$stockProcessor->execute($associatedProductIds);
