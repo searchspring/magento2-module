@@ -79,7 +79,11 @@ class UniqueChecker implements UniqueCheckerInterface
         $result = true;
         foreach ($firstPayload as $key => $value) {
             $checkValue = $secondPayload[$key];
-            if ($value != $checkValue) {
+            if (($value != $checkValue && !is_array($value))
+                || (is_array($value)
+                    && (array_diff($secondPayload[$key], $value) || array_diff($value, $secondPayload[$key]))
+                )
+            ) {
                 $result = false;
                 break;
             }
