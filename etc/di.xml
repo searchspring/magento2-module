@@ -288,16 +288,4 @@
     </type>
 
     <virtualType name="SearchSpringFeedGenerateFeedConfigurableChildStorage" type="SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage" />
-
-    <type name="SearchSpring\Feed\Model\Feed\DataProvider\ConfigurableProductsProvider">
-        <arguments>
-            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
-        </arguments>
-    </type>
-
-    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Price\ConfigurablePriceProvider">
-        <arguments>
-            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
-        </arguments>
-    </type>
 </config>
