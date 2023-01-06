@@ -50,8 +50,8 @@ class PreSignedUrlStorage implements StorageInterface
         }
 
         $formatter = $this->formatterPool->get($format);
-        $formattedData = $formatter->format($data, $feedSpecification);
-        $this->preSignedUrl->save($feedSpecification, $formattedData);
+        $data = $formatter->format($data, $feedSpecification);
+        $this->preSignedUrl->save($feedSpecification, $data);
     }
 
     /**

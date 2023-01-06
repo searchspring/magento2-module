@@ -181,4 +181,12 @@ class GroupedProductsProvider implements DataProviderInterface
         $this->childAttributesProvider->reset();
         $this->valueProcessor->reset();
     }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        // do nothing
+    }
 }

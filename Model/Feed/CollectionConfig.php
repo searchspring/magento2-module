@@ -10,7 +10,7 @@ use Magento\Framework\Exception\RuntimeException;
 
 class CollectionConfig implements CollectionConfigInterface
 {
-    const DEFAULT_PAGE_SIZE = 10000;
+    const DEFAULT_PAGE_SIZE = 2000;
     const PAGE_SIZE_CONFIG_PATH = 'searchspring/feed/page_size';
     /**
      * @var DeploymentConfig

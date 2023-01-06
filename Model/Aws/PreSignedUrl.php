@@ -61,6 +61,8 @@ class PreSignedUrl
      */
     public function save(FeedSpecificationInterface $feedSpecification, string $content) : void
     {
+//        file_put_contents('/Users/dmitrykisten/Desktop/vagrant-projects/searchspring244/var/searchspring.json', $content);
+//        return;
         $url = $feedSpecification->getPreSignedUrl();
         if (!$url) {
             throw new \Exception();

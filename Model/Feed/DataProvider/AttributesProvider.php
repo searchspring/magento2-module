@@ -115,6 +115,12 @@ class AttributesProvider implements DataProviderInterface
                 continue;
             }
 
+            $productAttributes = array_keys($productModel->getData());
+            $attributesDiff = array_diff($productAttributes, $productsAttributeKeys);
+            if (!empty($attributesDiff)) {
+                $productsAttributeKeys = array_merge($productsAttributeKeys, $attributesDiff);
+            }
+
             $productsAttributeKeys = array_merge($productsAttributeKeys, array_keys($productModel->getData()));
         }
 
@@ -158,5 +164,13 @@ class AttributesProvider implements DataProviderInterface
     {
         $this->attributes = [];
         $this->valueProcessor->reset();
+    }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        // do nothing
     }
 }

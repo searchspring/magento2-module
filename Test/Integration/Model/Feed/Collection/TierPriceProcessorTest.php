@@ -47,7 +47,7 @@ class TierPriceProcessorTest extends TestCase
     {
         $specification = $this->specificationBuilder->build(['includeTierPricing' => true]);
         $collection = $this->getCollection();
-        $this->tierPriceProcessor->process($collection, $specification);
+        $this->tierPriceProcessor->processAfterLoad($collection, $specification);
         $this->assertTrue($collection->getFlag('tier_price_added'));
         foreach ($collection as $item) {
             /** @var $item Product */
@@ -69,7 +69,7 @@ class TierPriceProcessorTest extends TestCase
     {
         $specification = $this->specificationBuilder->build(['includeTierPricing' => false]);
         $collection = $this->getCollection();
-        $this->tierPriceProcessor->process($collection, $specification);
+        $this->tierPriceProcessor->processAfterLoad($collection, $specification);
         $this->assertNull($collection->getFlag('tier_price_added'));
         foreach ($collection as $item) {
             /** @var $item Product */

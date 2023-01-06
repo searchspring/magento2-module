@@ -88,6 +88,14 @@ class ConfigurableProductsProvider implements DataProviderInterface
      */
     public function reset(): void
     {
-        $this->provider->resetStorages();
+        $this->provider->reset();
+    }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        $this->provider->resetChildStorage();
     }
 }

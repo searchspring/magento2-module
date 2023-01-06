@@ -82,6 +82,11 @@ class GenerateFeed implements GenerateFeedInterface
      */
     public function execute(FeedSpecificationInterface $feedSpecification): void
     {
+        $gcStatus = gc_enabled();
+        if (!$gcStatus) {
+            gc_enable();
+        }
+
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
             throw new \Exception((string) __('%1 is not supported format'));
@@ -90,24 +95,111 @@ class GenerateFeed implements GenerateFeedInterface
         $this->resetDataProviders($feedSpecification);
         $this->contextManager->setContextFromSpecification($feedSpecification);
         $collection = $this->collectionProvider->getCollection($feedSpecification);
+//        $collection->addAttributeToFilter('type_id', ['neq' => 'simple']);
         $pageSize = $this->collectionConfig->getPageSize();
         $collection->setPageSize($pageSize);
         $pageCount = $collection->getLastPageNumber();
+//        $pageCount = 1;
         $currentPageNumber = 1;
+        $memoryDumpPage = 1;
+        $memoryDumpMaxPage = 10;
+        $memoryDumps = 0;
         $data = [];
+        $itemsDataSize = 0;
+        $itemsDataCount = 0;
+        $memoryDump['initial'] = [
+            'usage' => memory_get_usage() / 1024 / 1024,
+            'usage_real' => memory_get_usage(true) / 1024 / 1024,
+            'peak' => memory_get_peak_usage() / 1024 / 1024,
+            'peak_real' => memory_get_peak_usage(true) / 1024 / 1024,
+            'full_data_size' => 0,
+            'full_data_count' => 0,
+            'items_data_size' => 0,
+            'items_data_count' => 0
+        ];
         while ($currentPageNumber <= $pageCount) {
-            $collection->clear();
             $collection->setCurPage($currentPageNumber);
             $collection->load();
             $this->processAfterLoad($collection, $feedSpecification);
             $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification);
             $data = array_merge($data, $itemsData);
+//            $data[] = serialize($itemsData);
+            $itemsDataSize = round(mb_strlen(serialize($itemsData), '8bit') / 1024 / 1024, 4);
+            $itemsDataCount = count($itemsData);
+            unset($itemsData);
             $currentPageNumber++;
+            gc_collect_cycles();
+            $this->resetDataProvidersAfterFetchItems($feedSpecification);
+            $collection->clear();
+            $this->processAfterFetchItems($collection, $feedSpecification);
+            if ($memoryDumpPage === $memoryDumpMaxPage) {
+                $memoryDump[] = [
+                    'usage' => round(memory_get_usage() / 1024 / 1024, 4),
+                    'usage_real' => round(memory_get_usage(true) / 1024 / 1024, 4),
+                    'peak' => round(memory_get_peak_usage() / 1024 / 1024, 4),
+                    'peak_real' => round(memory_get_peak_usage(true) / 1024 / 1024, 4),
+                    'full_data_size' => round(mb_strlen(serialize($data), '8bit') / 1024 / 1024, 4),
+                    'full_data_count' => count($data),
+                    'items_data_size' => $itemsDataSize,
+                    'items_data_count' => $itemsDataCount
+                ];
+                $memoryDumpPage = 1;
+                $this->printMemoryDump($memoryDump, $memoryDumpMaxPage * $pageSize * $memoryDumps, $memoryDumpMaxPage * $pageSize * ($memoryDumps + 1));
+                $memoryDumps++;
+                $data = [];
+            } else {
+                $memoryDumpPage++;
+            }
         }
+
+        $memoryDump[] = [
+            'usage' => round(memory_get_usage() / 1024 / 1024, 4),
+            'usage_real' => round(memory_get_usage(true) / 1024 / 1024, 4),
+            'peak' => round(memory_get_peak_usage() / 1024 / 1024, 4),
+            'peak_real' => round(memory_get_peak_usage(true) / 1024 / 1024, 4),
+            'full_data_size' => round(mb_strlen(serialize($data), '8bit') / 1024 / 1024, 4),
+            'full_data_count' => count($data),
+            'items_data_size' => $itemsDataSize,
+            'items_data_count' => $itemsDataCount
+        ];
+        $this->printMemoryDump($memoryDump);
 
         $this->storage->save($data, $feedSpecification);
         $this->contextManager->resetContext();
+        if (!$gcStatus) {
+            gc_disable();
+        }
         return;
+    }
+
+    /**
+     * @param array $dump
+     * @param int|null $start
+     * @param int|null $end
+     */
+    private function printMemoryDump(array $dump, int $start = null, int $end = null) : void
+    {
+        $memoryDumpView = [];
+        foreach ($dump as $item) {
+            foreach ($item as $key => $value) {
+                $memoryDumpView[$key][] = $value;
+            }
+        }
+
+        if (!$start && !$end) {
+            $firstStr = '----- Final Result -----';
+        } else {
+            $start = is_null($start) ? 0 : $start;
+            $firstStr = '----- Products ' . $start . ' - ' . $end . ' -----';
+        }
+
+        echo $firstStr . PHP_EOL;
+
+        foreach ($memoryDumpView as $key => $item) {
+            $valueStr = implode(' -> ', $item);
+            $str = $key . ": " . $valueStr . PHP_EOL;
+            echo $str;
+        }
     }
 
     /**
@@ -117,7 +209,18 @@ class GenerateFeed implements GenerateFeedInterface
     private function processAfterLoad(Collection $collection, FeedSpecificationInterface $feedSpecification) : void
     {
         foreach ($this->afterLoadProcessorPool->getAll() as $processor) {
-            $processor->process($collection, $feedSpecification);
+            $processor->processAfterLoad($collection, $feedSpecification);
+        }
+    }
+
+    /**
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $feedSpecification
+     */
+    private function processAfterFetchItems(Collection $collection, FeedSpecificationInterface $feedSpecification) : void
+    {
+        foreach ($this->afterLoadProcessorPool->getAll() as $processor) {
+            $processor->processAfterFetchItems($collection, $feedSpecification);
         }
     }
 
@@ -129,6 +232,17 @@ class GenerateFeed implements GenerateFeedInterface
         $dataProviders = $this->getDataProviders($feedSpecification);
         foreach ($dataProviders as $dataProvider) {
             $dataProvider->reset();
+        }
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     */
+    private function resetDataProvidersAfterFetchItems(FeedSpecificationInterface $feedSpecification) : void
+    {
+        $dataProviders = $this->getDataProviders($feedSpecification);
+        foreach ($dataProviders as $dataProvider) {
+            $dataProvider->resetAfterFetchItems();
         }
     }
 

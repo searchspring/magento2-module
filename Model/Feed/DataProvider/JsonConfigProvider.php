@@ -124,4 +124,12 @@ class JsonConfigProvider implements DataProviderInterface
         $this->configurableBlock = null;
         $this->swatchesBlock = null;
     }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        $this->provider->resetChildStorage();
+    }
 }

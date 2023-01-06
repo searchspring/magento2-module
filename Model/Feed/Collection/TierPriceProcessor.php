@@ -15,10 +15,24 @@ class TierPriceProcessor implements ProcessCollectionInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @return Collection
      */
-    public function process(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
+    public function processAfterLoad(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
     {
         if ($feedSpecification->getIncludeTierPricing()) {
             $collection->addTierPriceData();
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return Collection
+     */
+    public function processAfterFetchItems(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
+    {
+        if ($feedSpecification->getIncludeTierPricing()) {
+            $collection->setFlag('tier_price_added', false);
         }
 
         return $collection;

@@ -250,6 +250,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="media_gallery" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\MediaGalleryProcessor</item>
                 <item name="tier_price" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\TierPriceProcessor</item>
+                <item name="url" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\UrlProcessor</item>
             </argument>
         </arguments>
     </virtualType>
@@ -288,4 +289,12 @@
     </type>
 
     <virtualType name="SearchSpringFeedGenerateFeedConfigurableChildStorage" type="SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage" />
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="SearchSpringFeedExecutePendingTasks" xsi:type="object">SearchSpring\Feed\Console\Command\ExecutePendingTasks</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

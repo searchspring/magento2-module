@@ -120,4 +120,12 @@ class RatingProvider implements DataProviderInterface
     {
         // do nothing
     }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        // do nothing
+    }
 }

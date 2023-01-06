@@ -178,10 +178,18 @@ class Provider
     /**
      * @return void
      */
-    public function resetStorages(): void
+    public function reset(): void
     {
         $this->childAttributesProvider->reset();
         $this->valueProcessor->reset();
+        $this->childStorage->reset();
+    }
+
+    /**
+     * @return void
+     */
+    public function resetChildStorage(): void
+    {
         $this->childStorage->reset();
     }
 
