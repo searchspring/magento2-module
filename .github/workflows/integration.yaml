@@ -1,0 +1,42 @@
+name: Integration Test
+
+on:
+  push:
+    branches:
+      - feat/github-workflows
+
+jobs:
+  compute_matrix:
+    runs-on: self-hosted
+    outputs:
+      matrix: ${{ steps.supported-version.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: graycoreio/github-actions-magento2/supported-version@main
+        id: supported-version
+      - run: echo ${{ steps.supported-version.outputs.matrix }}
+  install-test:
+    needs: compute_matrix
+    strategy:
+      matrix: ${{ fromJSON(needs.compute_matrix.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: graycoreio/github-actions-magento2/installation-test@main
+        with:
+          composer_version: ${{ matrix.composer }}
+          php_version: ${{ matrix.php }}
+          magento_version: ${{ matrix.magento }}
+          composer_auth: ${{ secrets.COMPOSER_AUTH }}
+          package_name: absolute-web/searchspring-magento-2
+          source_folder: $GITHUB_WORKSPACE
+  integration_workflow:
+    uses: graycoreio/github-actions-magento2/.github/workflows/integration.yaml@main
+    with:
+      package_name: absolute-web/searchspring-magento-2
+      source_folder: $GITHUB_WORKSPACE
+      matrix: |
+        {"magento":["magento/project-community-edition:>=2.3 <2.4"],"include":[{"magento":"magento/project-community-edition:>=2.3 <2.4","php":7.4,"composer":1,"mysql":"mysql:5.7.30","elasticsearch":"elasticsearch:7.16.3","rabbitmq":"rabbitmq:3.8","redis":"redis:6.0","varnish":"varnish:6.0","nginx":"nginx:1.18","os":"ubuntu-18.04"}]}
+      test_command: ../../../vendor/bin/phpunit ../../../vendor/absolute-web/searchspring-magento-2/Test/Integration
+    secrets:
+      composer_auth: ${{ secrets.COMPOSER_AUTH }}
