@@ -54,7 +54,7 @@ class PreSignedUrlStorageTest extends TestCase
     {
         $feed = $this->getFeedSpecification();
         $data = $this->getData();
-        $this->preSignedUrlStorage->save($data, $feed);
+        $this->preSignedUrlStorage->commit($data, $feed);
         // check that we achieve this place and dont have any exceptions
         $this->assertEquals(1,1);
     }
@@ -73,7 +73,7 @@ class PreSignedUrlStorageTest extends TestCase
         $feed->setData(FeedSpecificationInterface::FORMAT, null);
         $data = $this->getData();
         $this->expectExceptionObject(new Exception((string) __('format cannot be empty')));
-        $this->preSignedUrlStorage->save($data, $feed);
+        $this->preSignedUrlStorage->commit($data, $feed);
     }
 
     /**
@@ -91,7 +91,7 @@ class PreSignedUrlStorageTest extends TestCase
         $feed->setData(FeedSpecificationInterface::FORMAT, $format);
         $data = $this->getData();
         $this->expectExceptionObject(new Exception((string) __('%1 is not supported format', $format)));
-        $this->preSignedUrlStorage->save($data, $feed);
+        $this->preSignedUrlStorage->commit($data, $feed);
     }
 
     /**

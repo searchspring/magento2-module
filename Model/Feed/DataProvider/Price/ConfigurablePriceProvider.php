@@ -8,13 +8,13 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\ConfigurableProduct\Pricing\Price\ConfigurableOptionsProviderInterface;
-use SearchSpring\Feed\Model\Product\Configurable\Provider;
+use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\PricesProvider;
 
 class ConfigurablePriceProvider implements PriceProviderInterface
 {
     /**
-     * @var Provider
+     * @var DataProvider
      */
     private $provider;
     /**
@@ -24,11 +24,11 @@ class ConfigurablePriceProvider implements PriceProviderInterface
 
     /**
      * ConfigurablePriceProvider constructor.
-     * @param Provider $provider
+     * @param DataProvider $provider
      * @param ConfigurableOptionsProviderInterface $configurableOptionsProvider
      */
     public function __construct(
-        Provider $provider,
+        DataProvider $provider,
         ConfigurableOptionsProviderInterface $configurableOptionsProvider
     ) {
         $this->provider = $provider;

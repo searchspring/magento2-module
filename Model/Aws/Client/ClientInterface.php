@@ -12,9 +12,9 @@ interface ClientInterface
      * @param string $method
      * @param string $url
      * @param array $headers
-     * @param string|null $content
+     * @param array|null $content
      * @return ResponseInterface
      * @throws ClientException
      */
-    public function execute(string $method, string $url, ?string $content = null, array $headers = []) : ResponseInterface;
+    public function execute(string $method, string $url, ?array $content = null, array $headers = []) : ResponseInterface;
 }

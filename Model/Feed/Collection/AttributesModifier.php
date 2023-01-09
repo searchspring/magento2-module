@@ -4,40 +4,32 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\Collection;
 
-use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\AttributesProviderInterface;
 
 class AttributesModifier implements ModifierInterface
 {
     /**
-     * @var ProductAttributeRepositoryInterface
-     */
-    private $productAttributeRepository;
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
      * @var array
      */
     private $appliedAttributes;
+    /**
+     * @var AttributesProviderInterface
+     */
+    private $attributesProvider;
 
     /**
      * AttributesModifier constructor.
-     * @param ProductAttributeRepositoryInterface $productAttributeRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param AttributesProviderInterface $attributesProvider
      * @param array $appliedAttributes
      */
     public function __construct(
-        ProductAttributeRepositoryInterface $productAttributeRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
+        AttributesProviderInterface $attributesProvider,
         array $appliedAttributes = []
     ) {
-        $this->productAttributeRepository = $productAttributeRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->appliedAttributes = $appliedAttributes;
+        $this->attributesProvider = $attributesProvider;
     }
 
     /**
@@ -47,17 +39,13 @@ class AttributesModifier implements ModifierInterface
      */
     public function modify(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
     {
-        $searchCriteria = $this->searchCriteriaBuilder->create();
-        $productAttributes = $this->productAttributeRepository->getList($searchCriteria)->getItems();
+        $productAttributes = $this->attributesProvider->getAttributes($feedSpecification);
         $codes = [];
-        $restrictedAttributes = $feedSpecification->getIgnoreFields();
         foreach ($productAttributes as $attribute) {
             $code = $attribute->getAttributeCode();
-            if (in_array($code, $this->appliedAttributes) || in_array($code, $restrictedAttributes)) {
-                continue;
+            if (!in_array($code, $this->appliedAttributes)) {
+                $codes[] = $code;
             }
-
-            $codes[] = $attribute->getAttributeCode();
         }
 
         $collection->addAttributeToSelect($codes);

@@ -56,13 +56,11 @@ class PreSignedUrl
 
     /**
      * @param FeedSpecificationInterface $feedSpecification
-     * @param string $content
+     * @param array $content
      * @throws \Exception
      */
-    public function save(FeedSpecificationInterface $feedSpecification, string $content) : void
+    public function save(FeedSpecificationInterface $feedSpecification, array $content) : void
     {
-//        file_put_contents('/Users/dmitrykisten/Desktop/vagrant-projects/searchspring244/var/searchspring.json', $content);
-//        return;
         $url = $feedSpecification->getPreSignedUrl();
         if (!$url) {
             throw new \Exception();
@@ -74,10 +72,10 @@ class PreSignedUrl
     /**
      * @param string $url
      * @param array $headers
-     * @param string $content
+     * @param array $content
      * @throws \Exception
      */
-    private function doRequest(string $url, array $headers, string $content) : void
+    private function doRequest(string $url, array $headers, array $content) : void
     {
         $retry = true;
         $lastError = null;

@@ -39,6 +39,8 @@
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolver"/>
+    <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Attribute\AttributesProviderInterface"
+                type="SearchSpring\Feed\Model\Feed\DataProvider\Attribute\FeedAttributesProvider"/>
     <preference for="SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface"
                 type="SearchSpring\Feed\Model\Webapi\DefaultExceptionConverter"/>
     <preference for="SearchSpring\Feed\Model\Aws\Client\ClientInterface"
@@ -183,6 +185,15 @@
             <argument name="formatters" xsi:type="array">
                 <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Csv</item>
                 <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Json</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\Storage\File\FileFactory">
+        <arguments>
+            <argument name="fileClassPool" xsi:type="array">
+                <item name="csv" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Csv</item>
+                <item name="json" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Json</item>
             </argument>
         </arguments>
     </type>

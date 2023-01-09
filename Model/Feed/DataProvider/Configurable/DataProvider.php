@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Model\Product\Configurable;
+namespace SearchSpring\Feed\Model\Feed\DataProvider\Configurable;
 
 use Exception;
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
@@ -13,6 +14,7 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute as Con
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\AttributesProviderInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ChildAttributesProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
 use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetAttributesCollection;
@@ -20,7 +22,7 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 
-class Provider
+class DataProvider
 {
     /**
      * @var GetAttributesCollection
@@ -56,6 +58,20 @@ class Provider
      * @var ChildStorage
      */
     private $childStorage;
+    /**
+     * @var AttributesProviderInterface[]
+     */
+    private $attributesProvider;
+
+    /**
+     * @var array|null
+     */
+    private $configurableAttributes = null;
+
+    /**
+     * @var ProductAttributeInterface[]
+     */
+    private $attributes = null;
 
     /**
      * ConfigurableProductsProvider constructor.
@@ -66,6 +82,7 @@ class Provider
      * @param GetChildProductsData $getChildProductsData
      * @param ValueProcessor $valueProcessor
      * @param ChildStorage $childStorage
+     * @param array $attributesProvider
      */
     public function __construct(
         GetAttributesCollection $getAttributesCollection,
@@ -74,7 +91,8 @@ class Provider
         ChildAttributesProvider $childAttributesProvider,
         GetChildProductsData $getChildProductsData,
         ValueProcessor $valueProcessor,
-        ChildStorage $childStorage
+        ChildStorage $childStorage,
+        array $attributesProvider = []
     ) {
         $this->getAttributesCollection = $getAttributesCollection;
         $this->getChildCollection = $getChildCollection;
@@ -83,6 +101,7 @@ class Provider
         $this->getChildProductsData = $getChildProductsData;
         $this->valueProcessor = $valueProcessor;
         $this->childStorage = $childStorage;
+        $this->attributesProvider = $attributesProvider;
     }
 
     /**
@@ -161,9 +180,12 @@ class Provider
         array $configurableProducts,
         FeedSpecificationInterface $feedSpecification
     ): array {
-        $attributesCollection = $this->getAttributesCollection->execute($configurableProducts);
+        if (is_null($this->configurableAttributes)) {
+            $attributes = $this->getAttributes($configurableProducts, $feedSpecification);
+            $this->configurableAttributes = $this->processAttributes($attributes, $feedSpecification);
+        }
 
-        return $this->processAttributes($attributesCollection->getItems(), $feedSpecification);
+        return $this->configurableAttributes;
     }
 
     /**
@@ -182,15 +204,17 @@ class Provider
     {
         $this->childAttributesProvider->reset();
         $this->valueProcessor->reset();
-        $this->childStorage->reset();
+        $this->resetAfterFetchItems();
     }
 
     /**
      * @return void
      */
-    public function resetChildStorage(): void
+    public function resetAfterFetchItems(): void
     {
         $this->childStorage->reset();
+        $this->attributes = null;
+        $this->configurableAttributes = null;
     }
 
     /**
@@ -260,5 +284,35 @@ class Provider
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $configurableProducts
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return ProductAttributeInterface[]
+     */
+    private function getAttributes(array $configurableProducts, FeedSpecificationInterface $feedSpecification) : array
+    {
+        if (is_null($this->attributes)) {
+            $attributesCollection = $this->getAttributesCollection->execute($configurableProducts);
+
+            $attributes = [];
+            foreach ($attributesCollection as $attribute) {
+                $attributes[$attribute->getAttributeCode()] = $attribute;
+            }
+
+            foreach ($this->attributesProvider as $attributesProvider) {
+                $newAttributes = $attributesProvider->getAttributes($feedSpecification);
+                foreach ($newAttributes as $attribute) {
+                    if (!isset($attributes[$attribute->getAttributeCode()])) {
+                        $attributes[$attribute->getAttributeCode()] = $attribute;
+                    }
+                }
+            }
+
+            $this->attributes = $attributes;
+        }
+
+        return $this->attributes;
     }
 }

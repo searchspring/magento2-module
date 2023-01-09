@@ -9,7 +9,7 @@ use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
-use SearchSpring\Feed\Model\Product\Configurable\Provider;
+use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 
 class ConfigurableProductsProvider implements DataProviderInterface
 {
@@ -19,17 +19,17 @@ class ConfigurableProductsProvider implements DataProviderInterface
     private $getChildProductsData;
 
     /**
-     * @var Provider
+     * @var DataProvider
      */
     private $provider;
 
     /**
      * @param GetChildProductsData $getChildProductsData
-     * @param Provider $provider
+     * @param DataProvider $provider
      */
     public function __construct(
         GetChildProductsData $getChildProductsData,
-        Provider $provider
+        DataProvider $provider
     ) {
         $this->getChildProductsData = $getChildProductsData;
         $this->provider = $provider;
@@ -96,6 +96,6 @@ class ConfigurableProductsProvider implements DataProviderInterface
      */
     public function resetAfterFetchItems(): void
     {
-        $this->provider->resetChildStorage();
+        $this->provider->resetAfterFetchItems();
     }
 }

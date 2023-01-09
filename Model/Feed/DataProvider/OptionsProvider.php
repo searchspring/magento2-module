@@ -12,6 +12,7 @@ use Magento\Catalog\Model\ResourceModel\Product\Option\CollectionFactory as Opti
 use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Store\Model\StoreManagerInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Option\TitleToFieldNameConverter;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 
 class OptionsProvider implements DataProviderInterface
@@ -96,7 +97,7 @@ class OptionsProvider implements DataProviderInterface
         $ignoreFields = $feedSpecification->getIgnoreFields();
         foreach($options as $option) {
             // Clean up option title for a field name
-            $field = 'option_' . $this->textToFieldName($option->getTitle());
+            $field = TitleToFieldNameConverter::convert($option->getTitle());
             if (in_array($field, $ignoreFields)) {
                 continue;
             }
@@ -110,18 +111,6 @@ class OptionsProvider implements DataProviderInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $text
-     * @return string
-     */
-    private function textToFieldName(string $text) {
-        return strtolower(preg_replace(
-            '/_+/',
-            '_',
-            preg_replace('/[^a-z0-9_]+/i', '_', trim($text))
-        ));
     }
 
     /**
