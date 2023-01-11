@@ -113,7 +113,7 @@ class AttributesProvider implements DataProviderInterface
      */
     public function reset(): void
     {
-        $this->attributes = [];
+        $this->attributes = null;
         $this->valueProcessor->reset();
         $this->attributesProvider->reset();
     }

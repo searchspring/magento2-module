@@ -64,5 +64,6 @@ class Json extends FileAbstract
         $file = $this->getFile();
         $data = $this->jsonSerializer->serialize($data) . "\n";
         $file->write($data);
+        $data = [];
     }
 }

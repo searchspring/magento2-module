@@ -119,18 +119,21 @@ class MediaGalleryProvider implements DataProviderInterface
         MediaGallerySpecificationInterface $mediaGallerySpecification,
         string $file = null
     ) : string {
-        if (!isset($this->imageHelpers[$type])) {
+//        if (!isset($this->imageHelpers[$type])) {
             $imageHelper = $this->imageHelper->init($product, $type);
-            $this->imageHelpers[$type] = $imageHelper;
-        } else {
-            $imageHelper = $this->imageHelpers[$type];
+//            $this->imageHelpers[$type] = $imageHelper;
+//        } else {
+//            $imageHelper = $this->imageHelpers[$type];
+//        }
+
+//        if (!$file) {
+//            $file = $product->getData($imageHelper->getType());
+//        }
+
+        if ($file) {
+            $imageHelper->setImageFile($file);
         }
 
-        if (!$file) {
-            $file = $product->getData($imageHelper->getType());
-        }
-
-        $imageHelper->setImageFile($file);
         if($mediaGallerySpecification->getKeepAspectRatio()) {
             $resizedImage = $imageHelper->constrainOnly(true)
                 ->keepAspectRatio(true)

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Aws;
 
+use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Exception\ClientException;
 use SearchSpring\Feed\Model\Aws\Client\ClientInterface;
@@ -31,10 +32,15 @@ class PreSignedUrl
      * @var int
      */
     private $repeatDelay;
+    /**
+     * @var AppConfigInterface
+     */
+    private $appConfig;
 
     /**
      * PreSignedUrl constructor.
      * @param ClientInterface $client
+     * @param AppConfigInterface $appConfig
      * @param array $retryCodes
      * @param array $successCodes
      * @param int $retryCount
@@ -42,6 +48,7 @@ class PreSignedUrl
      */
     public function __construct(
         ClientInterface $client,
+        AppConfigInterface $appConfig,
         array $retryCodes = [],
         array $successCodes = [],
         int $retryCount = 5,
@@ -52,6 +59,7 @@ class PreSignedUrl
         $this->successCodes = array_merge($this->successCodes, $successCodes);
         $this->retryCount = $retryCount;
         $this->repeatDelay = $repeatDelay;
+        $this->appConfig = $appConfig;
     }
 
     /**
@@ -61,6 +69,12 @@ class PreSignedUrl
      */
     public function save(FeedSpecificationInterface $feedSpecification, array $content) : void
     {
+        if ($this->appConfig->isDebug()
+            && !is_null($this->appConfig->getValue('product_api_mock'))
+            && $this->appConfig->getValue('product_api_mock')
+        ) {
+            return;
+        }
         $url = $feedSpecification->getPreSignedUrl();
         if (!$url) {
             throw new \Exception();

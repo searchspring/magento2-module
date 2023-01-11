@@ -7,24 +7,25 @@ namespace SearchSpring\Feed\Model\Feed;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\RuntimeException;
+use SearchSpring\Feed\Api\AppConfigInterface;
 
 class CollectionConfig implements CollectionConfigInterface
 {
     const DEFAULT_PAGE_SIZE = 2000;
-    const PAGE_SIZE_CONFIG_PATH = 'searchspring/feed/page_size';
+    const PAGE_SIZE_CONFIG_PATH = 'product_page_size';
     /**
-     * @var DeploymentConfig
+     * @var AppConfigInterface
      */
-    private $deploymentConfig;
+    private $appConfig;
 
     /**
      * CollectionConfig constructor.
-     * @param DeploymentConfig $deploymentConfig
+     * @param AppConfigInterface $appConfig
      */
     public function __construct(
-        DeploymentConfig $deploymentConfig
+        AppConfigInterface $appConfig
     ) {
-        $this->deploymentConfig = $deploymentConfig;
+        $this->appConfig = $appConfig;
     }
 
     /**
@@ -34,7 +35,7 @@ class CollectionConfig implements CollectionConfigInterface
      */
     public function getPageSize(): int
     {
-        $pageSize = $this->deploymentConfig->get(self::PAGE_SIZE_CONFIG_PATH);
+        $pageSize = $this->appConfig->getValue(self::PAGE_SIZE_CONFIG_PATH);
         return $pageSize ? (int) $pageSize : self::DEFAULT_PAGE_SIZE;
     }
 }

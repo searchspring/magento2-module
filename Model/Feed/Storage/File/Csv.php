@@ -67,6 +67,8 @@ class Csv extends FileAbstract
         foreach ($data as $item) {
             $file->writeCsv($item);
         }
+
+        $data = [];
     }
 
     /**

@@ -47,6 +47,7 @@ class Csv implements FormatterInterface
             $formattedData[] = $this->formatRow($item, $feedSpecification);
         }
 
+        $data = [];
         return $formattedData;
     }
 

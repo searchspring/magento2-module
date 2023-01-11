@@ -25,6 +25,14 @@
                 type="SearchSpring\Feed\Model\ExecuteTask"/>
     <preference for="SearchSpring\Feed\Api\GetStoresInfoInterface"
                 type="SearchSpring\Feed\Model\GetStoresInfo"/>
+    <preference for="SearchSpring\Feed\Api\AppConfigInterface"
+                type="SearchSpring\Feed\Model\AppConfig"/>
+    <preference for="SearchSpring\Feed\Model\Metric\CollectorInterface"
+                type="SearchSpring\Feed\Model\Metric\Collector"/>
+    <preference for="SearchSpring\Feed\Model\Metric\OutputInterface"
+                type="SearchSpring\Feed\Model\Metric\Output\LogOutput"/>
+    <preference for="SearchSpring\Feed\Model\Metric\View\FormatterInterface"
+                type="SearchSpring\Feed\Model\Metric\View\DefaultFormatter"/>
     <preference for="SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface"
                 type="SearchSpring\Feed\Model\Feed\SpecificationBuilder"/>
     <preference for="SearchSpring\Feed\Model\Feed\CollectionProviderInterface"
@@ -308,4 +316,20 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="SearchSpring\Feed\Model\Metric\Collector">
+        <arguments>
+            <argument name="metricProviders" xsi:type="array">
+                <item name="product_feed" xsi:type="array">
+                    <item name="time" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\TimeProvider</item>
+                    <item name="timer" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\TimerProvider</item>
+                    <item name="memory" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\MemoryProvider</item>
+                    <item name="file_size" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Metric\MetricProvider\TimerProvider" shared="false" />
+    <type name="SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider" shared="false" />
 </config>

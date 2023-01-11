@@ -30,6 +30,11 @@ interface FileInterface
     public function rollback() : void;
 
     /**
+     *
+     */
+    public function delete() : void;
+
+    /**
      * @return string|null
      */
     public function getName() : ?string;

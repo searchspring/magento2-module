@@ -6,6 +6,7 @@ namespace SearchSpring\Feed\Model\Feed\Storage;
 
 use Exception;
 use Magento\Framework\App\ObjectManager;
+use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Aws\PreSignedUrl;
 use SearchSpring\Feed\Model\Feed\Storage\File\FileFactory;
@@ -47,6 +48,10 @@ class PreSignedUrlStorage implements StorageInterface
      * @var FileFactory
      */
     private $fileFactory;
+    /**
+     * @var AppConfigInterface
+     */
+    private $appConfig;
 
     /**
      * PreSignedUrlStorage constructor.
@@ -54,6 +59,7 @@ class PreSignedUrlStorage implements StorageInterface
      * @param PreSignedUrl $preSignedUrl
      * @param NameGenerator $nameGenerator
      * @param FileFactory $fileFactory
+     * @param AppConfigInterface $appConfig
      * @param string $type
      * @param string $feedType
      */
@@ -62,6 +68,7 @@ class PreSignedUrlStorage implements StorageInterface
         PreSignedUrl $preSignedUrl,
         NameGenerator $nameGenerator,
         FileFactory $fileFactory,
+        AppConfigInterface $appConfig,
         string $type = 'aws_presigned',
         string $feedType = 'product'
     ) {
@@ -71,6 +78,7 @@ class PreSignedUrlStorage implements StorageInterface
         $this->feedType = $feedType;
         $this->nameGenerator = $nameGenerator;
         $this->fileFactory = $fileFactory;
+        $this->appConfig = $appConfig;
     }
 
     /**
@@ -131,7 +139,13 @@ class PreSignedUrlStorage implements StorageInterface
             'file' => $file->getAbsolutePath()
         ];
 
-        $this->preSignedUrl->save($this->specification, $data);
+        try {
+            $this->preSignedUrl->save($this->specification, $data);
+        } finally {
+            if (!$this->appConfig->isDebug() || $this->appConfig->getValue('product_delete_file')) {
+                $file->delete();
+            }
+        }
     }
 
     /**
@@ -147,7 +161,9 @@ class PreSignedUrlStorage implements StorageInterface
      */
     public function getAdditionalData(): array
     {
-        return $this->getFile()->getFileInfo();
+        $additionalData = $this->getFile()->getFileInfo();
+        $additionalData['name'] = $this->getFile()->getName();
+        return $additionalData;
     }
 
     /**

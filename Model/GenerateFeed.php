@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model;
 
+use Exception;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\RuntimeException;
+use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\GenerateFeedInterface;
 use SearchSpring\Feed\Model\Feed\Collection\ProcessorPool;
@@ -16,6 +20,7 @@ use SearchSpring\Feed\Model\Feed\DataProviderInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderPool;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
+use SearchSpring\Feed\Model\Metric\CollectorInterface;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -47,6 +52,16 @@ class GenerateFeed implements GenerateFeedInterface
      * @var ProcessorPool
      */
     private $afterLoadProcessorPool;
+    /**
+     * @var CollectorInterface
+     */
+    private $metricCollector;
+    /**
+     * @var AppConfigInterface
+     */
+    private $appConfig;
+
+    private $gcStatus = false;
 
     /**
      * GenerateFeed constructor.
@@ -57,6 +72,8 @@ class GenerateFeed implements GenerateFeedInterface
      * @param SystemFieldsList $systemFieldsList
      * @param ContextManagerInterface $contextManager
      * @param ProcessorPool $afterLoadProcessorPool
+     * @param CollectorInterface $metricCollector
+     * @param AppConfigInterface $appConfig
      */
     public function __construct(
         CollectionProviderInterface $collectionProvider,
@@ -65,7 +82,9 @@ class GenerateFeed implements GenerateFeedInterface
         StorageInterface $storage,
         SystemFieldsList $systemFieldsList,
         ContextManagerInterface $contextManager,
-        ProcessorPool $afterLoadProcessorPool
+        ProcessorPool $afterLoadProcessorPool,
+        CollectorInterface $metricCollector,
+        AppConfigInterface $appConfig
     ) {
         $this->collectionProvider = $collectionProvider;
         $this->dataProviderPool = $dataProviderPool;
@@ -74,140 +93,160 @@ class GenerateFeed implements GenerateFeedInterface
         $this->systemFieldsList = $systemFieldsList;
         $this->contextManager = $contextManager;
         $this->afterLoadProcessorPool = $afterLoadProcessorPool;
+        $this->metricCollector = $metricCollector;
+        $this->appConfig = $appConfig;
     }
 
     /**
      * @param FeedSpecificationInterface $feedSpecification
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(FeedSpecificationInterface $feedSpecification): void
     {
-        $gcStatus = gc_enabled();
-        if (!$gcStatus) {
-            gc_enable();
-        }
-
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
-            throw new \Exception((string) __('%1 is not supported format'));
+            throw new Exception((string) __('%1 is not supported format'));
         }
 
-        $this->resetDataProviders($feedSpecification);
-        $this->contextManager->setContextFromSpecification($feedSpecification);
-        $this->storage->initiate($feedSpecification);
+        $this->initialize($feedSpecification);
         $collection = $this->collectionProvider->getCollection($feedSpecification);
-//        $collection->addAttributeToFilter('type_id', ['neq' => 'simple']);
         $pageSize = $this->collectionConfig->getPageSize();
         $collection->setPageSize($pageSize);
-        $pageCount = $collection->getLastPageNumber();
-//        $pageCount = 5;
+        $pageCount = $this->getPageCount($collection);
         $currentPageNumber = 1;
-        $memoryDumpPage = 1;
-        $memoryDumpMaxPage = 10;
-        $memoryDumps = 0;
-        $itemsDataSize = 0;
-        $itemsDataCount = 0;
-        $memoryDump['initial'] = [
-            'usage' => memory_get_usage() / 1024 / 1024,
-            'usage_real' => memory_get_usage(true) / 1024 / 1024,
-            'peak' => memory_get_peak_usage() / 1024 / 1024,
-            'peak_real' => memory_get_peak_usage(true) / 1024 / 1024,
-            'items_data_size' => 0,
-            'items_data_count' => 0
-        ];
+        $metricPage = 1;
+        $metricMaxPage = $this->appConfig->getValue('product_metric_max_page') ?? 10;
+        $metrics = 0;
+        $this->collectMetrics('Before Start Items Generation');
         while ($currentPageNumber <= $pageCount) {
             try {
                 $collection->setCurPage($currentPageNumber);
                 $collection->load();
                 $this->processAfterLoad($collection, $feedSpecification);
                 $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification);
-                $itemsDataSize = round(mb_strlen(serialize($itemsData), '8bit') / 1024 / 1024, 4);
-                $itemsDataCount = count($itemsData);
+                $title = 'Products: ' . $pageSize * $metrics . ' - ' . $pageSize * ($metrics + 1);
+                $metrics++;
+                if ($metricPage === (int) $metricMaxPage) {
+                    $this->collectMetrics($title, $itemsData);
+                    $metricPage = 1;
+                } else {
+                    $this->collectMetrics($title, $itemsData, false);
+                    $metricPage++;
+                }
+
                 $this->storage->addData($itemsData);
+                $itemsData = [];
                 $currentPageNumber++;
-                gc_collect_cycles();
                 $this->resetDataProvidersAfterFetchItems($feedSpecification);
                 $collection->clear();
                 $this->processAfterFetchItems($collection, $feedSpecification);
-                if ($memoryDumpPage === $memoryDumpMaxPage) {
-                    $memoryDump[] = [
-                        'usage' => round(memory_get_usage() / 1024 / 1024, 4),
-                        'usage_real' => round(memory_get_usage(true) / 1024 / 1024, 4),
-                        'peak' => round(memory_get_peak_usage() / 1024 / 1024, 4),
-                        'peak_real' => round(memory_get_peak_usage(true) / 1024 / 1024, 4),
-                        'items_data_size' => $itemsDataSize,
-                        'items_data_count' => $itemsDataCount
-                    ];
-                    $memoryDumpPage = 1;
-                    $this->printMemoryDump($memoryDump, $memoryDumpMaxPage * $pageSize * $memoryDumps, $memoryDumpMaxPage * $pageSize * ($memoryDumps + 1));
-                    $memoryDumps++;
-                } else {
-                    $memoryDumpPage++;
-                }
-            } catch (\Exception $exception) {
+                gc_collect_cycles();
+            } catch (Exception $exception) {
                 $this->storage->rollback();
                 throw $exception;
             }
         }
 
-        $this->resetDataProviders($feedSpecification);
-        $memoryDump[] = [
-            'usage' => round(memory_get_usage() / 1024 / 1024, 4),
-            'usage_real' => round(memory_get_usage(true) / 1024 / 1024, 4),
-            'peak' => round(memory_get_peak_usage() / 1024 / 1024, 4),
-            'peak_real' => round(memory_get_peak_usage(true) / 1024 / 1024, 4),
-            'items_data_size' => $itemsDataSize,
-            'items_data_count' => $itemsDataCount
-        ];
-        $this->printMemoryDump($memoryDump, null, null, 'before file send');
-        $this->storage->commit();
-        $memoryDump[] = [
-            'usage' => round(memory_get_usage() / 1024 / 1024, 4),
-            'usage_real' => round(memory_get_usage(true) / 1024 / 1024, 4),
-            'peak' => round(memory_get_peak_usage() / 1024 / 1024, 4),
-            'peak_real' => round(memory_get_peak_usage(true) / 1024 / 1024, 4),
-            'items_data_size' => $itemsDataSize,
-            'items_data_count' => $itemsDataCount
-        ];
-        $this->printMemoryDump($memoryDump);
-        $this->contextManager->resetContext();
-        if (!$gcStatus) {
-            gc_disable();
-        }
+        $this->reset($feedSpecification);
         return;
     }
 
     /**
-     * @param array $dump
-     * @param int|null $start
-     * @param int|null $end
-     * @param string|null $header
+     * @param FeedSpecificationInterface $feedSpecification
      */
-    private function printMemoryDump(array $dump, int $start = null, int $end = null, string $header = null) : void
+    private function initialize(FeedSpecificationInterface $feedSpecification) : void
     {
-        $memoryDumpView = [];
-        foreach ($dump as $item) {
-            foreach ($item as $key => $value) {
-                $memoryDumpView[$key][] = $value;
-            }
+        $this->gcStatus = gc_enabled();
+        if (!$this->gcStatus) {
+            gc_enable();
         }
 
-        if ($header) {
-            $firstStr = '----- ' . $header . ' -----';
-        } elseif (!$start && !$end) {
-            $firstStr = '----- Final Result -----';
-        } else {
-            $start = is_null($start) ? 0 : $start;
-            $firstStr = '----- Products ' . $start . ' - ' . $end . ' -----';
+        $this->collectMetrics('Initial');
+        $this->resetDataProviders($feedSpecification);
+        $this->contextManager->setContextFromSpecification($feedSpecification);
+        $this->storage->initiate($feedSpecification);
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     * @throws Exception
+     */
+    private function reset(FeedSpecificationInterface $feedSpecification) : void
+    {
+        $this->resetDataProviders($feedSpecification);
+        $this->collectMetrics('Before Send File');
+        try {
+            $this->storage->commit();
+        } finally {
+            $this->collectMetrics('After Send File');
+            $this->metricCollector->print(
+                CollectorInterface::CODE_PRODUCT_FEED,
+                CollectorInterface::PRINT_TYPE_FULL
+            );
         }
 
-        echo $firstStr . PHP_EOL;
-
-        foreach ($memoryDumpView as $key => $item) {
-            $valueStr = implode(' -> ', $item);
-            $str = $key . ": " . $valueStr . PHP_EOL;
-            echo $str;
+        $this->metricCollector->reset(CollectorInterface::CODE_PRODUCT_FEED);
+        $this->contextManager->resetContext();
+        if (!$this->gcStatus) {
+            gc_disable();
         }
+    }
+
+    /**
+     * @param string $title
+     * @param array|null $itemsData
+     * @param bool $print
+     */
+    private function collectMetrics(string $title, array $itemsData = null, bool $print = true) : void
+    {
+        $data = [];
+        try {
+            $storageAdditionalData = $this->storage->getAdditionalData();
+        } catch (\Throwable $exception) {
+            $storageAdditionalData = [];
+        }
+
+        if (isset($storageAdditionalData['name'])) {
+            $data['name'] = [
+                'static' => true,
+                'value' => $storageAdditionalData['name']
+            ];
+        }
+
+        if (isset($storageAdditionalData['size'])) {
+            $data['size'] = $storageAdditionalData['size'];
+        }
+
+        if (!is_null($itemsData)) {
+            $itemsDataSize = round(mb_strlen(serialize($itemsData), '8bit') / 1024 / 1024, 4);
+            $itemsDataCount = count($itemsData);
+            $data['items_data_size'] = $itemsDataSize;
+            $data['items_data_count'] = $itemsDataCount;
+        }
+
+        $this->metricCollector->collect(CollectorInterface::CODE_PRODUCT_FEED, $title, $data);
+        if ($print) {
+            $this->metricCollector->print(CollectorInterface::CODE_PRODUCT_FEED);
+        }
+    }
+
+    /**
+     * @param Collection $collection
+     * @return int
+     * @throws FileSystemException
+     * @throws RuntimeException
+     */
+    private function getPageCount(Collection $collection) : int
+    {
+        $pageCount = null;
+        if ($this->appConfig->isDebug()) {
+            $pageCount = $this->appConfig->getValue('product_page_count');
+        }
+        if (is_null($pageCount)) {
+            $pageCount = $collection->getLastPageNumber();
+        }
+
+        return (int) $pageCount;
     }
 
     /**

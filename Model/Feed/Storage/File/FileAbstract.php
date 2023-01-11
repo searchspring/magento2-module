@@ -112,6 +112,14 @@ abstract class FileAbstract implements FileInterface
      */
     public function rollback(): void
     {
+        $this->delete();
+    }
+
+    /**
+     * @throws FileSystemException
+     */
+    public function delete(): void
+    {
         if (!$this->isInitialized()) {
             return;
         }
@@ -173,7 +181,7 @@ abstract class FileAbstract implements FileInterface
         $file = $directory->openFile($pathWithExtension);
         $this->file = $file;
         $this->path = $pathWithExtension;
-        $this->name = $name;
+        $this->name = $name . '.' . $this->fileExtension;
         $this->initialized = true;
         $this->closed = false;
     }
@@ -220,14 +228,6 @@ abstract class FileAbstract implements FileInterface
     protected function getFile() : ?FileWriteInterface
     {
         return $this->file;
-    }
-
-    /**
-     * @return string|null
-     */
-    protected function getFileName() : ?string
-    {
-        return $this->name;
     }
 
     /**
