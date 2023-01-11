@@ -42,7 +42,7 @@ class GetProducts
         /** @var ProcessorPool $processorPool */
         $processorPool = Bootstrap::getObjectManager()->get('SearchSpringFeedGenerateFeedAfterLoadCollectionProcessorPool');
         foreach ($processorPool->getAll() as $processor) {
-            $processor->process($collection, $specification);
+            $processor->processAfterLoad($collection, $specification);
         }
 
         $result = [];

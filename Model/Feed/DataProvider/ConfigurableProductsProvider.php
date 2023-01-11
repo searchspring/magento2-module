@@ -4,80 +4,35 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider;
 
-use Exception;
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable\Attribute as ConfigurableAttribute;
-use Magento\Framework\EntityManager\MetadataPool;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
-use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ChildAttributesProvider;
-use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
-use SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage;
-use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetAttributesCollection;
-use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection;
 use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 
 class ConfigurableProductsProvider implements DataProviderInterface
 {
     /**
-     * @var GetAttributesCollection
-     */
-    private $getAttributesCollection;
-    /**
-     * @var GetChildCollection
-     */
-    private $getChildCollection;
-    /**
-     * @var MetadataPool
-     */
-    private $metadataPool;
-    /**
-     * @var ChildAttributesProvider
-     */
-    private $childAttributesProvider;
-    /**
      * @var GetChildProductsData
      */
     private $getChildProductsData;
-    /**
-     * @var ValueProcessor
-     */
-    private $valueProcessor;
-    /**
-     * @var ChildStorage
-     */
-    private $childStorage;
 
     /**
-     * ConfigurableProductsProvider constructor.
-     * @param GetAttributesCollection $getAttributesCollection
-     * @param GetChildCollection $getChildCollection
-     * @param MetadataPool $metadataPool
-     * @param ChildAttributesProvider $childAttributesProvider
+     * @var DataProvider
+     */
+    private $provider;
+
+    /**
      * @param GetChildProductsData $getChildProductsData
-     * @param ValueProcessor $valueProcessor
-     * @param ChildStorage $childStorage
+     * @param DataProvider $provider
      */
     public function __construct(
-        GetAttributesCollection $getAttributesCollection,
-        GetChildCollection $getChildCollection,
-        MetadataPool $metadataPool,
-        ChildAttributesProvider $childAttributesProvider,
         GetChildProductsData $getChildProductsData,
-        ValueProcessor $valueProcessor,
-        ChildStorage $childStorage
+        DataProvider $provider
     ) {
-        $this->getAttributesCollection = $getAttributesCollection;
-        $this->getChildCollection = $getChildCollection;
-        $this->metadataPool = $metadataPool;
-        $this->childAttributesProvider = $childAttributesProvider;
         $this->getChildProductsData = $getChildProductsData;
-        $this->valueProcessor = $valueProcessor;
-        $this->childStorage = $childStorage;
+        $this->provider = $provider;
     }
 
     /**
@@ -88,20 +43,20 @@ class ConfigurableProductsProvider implements DataProviderInterface
      */
     public function getData(array $products, FeedSpecificationInterface $feedSpecification): array
     {
-        $configurableProducts = $this->getConfigurableProducts($products);
+        $configurableProducts = $this->provider->getConfigurableProducts($products);
+
         if (empty($configurableProducts)) {
             return $products;
         }
 
-        $attributesCollection = $this->getAttributesCollection->execute($configurableProducts);
-        $configurableAttributes = $this->processAttributes($attributesCollection->getItems(), $feedSpecification);
-        $childAttributes = $this->getChildAttributes($attributesCollection->getItems(), $feedSpecification);
-        $childAttributeCodes = array_map(function ($attribute) {
-            return $attribute->getAttributeCode();
-        }, $childAttributes);
-        $childProductsCollection = $this->getChildCollection->execute($configurableProducts, $childAttributeCodes);
-        $childProducts = $this->processChildProducts($childProductsCollection->getItems());
-        $this->childStorage->set($childProducts);
+        $childProducts = $this->provider->getAllChildProducts($products, $feedSpecification);
+        $configurableAttributes =
+            $this->provider->getConfigurableAttributes($configurableProducts, $feedSpecification);
+
+        if (empty($configurableAttributes)) {
+            return $products;
+        }
+
         foreach ($products as &$product) {
             /** @var Product $productModel */
             $productModel = $product['product_model'] ?? null;
@@ -109,7 +64,7 @@ class ConfigurableProductsProvider implements DataProviderInterface
                 continue;
             }
 
-            $id = $productModel->getData($this->getLinkField());
+            $id = $productModel->getData($this->provider->getLinkField());
             if (!isset($childProducts[$id]) || !isset($configurableAttributes[$id])) {
                 continue;
             }
@@ -129,116 +84,18 @@ class ConfigurableProductsProvider implements DataProviderInterface
     }
 
     /**
-     * @param Product[] $childProducts
-     * @return array
+     *
      */
-    private function processChildProducts(array $childProducts) : array
+    public function reset(): void
     {
-        $result = [];
-        foreach ($childProducts as $product) {
-            if ($product->getParentId()) {
-                $result[$product->getParentId()][] = $product;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param ConfigurableAttribute[] $attributes
-     * @param FeedSpecificationInterface $feedSpecification
-     * @return Attribute[]
-     * @throws LocalizedException
-     */
-    private function getChildAttributes(array $attributes, FeedSpecificationInterface $feedSpecification) : array
-    {
-        $result = [];
-        foreach ($attributes as $attribute) {
-            if (!isset($result[$attribute->getAttributeId()]) && $attribute->getProductAttribute()) {
-                $result[$attribute->getAttributeId()] = $attribute->getProductAttribute();
-            }
-        }
-
-        $specificationAttributes = $this->childAttributesProvider->getAttributes($feedSpecification);
-        foreach($specificationAttributes as $attribute) {
-            if(!isset($result[$attribute->getAttributeId()])) {
-                $result[$attribute->getAttributeId()] = $attribute;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array $products
-     * @return array
-     * @throws Exception
-     */
-    private function getConfigurableProducts(array $products) : array
-    {
-        $configurableProducts = [];
-        foreach ($products as $product) {
-            /** @var Product $productModel */
-            $productModel = $product['product_model'] ?? null;
-            if (!$productModel) {
-                continue;
-            }
-
-            if (Configurable::TYPE_CODE === $productModel->getTypeId()) {
-                $id = $productModel->getData($this->getLinkField());
-                if ($id) {
-                    $configurableProducts[$id] = $productModel;
-                }
-            }
-        }
-
-        return $configurableProducts;
-    }
-
-    /**
-     * @return string
-     * @throws Exception
-     */
-    private function getLinkField() : string
-    {
-        return $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
-    }
-
-    /**
-     * @param ConfigurableAttribute[] $attributes
-     * @param FeedSpecificationInterface $feedSpecification
-     * @return array
-     * @throws LocalizedException
-     */
-    private function processAttributes(array $attributes, FeedSpecificationInterface $feedSpecification) : array
-    {
-        $result = [];
-        foreach ($attributes as $attribute) {
-            $productAttribute = $attribute->getProductAttribute();
-            if ($productAttribute) {
-                $result[$attribute->getProductId()][$productAttribute->getAttributeId()] = $productAttribute;
-            }
-        }
-
-        $specificationAttributes = $this->childAttributesProvider->getAttributes($feedSpecification);
-        foreach ($result as $productId => &$productAttributes) {
-            foreach ($specificationAttributes as $specificationAttribute) {
-                if (!isset($productAttributes[$specificationAttribute->getAttributeId()])) {
-                    $productAttributes[$specificationAttribute->getAttributeId()] = $specificationAttribute;
-                }
-            }
-        }
-
-        return $result;
+        $this->provider->reset();
     }
 
     /**
      *
      */
-    public function reset(): void
+    public function resetAfterFetchItems(): void
     {
-        $this->childAttributesProvider->reset();
-        $this->valueProcessor->reset();
-        $this->childStorage->reset();
+        $this->provider->resetAfterFetchItems();
     }
 }

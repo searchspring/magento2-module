@@ -22,6 +22,8 @@ class MediaGalleryProvider implements DataProviderInterface
      */
     private $json;
 
+    private $imageHelpers = [];
+
     /**
      * MediaGalleryProvider constructor.
      * @param Image $imageHelper
@@ -117,9 +119,18 @@ class MediaGalleryProvider implements DataProviderInterface
         MediaGallerySpecificationInterface $mediaGallerySpecification,
         string $file = null
     ) : string {
-        $imageHelper = $this->imageHelper->init($product, $type);
+//        if (!isset($this->imageHelpers[$type])) {
+            $imageHelper = $this->imageHelper->init($product, $type);
+//            $this->imageHelpers[$type] = $imageHelper;
+//        } else {
+//            $imageHelper = $this->imageHelpers[$type];
+//        }
 
-        if($file) {
+//        if (!$file) {
+//            $file = $product->getData($imageHelper->getType());
+//        }
+
+        if ($file) {
             $imageHelper->setImageFile($file);
         }
 
@@ -144,6 +155,14 @@ class MediaGalleryProvider implements DataProviderInterface
      *
      */
     public function reset(): void
+    {
+        $this->imageHelpers = [];
+    }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
     {
         // do nothing
     }

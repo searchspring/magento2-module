@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\Storage\Formatter;
 
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Exception\FileSystemException;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Filesystem;
-use Magento\Framework\Math\Random;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Model\Feed\FieldsProvider;
 use SearchSpring\Feed\Model\Feed\Storage\FormatterInterface;
 
 class Csv implements FormatterInterface
@@ -20,67 +17,49 @@ class Csv implements FormatterInterface
      */
     private $json;
     /**
-     * @var Filesystem
+     * @var FieldsProvider
      */
-    private $filesystem;
-    /**
-     * @var Random
-     */
-    private $random;
+    private $fieldsProvider;
 
     /**
      * Csv constructor.
      * @param JsonSerializer $json
-     * @param Filesystem $filesystem
-     * @param Random $random
+     * @param FieldsProvider $fieldsProvider
      */
     public function __construct(
         JsonSerializer $json,
-        Filesystem $filesystem,
-        Random $random
+        FieldsProvider $fieldsProvider
     ) {
         $this->json = $json;
-        $this->filesystem = $filesystem;
-        $this->random = $random;
+        $this->fieldsProvider = $fieldsProvider;
     }
 
     /**
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
-     * @return string
-     * @throws FileSystemException
-     * @throws LocalizedException
+     * @return array
+     * @throws NoSuchEntityException
      */
-    public function format(array $data, FeedSpecificationInterface $feedSpecification): string
+    public function format(array $data, FeedSpecificationInterface $feedSpecification): array
     {
-        $columns = $this->getColumns($data);
-        $formattedData[] = $columns;
+        $formattedData = [];
         foreach ($data as $item) {
-            $formattedData[] = $this->formatRow($item, $columns, $feedSpecification);
+            $formattedData[] = $this->formatRow($item, $feedSpecification);
         }
 
-        $directory = $this->filesystem->getDirectoryWrite(DirectoryList::TMP);
-        $filename = $this->random->getRandomString(32);
-        $file = $directory->openFile($filename);
-        foreach ($formattedData as $item) {
-            $file->writeCsv($item);
-        }
-
-        $result = $file->readAll();
-        $file->close();
-        $directory->delete($filename);
-
-        return $result;
+        $data = [];
+        return $formattedData;
     }
 
     /**
      * @param array $row
-     * @param array $columns
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
+     * @throws NoSuchEntityException
      */
-    private function formatRow(array $row, array $columns, FeedSpecificationInterface $feedSpecification) : array
+    private function formatRow(array $row, FeedSpecificationInterface $feedSpecification) : array
     {
+        $columns = $this->fieldsProvider->getFields($feedSpecification);
         $result = [];
         $multiValuedSeparator = $feedSpecification->getMultiValuedSeparator();
         foreach($columns as $field) {
@@ -102,19 +81,5 @@ class Csv implements FormatterInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function getColumns(array $data) : array
-    {
-        $result = [];
-        foreach ($data as $item) {
-            $result = array_merge($result, array_keys($item));
-        }
-
-        return array_unique($result);
     }
 }

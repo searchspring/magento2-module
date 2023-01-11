@@ -99,7 +99,7 @@ class GetStoresInfo implements GetStoresInfoInterface
             ];
         }
 
-        return ['stores' => $preparedResult];
+        return $preparedResult;
     }
 
     /**

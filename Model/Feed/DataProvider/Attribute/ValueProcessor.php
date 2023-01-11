@@ -12,6 +12,8 @@ use Magento\Framework\Phrase;
 class ValueProcessor
 {
     private $cache = [];
+
+    private $sourceAttributes = [];
     /**
      * @param Attribute $attribute
      * @param $value
@@ -23,7 +25,7 @@ class ValueProcessor
     {
         $key = null;
         $code = $attribute->getAttributeCode();
-        if (!is_object($value) && !is_array($value)) {
+        if (!is_object($value) && !is_array($value) && $this->isSourceAttribute($attribute)) {
             $key = $code . '_' . $value;
             if (isset($this->cache[$key])) {
                 return $this->cache[$key];
@@ -31,7 +33,7 @@ class ValueProcessor
         }
 
         $result = null;
-        if ($attribute->usesSource()) {
+        if ($this->isSourceAttribute($attribute)) {
             $result = $attribute->getSource()->getOptionText($value);
         } else {
             $result = $value;
@@ -58,5 +60,20 @@ class ValueProcessor
     public function reset() : void
     {
         $this->cache = [];
+        $this->sourceAttributes = [];
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @return bool
+     */
+    private function isSourceAttribute(Attribute $attribute) : bool
+    {
+        $code = $attribute->getAttributeCode();
+        if (!array_key_exists($code, $this->sourceAttributes)) {
+            $this->sourceAttributes[$code] = $attribute->usesSource();
+        }
+
+        return $this->sourceAttributes[$code];
     }
 }

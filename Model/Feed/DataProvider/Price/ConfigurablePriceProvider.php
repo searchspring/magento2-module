@@ -8,15 +8,15 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\ConfigurableProduct\Pricing\Price\ConfigurableOptionsProviderInterface;
-use SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage;
+use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\PricesProvider;
 
 class ConfigurablePriceProvider implements PriceProviderInterface
 {
     /**
-     * @var ChildStorage
+     * @var DataProvider
      */
-    private $childStorage;
+    private $provider;
     /**
      * @var ConfigurableOptionsProviderInterface
      */
@@ -24,14 +24,14 @@ class ConfigurablePriceProvider implements PriceProviderInterface
 
     /**
      * ConfigurablePriceProvider constructor.
-     * @param ChildStorage $childStorage
+     * @param DataProvider $provider
      * @param ConfigurableOptionsProviderInterface $configurableOptionsProvider
      */
     public function __construct(
-        ChildStorage $childStorage,
+        DataProvider $provider,
         ConfigurableOptionsProviderInterface $configurableOptionsProvider
     ) {
-        $this->childStorage = $childStorage;
+        $this->provider = $provider;
         $this->configurableOptionsProvider = $configurableOptionsProvider;
     }
 
@@ -61,7 +61,7 @@ class ConfigurablePriceProvider implements PriceProviderInterface
         if (!in_array(PricesProvider::MAX_PRICE_KEY, $ignoredFields)) {
             $maximumAmount = $product->hasMaxPrice() ? (float) $product->getMaxPrice() : null;
             if (is_null($maximumAmount)) {
-                $childProducts = $this->childStorage->getById((int)$product->getId())
+                $childProducts = $this->provider->getById((int)$product->getId())
                     ?? $this->configurableOptionsProvider->getProducts($product);
                 foreach ($childProducts as $variant) {
                     $variantAmount = $variant->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount();

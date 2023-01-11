@@ -7,10 +7,12 @@ namespace SearchSpring\Feed\Model\Feed\DataProvider;
 use Magento\Catalog\Model\Product;
 use Magento\ConfigurableProduct\Block\Product\View\Type\Configurable;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableType;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Swatches\Block\Product\Renderer\Configurable as SwatchesConfigurable;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\DataProviderInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 
 class JsonConfigProvider implements DataProviderInterface
 {
@@ -30,19 +32,27 @@ class JsonConfigProvider implements DataProviderInterface
     private $swatchesBlock = null;
 
     /**
-     * JsonConfigProvider constructor.
+     * @var DataProvider
+     */
+    private $provider;
+
+    /**
      * @param LayoutInterface $layout
+     * @param DataProvider $provider
      */
     public function __construct(
-        LayoutInterface $layout
+        LayoutInterface $layout,
+        DataProvider $provider
     ) {
         $this->layout = $layout;
+        $this->provider = $provider;
     }
 
     /**
      * @param array $products
      * @param FeedSpecificationInterface $feedSpecification
      * @return array
+     * @throws LocalizedException
      */
     public function getData(array $products, FeedSpecificationInterface $feedSpecification): array
     {
@@ -50,7 +60,9 @@ class JsonConfigProvider implements DataProviderInterface
             return $products;
         }
 
+        $childProducts = $this->provider->getAllChildProducts($products, $feedSpecification);
         $ignoredFields = $feedSpecification->getIgnoreFields();
+
         foreach ($products as &$product) {
             /** @var Product $productModel */
             $productModel = $product['product_model'] ?? null;
@@ -58,11 +70,15 @@ class JsonConfigProvider implements DataProviderInterface
                 continue;
             }
 
-            if(ConfigurableType::TYPE_CODE === $productModel->getTypeId()) {
+            if (ConfigurableType::TYPE_CODE === $productModel->getTypeId()) {
                 if (!in_array('json_config', $ignoredFields)) {
                     $configurableBlock = $this->getConfigurableBlock();
                     $configurableBlock->unsetData();
                     $configurableBlock->setProduct($productModel);
+                    if (isset($childProducts[$productModel->getId()])) {
+                        $configurableBlock->setAllowProducts($childProducts[$productModel->getId()]);
+                    }
+
                     $product['json_config'] = $configurableBlock->getJsonConfig();
                 }
 
@@ -70,6 +86,10 @@ class JsonConfigProvider implements DataProviderInterface
                     $swatchesBlock = $this->getSwatchesBlock();
                     $swatchesBlock->unsetData();
                     $swatchesBlock->setProduct($productModel);
+                    if (isset($childProducts[$productModel->getId()])) {
+                        $swatchesBlock->setAllowProducts($childProducts[$productModel->getId()]);
+                    }
+
                     $product['swatch_json_config'] = $swatchesBlock->getJsonSwatchConfig();
                 }
             }
@@ -109,5 +129,13 @@ class JsonConfigProvider implements DataProviderInterface
     {
         $this->configurableBlock = null;
         $this->swatchesBlock = null;
+    }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        $this->provider->resetAfterFetchItems();
     }
 }

@@ -38,4 +38,12 @@ class SaleableProvider implements DataProviderInterface
     {
         // do nothing
     }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        // do nothing
+    }
 }

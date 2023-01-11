@@ -19,4 +19,9 @@ interface DataProviderInterface
      *
      */
     public function reset() : void;
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems() : void;
 }
