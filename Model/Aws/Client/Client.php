@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Aws\Client;
 
-use Magento\Framework\HTTP\AsyncClient\Request;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Psr7\Utils;
+use GuzzleHttp\RequestOptions;
+use Magento\Framework\HTTP\AsyncClient\GuzzleWrapDeferred;
 use Magento\Framework\HTTP\AsyncClient\RequestFactory;
-use Magento\Framework\HTTP\AsyncClientInterface;
+use Psr\Http\Message\StreamInterface;
 use SearchSpring\Feed\Exception\ClientException;
-use SearchSpring\Feed\Model\Aws\Client\ResponseInterfaceFactory;
+use Throwable;
 
 class Client implements ClientInterface
 {
-    /**
-     * @var AsyncClientInterface
-     */
-    private $asyncClient;
     /**
      * @var RequestFactory
      */
@@ -24,52 +23,81 @@ class Client implements ClientInterface
      * @var ResponseInterfaceFactory
      */
     private $responseFactory;
+    /**
+     * @var GuzzleClient
+     */
+    private $client;
 
     /**
      * Client constructor.
-     * @param AsyncClientInterface $asyncClient
+     * @param GuzzleClient $client
      * @param RequestFactory $requestFactory
      * @param ResponseInterfaceFactory $responseFactory
      */
     public function __construct(
-        AsyncClientInterface $asyncClient,
+        GuzzleClient $client,
         RequestFactory $requestFactory,
         ResponseInterfaceFactory $responseFactory
     ) {
-        $this->asyncClient = $asyncClient;
         $this->requestFactory = $requestFactory;
         $this->responseFactory = $responseFactory;
+        $this->client = $client;
     }
 
     /**
      * @param string $method
      * @param string $url
-     * @param string|null $content
+     * @param array|null $content
      * @param array $headers
      * @return ResponseInterface
      * @throws ClientException
      */
-    public function execute(string $method, string $url, ?string $content = null, array $headers = []) : ResponseInterface
+    public function execute(string $method, string $url, ?array $content = null, array $headers = []) : ResponseInterface
     {
-        $request = $this->requestFactory->create([
-            'url' => $url,
-            'headers' => $headers,
-            'method' => $method,
-            'body' => $content
-        ]);
+        if ($content) {
+            $content = $this->prepareContent($content);
+        }
 
         try {
-            $responseWrapper = $this->asyncClient->request($request);
+            $options = [];
+            $options[RequestOptions::HEADERS] = $headers;
+            if ($content !== null) {
+                $options[RequestOptions::BODY] = $content;
+            }
+
+            $responseWrapper = new GuzzleWrapDeferred(
+                $this->client->requestAsync(
+                    $method,
+                    $url,
+                    $options
+                )
+            );
             $response = $responseWrapper->get();
             $convertedResponse = $this->responseFactory->create([
                 'code' => $response->getStatusCode(),
                 'headers' => $response->getHeaders(),
                 'body' => $response->getBody()
             ]);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             throw new ClientException($exception->getMessage(), 0, $exception);
         }
 
         return $convertedResponse;
+    }
+
+    /**
+     * @param array $content
+     * @return mixed|StreamInterface
+     */
+    private function prepareContent(array $content)
+    {
+        $type = $content['type'] ?? 'default';
+        if ($type === 'stream' && isset($content['file'])) {
+            $result = Utils::streamFor(Utils::tryFopen($content['file'], 'r+'));
+        } else {
+            $result = $content['content'] ?? array_shift($content);
+        }
+
+        return $result;
     }
 }

@@ -11,27 +11,12 @@ use SearchSpring\Feed\Model\Feed\Storage\FormatterInterface;
 class Json implements FormatterInterface
 {
     /**
-     * @var JsonSerializer
-     */
-    private $json;
-
-    /**
-     * Json constructor.
-     * @param JsonSerializer $json
-     */
-    public function __construct(
-        JsonSerializer $json
-    ) {
-        $this->json = $json;
-    }
-
-    /**
      * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
-     * @return string
+     * @return array
      */
-    public function format(array $data, FeedSpecificationInterface $feedSpecification): string
+    public function format(array $data, FeedSpecificationInterface $feedSpecification): array
     {
-        return $this->json->serialize($data);
+        return $data;
     }
 }

@@ -14,5 +14,12 @@ interface ProcessCollectionInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @return Collection
      */
-    public function process(Collection $collection, FeedSpecificationInterface $feedSpecification) : Collection;
+    public function processAfterLoad(Collection $collection, FeedSpecificationInterface $feedSpecification) : Collection;
+
+    /**
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return Collection
+     */
+    public function processAfterFetchItems(Collection $collection, FeedSpecificationInterface $feedSpecification) : Collection;
 }

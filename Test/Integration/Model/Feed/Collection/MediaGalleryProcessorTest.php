@@ -47,7 +47,7 @@ class MediaGalleryProcessorTest extends TestCase
     {
         $specification = $this->specificationBuilder->build(['includeMediaGallery' => 1]);
         $collection = $this->getCollection();
-        $this->mediaGalleryProcessor->process($collection, $specification);
+        $this->mediaGalleryProcessor->processAfterLoad($collection, $specification);
         $this->assertTrue($collection->getFlag('media_gallery_added'));
         foreach ($collection as $item) {
             if (in_array($item->getSku(), ['searchspring_simple_1', 'searchspring_simple_2'])) {
@@ -69,7 +69,7 @@ class MediaGalleryProcessorTest extends TestCase
     {
         $specification = $this->specificationBuilder->build(['includeMediaGallery' => 0]);
         $collection = $this->getCollection();
-        $this->mediaGalleryProcessor->process($collection, $specification);
+        $this->mediaGalleryProcessor->processAfterLoad($collection, $specification);
         $this->assertNull($collection->getFlag('media_gallery_added'));
         foreach ($collection as $item) {
             $this->assertNull($item->getMediaGallery());

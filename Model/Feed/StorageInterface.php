@@ -10,11 +10,29 @@ use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 interface StorageInterface
 {
     /**
-     * @param array $data
      * @param FeedSpecificationInterface $feedSpecification
+     */
+    public function initiate(FeedSpecificationInterface $feedSpecification) : void;
+
+    /**
+     * @param array $data
+     */
+    public function addData(array $data) : void;
+
+    /**
      * @throws Exception
      */
-    public function save(array $data, FeedSpecificationInterface $feedSpecification) : void;
+    public function commit() : void;
+
+    /**
+     *
+     */
+    public function rollback() : void;
+
+    /**
+     *
+     */
+    public function getAdditionalData() : array;
 
     /**
      * @param string $format

@@ -263,4 +263,12 @@ class CategoriesProvider implements DataProviderInterface
         $this->loadedCategories = [];
         $this->categoriesData = [];
     }
+
+    /**
+     *
+     */
+    public function resetAfterFetchItems(): void
+    {
+        // do nothing
+    }
 }

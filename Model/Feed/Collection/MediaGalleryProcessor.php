@@ -16,10 +16,24 @@ class MediaGalleryProcessor implements ProcessCollectionInterface
      * @return Collection
      * @throws LocalizedException
      */
-    public function process(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
+    public function processAfterLoad(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
     {
         if ($feedSpecification->getMediaGallerySpecification()->getIncludeMediaGallery()) {
             $collection->addMediaGalleryData();
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return Collection
+     */
+    public function processAfterFetchItems(Collection $collection, FeedSpecificationInterface $feedSpecification): Collection
+    {
+        if ($feedSpecification->getMediaGallerySpecification()->getIncludeMediaGallery()) {
+            $collection->setFlag('media_gallery_added', false);
         }
 
         return $collection;

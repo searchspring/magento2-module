@@ -25,6 +25,14 @@
                 type="SearchSpring\Feed\Model\ExecuteTask"/>
     <preference for="SearchSpring\Feed\Api\GetStoresInfoInterface"
                 type="SearchSpring\Feed\Model\GetStoresInfo"/>
+    <preference for="SearchSpring\Feed\Api\AppConfigInterface"
+                type="SearchSpring\Feed\Model\AppConfig"/>
+    <preference for="SearchSpring\Feed\Model\Metric\CollectorInterface"
+                type="SearchSpring\Feed\Model\Metric\Collector"/>
+    <preference for="SearchSpring\Feed\Model\Metric\OutputInterface"
+                type="SearchSpring\Feed\Model\Metric\Output\LogOutput"/>
+    <preference for="SearchSpring\Feed\Model\Metric\View\FormatterInterface"
+                type="SearchSpring\Feed\Model\Metric\View\DefaultFormatter"/>
     <preference for="SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface"
                 type="SearchSpring\Feed\Model\Feed\SpecificationBuilder"/>
     <preference for="SearchSpring\Feed\Model\Feed\CollectionProviderInterface"
@@ -39,6 +47,8 @@
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver"/>
     <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolverInterface"
                 type="SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolver"/>
+    <preference for="SearchSpring\Feed\Model\Feed\DataProvider\Attribute\AttributesProviderInterface"
+                type="SearchSpring\Feed\Model\Feed\DataProvider\Attribute\FeedAttributesProvider"/>
     <preference for="SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface"
                 type="SearchSpring\Feed\Model\Webapi\DefaultExceptionConverter"/>
     <preference for="SearchSpring\Feed\Model\Aws\Client\ClientInterface"
@@ -187,6 +197,15 @@
         </arguments>
     </type>
 
+    <type name="SearchSpring\Feed\Model\Feed\Storage\File\FileFactory">
+        <arguments>
+            <argument name="fileClassPool" xsi:type="array">
+                <item name="csv" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Csv</item>
+                <item name="json" xsi:type="string">SearchSpring\Feed\Model\Feed\Storage\File\Json</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="SearchSpring\Feed\Model\Feed\DataProviderPool">
         <arguments>
             <argument name="dataProviders" xsi:type="array">
@@ -250,6 +269,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="media_gallery" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\MediaGalleryProcessor</item>
                 <item name="tier_price" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\TierPriceProcessor</item>
+                <item name="url" xsi:type="object">SearchSpring\Feed\Model\Feed\Collection\UrlProcessor</item>
             </argument>
         </arguments>
     </virtualType>
@@ -289,15 +309,27 @@
 
     <virtualType name="SearchSpringFeedGenerateFeedConfigurableChildStorage" type="SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage" />
 
-    <type name="SearchSpring\Feed\Model\Feed\DataProvider\ConfigurableProductsProvider">
+    <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
-            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
+            <argument name="commands" xsi:type="array">
+                <item name="SearchSpringFeedExecutePendingTasks" xsi:type="object">SearchSpring\Feed\Console\Command\ExecutePendingTasks</item>
+            </argument>
         </arguments>
     </type>
 
-    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Price\ConfigurablePriceProvider">
+    <type name="SearchSpring\Feed\Model\Metric\Collector">
         <arguments>
-            <argument name="childStorage" xsi:type="object">SearchSpringFeedGenerateFeedConfigurableChildStorage</argument>
+            <argument name="metricProviders" xsi:type="array">
+                <item name="product_feed" xsi:type="array">
+                    <item name="time" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\TimeProvider</item>
+                    <item name="timer" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\TimerProvider</item>
+                    <item name="memory" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\MemoryProvider</item>
+                    <item name="file_size" xsi:type="object">SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider</item>
+                </item>
+            </argument>
         </arguments>
     </type>
+
+    <type name="SearchSpring\Feed\Model\Metric\MetricProvider\TimerProvider" shared="false" />
+    <type name="SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider" shared="false" />
 </config>

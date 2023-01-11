@@ -5,12 +5,29 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Price;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Catalog\Pricing\Price\RegularPrice;
 use SearchSpring\Feed\Model\Feed\DataProvider\PricesProvider;
 
 class BasePriceProvider implements PriceProviderInterface
 {
+    /**
+     * @var Type
+     */
+    private $type;
+
+    /**
+     * BasePriceProvider constructor.
+     * @param Type $type
+     */
+    public function __construct(
+        Type $type
+    ) {
+        $this->type = $type;
+    }
+
     /**
      * @param ProductInterface $product
      * @param array $ignoredFields
