@@ -8,3 +8,4 @@
 use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
 Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_with_images_rollback.php');
+Resolver::getInstance()->requireDataFixture('Magento/Store/_files/core_fixturestore_rollback.php');

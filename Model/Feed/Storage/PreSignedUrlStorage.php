@@ -6,6 +6,8 @@ namespace SearchSpring\Feed\Model\Feed\Storage;
 
 use Exception;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Exception\RuntimeException;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Aws\PreSignedUrl;
@@ -122,15 +124,22 @@ class PreSignedUrlStorage implements StorageInterface
             throw new Exception((string) __('format cannot be empty'));
         }
 
+        if (!$this->isSupportedFormat($format)) {
+            throw new Exception((string) __('%1 is not supported format', $format));
+        }
+
         $formatter = $this->formatterPool->get($format);
         $data = $formatter->format($data, $specification);
         $file->appendData($data);
     }
 
     /**
+     * @param bool $deleteFile
+     * @throws FileSystemException
+     * @throws RuntimeException
      * @throws Exception
      */
-    public function commit(): void
+    public function commit(bool $deleteFile = true): void
     {
         $file = $this->getFile();
         $file->commit();
@@ -142,7 +151,9 @@ class PreSignedUrlStorage implements StorageInterface
         try {
             $this->preSignedUrl->save($this->specification, $data);
         } finally {
-            if (!$this->appConfig->isDebug() || $this->appConfig->getValue('product_delete_file')) {
+            if ((!$this->appConfig->isDebug() || $this->appConfig->getValue('product_delete_file'))
+                && $deleteFile
+            ) {
                 $file->delete();
             }
         }
@@ -184,7 +195,7 @@ class PreSignedUrlStorage implements StorageInterface
      * @return FileInterface
      * @throws Exception
      */
-    private function getFile() : FileInterface
+    public function getFile() : FileInterface
     {
         if (!$this->file) {
             throw new Exception('file is not initialized yet');

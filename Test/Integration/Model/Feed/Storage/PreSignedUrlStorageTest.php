@@ -45,53 +45,81 @@ class PreSignedUrlStorageTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
      *
      * @return void
      * @throws \Exception
      */
-    public function testSave() : void
+    public function testInitiate() : void
     {
         $feed = $this->getFeedSpecification();
-        $data = $this->getData();
-        $this->preSignedUrlStorage->commit($data, $feed);
+        $this->preSignedUrlStorage->initiate($feed);
         // check that we achieve this place and dont have any exceptions
         $this->assertEquals(1,1);
     }
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
      *
      * @return void
      * @throws \Exception
      */
-    public function testSaveWithEmptyFormat() : void
+    public function testInitiateWithEmptyFormat() : void
     {
         /** @var Feed $feed */
         $feed = $this->getFeedSpecification();
         $feed->setData(FeedSpecificationInterface::FORMAT, null);
-        $data = $this->getData();
         $this->expectExceptionObject(new Exception((string) __('format cannot be empty')));
-        $this->preSignedUrlStorage->commit($data, $feed);
+        $this->preSignedUrlStorage->initiate($feed);
     }
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
      *
      * @return void
      * @throws \Exception
      */
-    public function testSaveWithInvalidFormat() : void
+    public function testInitiateWithInvalidFormat() : void
     {
         /** @var Feed $feed */
         $feed = $this->getFeedSpecification();
         $format = '___test___';
         $feed->setData(FeedSpecificationInterface::FORMAT, $format);
-        $data = $this->getData();
         $this->expectExceptionObject(new Exception((string) __('%1 is not supported format', $format)));
-        $this->preSignedUrlStorage->commit($data, $feed);
+        $this->preSignedUrlStorage->initiate($feed);
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testAddData() : void
+    {
+        $feed = $this->getFeedSpecification();
+        $this->preSignedUrlStorage->initiate($feed);
+        $data = $this->getData();
+        $this->preSignedUrlStorage->addData($data);
+        // check that we achieve this place and dont have any exceptions
+        $this->assertEquals(1,1);
+        $file = $this->preSignedUrlStorage->getFile();
+        $file->commit();
+        $path = $file->getAbsolutePath();
+        $content = file_get_contents($path);
+        $this->assertEquals(2, count(json_decode($content)));
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testAddDataToNotInitiatedStorage() : void
+    {
+        $data = $this->getData();
+        $this->expectExceptionObject(new Exception('file is not initialized yet'));
+        $this->preSignedUrlStorage->addData($data);
     }
 
     /**
@@ -101,7 +129,96 @@ class PreSignedUrlStorageTest extends TestCase
      * @return void
      * @throws \Exception
      */
-    public function setIsSupportedFormat() : void
+    public function testCommit() : void
+    {
+        $feed = $this->getFeedSpecification();
+        $this->preSignedUrlStorage->initiate($feed);
+        $data = $this->getData();
+        $this->preSignedUrlStorage->addData($data);
+        $this->preSignedUrlStorage->commit();
+        // check that file was deleted
+        $this->assertEquals(1, count($this->preSignedUrlStorage->getAdditionalData()));
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testCommitNotInitiatedStorage() : void
+    {
+        $this->expectExceptionObject(new Exception('file is not initialized yet'));
+        $this->preSignedUrlStorage->commit();
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testRollback() : void
+    {
+        $feed = $this->getFeedSpecification();
+        $this->preSignedUrlStorage->initiate($feed);
+        $data = $this->getData();
+        $this->preSignedUrlStorage->addData($data);
+        $this->preSignedUrlStorage->rollback();
+        // check that file was deleted
+        $this->assertEquals(1, count($this->preSignedUrlStorage->getAdditionalData()));
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testRollbackNotInitiatedStorage() : void
+    {
+        $this->expectExceptionObject(new Exception('file is not initialized yet'));
+        $this->preSignedUrlStorage->rollback();
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testGetAdditionalData() : void
+    {
+        $feed = $this->getFeedSpecification();
+        $this->preSignedUrlStorage->initiate($feed);
+        $data = $this->getData();
+        $this->preSignedUrlStorage->addData($data);
+        $this->assertGreaterThan(1, count($this->preSignedUrlStorage->getAdditionalData()));
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testGetAdditionalDataNotInitiatedStorage() : void
+    {
+        $this->expectExceptionObject(new Exception('file is not initialized yet'));
+        $this->preSignedUrlStorage->getAdditionalData();
+    }
+
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/configure_aws_client_mock.php
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testIsSupportedFormat() : void
     {
         $this->assertTrue($this->preSignedUrlStorage->isSupportedFormat(MetadataInterface::FORMAT_JSON));
         $this->assertFalse($this->preSignedUrlStorage->isSupportedFormat('___test____'));
@@ -112,7 +229,7 @@ class PreSignedUrlStorageTest extends TestCase
      */
     private function getFeedSpecification() : FeedSpecificationInterface
     {
-        return $this->feedSpecificationBuilder->build(['preSignedUrl' => 'https://testurl.com']);
+        return $this->feedSpecificationBuilder->build(['preSignedUrl' => 'https://testurl.com', 'format' => MetadataInterface::FORMAT_JSON]);
     }
 
     /**

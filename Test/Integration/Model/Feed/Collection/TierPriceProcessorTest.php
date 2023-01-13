@@ -43,7 +43,7 @@ class TierPriceProcessorTest extends TestCase
      * @magentoAppIsolation enabled
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_tierprice.php
      */
-    public function testProcess() : void
+    public function testProcessAfterLoad() : void
     {
         $specification = $this->specificationBuilder->build(['includeTierPricing' => true]);
         $collection = $this->getCollection();

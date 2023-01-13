@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SearchSpring\Feed\Test\Integration\Model\Feed\DataProvider;
+namespace SearchSpring\Feed\Test\Integration\Model\Feed\DataProvider\Stock;
 
 use SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockProvider;
 
