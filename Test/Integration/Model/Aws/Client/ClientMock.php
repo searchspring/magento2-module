@@ -29,12 +29,11 @@ class ClientMock implements ClientInterface
     /**
      * @param string $method
      * @param string $url
+     * @param array|null $content
      * @param array $headers
-     * @param string|null $content
      * @return ResponseInterface
-     * @throws ClientException
      */
-    public function execute(string $method, string $url, ?string $content = null, array $headers = []): ResponseInterface
+    public function execute(string $method, string $url, ?array $content = null, array $headers = []): ResponseInterface
     {
         return $this->responseFactory->create([
             'code' => 200,

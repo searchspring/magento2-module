@@ -20,9 +20,9 @@ interface StorageInterface
     public function addData(array $data) : void;
 
     /**
-     * @throws Exception
+     * @param bool $deleteFile
      */
-    public function commit() : void;
+    public function commit(bool $deleteFile = true) : void;
 
     /**
      *

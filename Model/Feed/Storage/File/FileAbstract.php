@@ -126,6 +126,7 @@ abstract class FileAbstract implements FileInterface
 
         $this->closeFile();
         $this->getWriteDirectory()->delete($this->path);
+        $this->initialized = false;
     }
 
     /**
