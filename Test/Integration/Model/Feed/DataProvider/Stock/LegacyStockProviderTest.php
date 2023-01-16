@@ -102,7 +102,7 @@ class LegacyStockProviderTest extends StockProviderTest
      * @magentoDbIsolation disabled
      * @magentoConfigFixture current_store cataloginventory/options/show_out_of_stock 1
      * @magentoConfigFixture current_store cataloginventory/item_options/manage_stock 1
-     * @magentoDataFixture Magento/Store/_files/core_fixturestore.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/core_fixturestore.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_product_oos.php
      * @magentoConfigFixture fixturestore_store cataloginventory/options/show_out_of_stock 1
      * @magentoConfigFixture fixturestore_store cataloginventory/item_options/manage_stock 0

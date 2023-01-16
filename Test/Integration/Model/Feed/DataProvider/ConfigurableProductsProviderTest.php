@@ -90,8 +90,8 @@ class ConfigurableProductsProviderTest extends TestCase
     /**
      * @magentoAppIsolation enabled
      * @magentoDbIsolation disabled
-     * @magentoDataFixture Magento/Catalog/_files/product_boolean_attribute.php
-     * @magentoDataFixture Magento/Catalog/_files/product_decimal_attribute.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/product_boolean_attribute.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/product_decimal_attribute.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/configurable_products.php
      *
      * @throws \Exception

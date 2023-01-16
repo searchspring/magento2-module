@@ -6,7 +6,7 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 
-require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/core_fixturestore.php';
+require __DIR__ . '/core_fixturestore.php';
 require __DIR__ . '/simple_products.php';
 $storeManager = Magento\TestFramework\Helper\Bootstrap::getObjectManager()
     ->get(StoreManagerInterface::class);

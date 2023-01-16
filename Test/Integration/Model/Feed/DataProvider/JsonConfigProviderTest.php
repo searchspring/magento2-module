@@ -55,7 +55,7 @@ class JsonConfigProviderTest extends TestCase
      * @magentoDbIsolation disabled
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/configurable_products.php
-     * @magentoDataFixture Magento/Swatches/_files/configurable_product_two_attributes.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/configurable_product_two_swatches_attributes.php
      *
      * @throws \Exception
      */

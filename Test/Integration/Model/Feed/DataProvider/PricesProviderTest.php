@@ -213,7 +213,7 @@ class PricesProviderTest extends TestCase
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products_catalogrule_with_customer_group.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/configurable_products_catalogrule.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/grouped_products_catalogrule.php
-     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/customer.php
      *
      * @throws \Exception
      */

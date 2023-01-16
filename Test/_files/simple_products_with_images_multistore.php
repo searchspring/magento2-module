@@ -5,7 +5,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\Store;
 use Magento\TestFramework\Helper\Bootstrap;
 
-require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/core_fixturestore.php';
+require __DIR__ . '/core_fixturestore.php';
 require __DIR__ . '/simple_products_with_images.php';
 
 $objectManager = Bootstrap::getObjectManager();

@@ -15,8 +15,8 @@ use Magento\Eav\Setup\EavSetup;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 
-require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/ConfigurableProduct/_files/configurable_attribute_first.php';
-require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/ConfigurableProduct/_files/configurable_attribute_second.php';
+require __DIR__ . '/configurable_attribute_first.php';
+require __DIR__ . '/configurable_attribute_second.php';
 
 $objectManager = Bootstrap::getObjectManager();
 

@@ -42,7 +42,7 @@ class MediaGalleryProcessorTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Catalog/_files/product_simple_with_media_gallery_entries.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/product_simple_with_media_gallery_entries.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products.php
      * @throws LocalizedException
      */
@@ -65,7 +65,7 @@ class MediaGalleryProcessorTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Catalog/_files/product_simple_with_media_gallery_entries.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/product_simple_with_media_gallery_entries.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products.php
      */
     public function testProcessAfterLoadWithIncludeMediaGalleryIsFalse() : void
@@ -81,7 +81,7 @@ class MediaGalleryProcessorTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Catalog/_files/product_simple_with_media_gallery_entries.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/product_simple_with_media_gallery_entries.php
      * @magentoDataFixture SearchSpring_Feed::Test/_files/simple_products.php
      * @throws LocalizedException
      */
