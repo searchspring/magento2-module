@@ -133,10 +133,7 @@ class DataProvider
         }
 
         $attributesCollection = $this->getAttributesCollection->execute($configurableProducts);
-        $childAttributes = $this->getChildAttributes($attributesCollection->getItems(), $feedSpecification);
-        $childAttributeCodes = array_map(function ($attribute) {
-            return $attribute->getAttributeCode();
-        }, $childAttributes);
+        $childAttributeCodes = $this->getChildAttributeCodes($attributesCollection->getItems(), $feedSpecification);
         $childProductsCollection = $this->getChildCollection->execute($configurableProducts, $childAttributeCodes);
         $childProducts = $this->processChildProducts($childProductsCollection->getItems());
         $this->childStorage->set($childProducts);
@@ -181,7 +178,7 @@ class DataProvider
         FeedSpecificationInterface $feedSpecification
     ): array {
         if (is_null($this->configurableAttributes)) {
-            $attributes = $this->getAttributes($configurableProducts, $feedSpecification);
+            $attributes = $this->getAttributes($configurableProducts);
             $this->configurableAttributes = $this->processAttributes($attributes, $feedSpecification);
         }
 
@@ -267,47 +264,39 @@ class DataProvider
      * @return Attribute[]
      * @throws LocalizedException
      */
-    private function getChildAttributes(array $attributes, FeedSpecificationInterface $feedSpecification) : array
+    private function getChildAttributeCodes(array $attributes, FeedSpecificationInterface $feedSpecification) : array
     {
         $result = [];
         foreach ($attributes as $attribute) {
-            if (!isset($result[$attribute->getAttributeId()]) && $attribute->getProductAttribute()) {
-                $result[$attribute->getAttributeId()] = $attribute->getProductAttribute();
+            if ($attribute->getProductAttribute()) {
+                $result[] = $attribute->getProductAttribute()->getAttributeCode();
             }
         }
 
         $specificationAttributes = $this->childAttributesProvider->getAttributes($feedSpecification);
         foreach ($specificationAttributes as $attribute) {
-            if (!isset($result[$attribute->getAttributeId()])) {
-                $result[$attribute->getAttributeId()] = $attribute;
-            }
+            $result[] = $attribute->getAttributeCode();
         }
 
-        return $result;
+        foreach ($this->attributesProvider as $attributesProvider) {
+            $result = array_merge($result, $attributesProvider->getAttributeCodes($feedSpecification));
+        }
+
+        return array_unique($result);
     }
 
     /**
      * @param array $configurableProducts
-     * @param FeedSpecificationInterface $feedSpecification
-     * @return ProductAttributeInterface[]
+     * @return ConfigurableAttribute[]
      */
-    private function getAttributes(array $configurableProducts, FeedSpecificationInterface $feedSpecification) : array
+    private function getAttributes(array $configurableProducts) : array
     {
         if (is_null($this->attributes)) {
             $attributesCollection = $this->getAttributesCollection->execute($configurableProducts);
 
             $attributes = [];
             foreach ($attributesCollection as $attribute) {
-                $attributes[$attribute->getAttributeCode()] = $attribute;
-            }
-
-            foreach ($this->attributesProvider as $attributesProvider) {
-                $newAttributes = $attributesProvider->getAttributes($feedSpecification);
-                foreach ($newAttributes as $attribute) {
-                    if (!isset($attributes[$attribute->getAttributeCode()])) {
-                        $attributes[$attribute->getAttributeCode()] = $attribute;
-                    }
-                }
+                $attributes[] = $attribute;
             }
 
             $this->attributes = $attributes;

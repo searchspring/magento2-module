@@ -119,16 +119,7 @@ class MediaGalleryProvider implements DataProviderInterface
         MediaGallerySpecificationInterface $mediaGallerySpecification,
         string $file = null
     ) : string {
-//        if (!isset($this->imageHelpers[$type])) {
-            $imageHelper = $this->imageHelper->init($product, $type);
-//            $this->imageHelpers[$type] = $imageHelper;
-//        } else {
-//            $imageHelper = $this->imageHelpers[$type];
-//        }
-
-//        if (!$file) {
-//            $file = $product->getData($imageHelper->getType());
-//        }
+        $imageHelper = $this->imageHelper->init($product, $type);
 
         if ($file) {
             $imageHelper->setImageFile($file);

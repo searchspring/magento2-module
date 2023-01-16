@@ -46,8 +46,15 @@ class FeedAttributesProvider implements AttributesProviderInterface
     {
         if (is_null($this->attributes)) {
             $restrictedAttributes = $feedSpecification->getIgnoreFields();
+            if (!empty($restrictedAttributes)) {
+                $this->searchCriteriaBuilder->addFilter(
+                    ProductAttributeInterface::ATTRIBUTE_CODE,
+                    $restrictedAttributes,
+                    'nin'
+                );
+            }
+
             $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter(ProductAttributeInterface::ATTRIBUTE_CODE, $restrictedAttributes, 'nin')
                 ->create();
             $this->attributes = $this->productAttributeRepository->getList($searchCriteria)->getItems();
         }
