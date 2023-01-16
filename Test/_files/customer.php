@@ -1,11 +1,8 @@
 <?php
 
-use Magento\Authorization\Model\UserContextInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerRegistry;
-use Magento\JwtUserToken\Api\Data\Revoked;
-use Magento\JwtUserToken\Api\RevokedRepositoryInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 
 $objectManager = Bootstrap::getObjectManager();
@@ -35,12 +32,3 @@ $customer->setWebsiteId(1)
 $customer->isObjectNew(true);
 $customer->save();
 $customerRegistry->remove($customer->getId());
-/** @var RevokedRepositoryInterface $revokedRepo */
-$revokedRepo = $objectManager->get(RevokedRepositoryInterface::class);
-$revokedRepo->saveRevoked(
-    new Revoked(
-        UserContextInterface::USER_TYPE_CUSTOMER,
-        (int) $customer->getId(),
-        time() - 3600 * 24
-    )
-);

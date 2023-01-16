@@ -184,7 +184,7 @@ class CategoriesProviderTest extends TestCase
         foreach ($data as $item) {
             $categories = $item['categories'];
             foreach ($categories as $categoryName) {
-                $this->assertStringContainsString('Store default', $categoryName);
+                $this->assertTrue(strpos($categoryName, 'Store default') !== false);
             }
         }
         $this->categoriesProvider->reset();

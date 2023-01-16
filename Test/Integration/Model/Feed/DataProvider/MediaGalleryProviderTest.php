@@ -218,7 +218,7 @@ class MediaGalleryProviderTest extends TestCase
                 $this->assertArrayHasKey($key, $item);
                 $nameString = $typeMap[$key] ?? null;
                 if ($nameString) {
-                    $this->assertStringContainsString((string) $nameString, $item[$key]);
+                    $this->assertTrue(strpos($item[$key], $nameString) !== false);
                 }
             }
         }

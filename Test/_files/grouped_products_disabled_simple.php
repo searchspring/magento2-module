@@ -7,7 +7,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
-use Magento\GroupedProduct\Model\Inventory\ChangeParentStockStatus;
+use SearchSpring\Feed\Test\Integration\BackwardCompatibility\Grouped\Inventory\ChangeParentStockStatus;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\TestFramework\Helper\Bootstrap;
 
