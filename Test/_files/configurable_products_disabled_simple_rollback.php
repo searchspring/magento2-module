@@ -6,7 +6,6 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
 $objectManager = Bootstrap::getObjectManager();
 
@@ -36,8 +35,7 @@ foreach ($productRepository->getList($searchCriteria)->getItems() as $product) {
         //Product already removed
     }
 }
-
-Resolver::getInstance()->requireDataFixture('Magento/ConfigurableProduct/_files/configurable_attribute_first_rollback.php');
+require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/ConfigurableProduct/_files/configurable_attribute_first_rollback.php';
 
 $registry->unregister('isSecureArea');
 $registry->register('isSecureArea', false);

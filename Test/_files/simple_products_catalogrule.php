@@ -12,9 +12,9 @@ use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\ObjectManager;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
+require __DIR__ . '/simple_products.php';
+
 Bootstrap::getInstance()->loadArea(Area::AREA_ADMINHTML);
 /** @var ObjectManager $objectManager */
 $objectManager = Bootstrap::getObjectManager();

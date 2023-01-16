@@ -5,10 +5,9 @@ use Magento\Catalog\Model\CategoryFactory;
 use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
+require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/store_with_second_root_category.php';
 $objectManager = Bootstrap::getObjectManager();
-Resolver::getInstance()->requireDataFixture('Magento/Store/_files/store_with_second_root_category.php');
 /** @var CategoryFactory $categoryFactory */
 $categoryFactory = $objectManager->get(CategoryFactory::class);
 $categoryCollectionFactory = $objectManager->get(CollectionFactory::class);

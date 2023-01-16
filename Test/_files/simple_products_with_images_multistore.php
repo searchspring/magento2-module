@@ -1,14 +1,12 @@
 <?php
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\Store;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('Magento/Store/_files/core_fixturestore.php');
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_with_images.php');
+require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/core_fixturestore.php';
+require __DIR__ . '/simple_products_with_images.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var ProductRepositoryInterface $productRepository */

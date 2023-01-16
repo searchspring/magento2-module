@@ -1,14 +1,14 @@
 <?php
+
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Action;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('Magento/Store/_files/second_website_with_store_group_and_store.php');
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
+require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/second_website_with_store_group_and_store.php';
+require __DIR__ . '/simple_products.php';
 $objectManager = Bootstrap::getObjectManager();
 /** @var StoreManagerInterface $storeManager */
 $storeManager = $objectManager->get(StoreManagerInterface::class);

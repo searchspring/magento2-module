@@ -1,9 +1,4 @@
 <?php
-/**
- *  @author Dmitry Kisten <dkisten@absoluteweb.com>
- *  @author Absolute Web Services <info@absoluteweb.com>
- *  @copyright Copyright (c) 2021, Focus Camera, Inc.
- */
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogInventory\Api\StockStatusCriteriaInterfaceFactory;

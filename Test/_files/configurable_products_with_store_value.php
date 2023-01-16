@@ -4,9 +4,8 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/configurable_products.php');
+require __DIR__ . '/configurable_products.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var SearchCriteriaBuilder $searchCriteriaBuilder */

@@ -1,14 +1,17 @@
 <?php
-/**
- *  @author Dmitry Kisten <dkisten@absoluteweb.com>
- *  @author Absolute Web Services <info@absoluteweb.com>
- *  @copyright Copyright (c) 2021, Focus Camera, Inc.
- */
+
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\TestFramework\Helper\Bootstrap;
+
 $storeManager = Magento\TestFramework\Helper\Bootstrap::getObjectManager()
-    ->get(\Magento\Store\Model\StoreManagerInterface::class);
-$product = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(\Magento\Catalog\Model\Product::class);
-$productRepository = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
-/** @var \Magento\Catalog\Model\Product $product */
+    ->get(StoreManagerInterface::class);
+$product = Bootstrap::getObjectManager()->create(Product::class);
+$productRepository = Bootstrap::getObjectManager()->get(ProductRepositoryInterface::class);
+/** @var Product $product */
 $product->setTypeId('simple')
     ->setAttributeSetId(4)
     ->setName('Simple Visibility Catalog')
@@ -18,8 +21,8 @@ $product->setTypeId('simple')
     ->setMetaTitle('meta title')
     ->setMetaKeyword('meta keyword')
     ->setMetaDescription('meta description')
-    ->setVisibility(\Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_CATALOG)
-    ->setStatus(\Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED)
+    ->setVisibility(Visibility::VISIBILITY_IN_CATALOG)
+    ->setStatus(Status::STATUS_ENABLED)
     ->setStockData(
         [
             'qty' => 100,

@@ -4,9 +4,8 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
+require __DIR__ . '/simple_products.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var ProductRepositoryInterface $productRepository */
@@ -16,7 +15,7 @@ $searchCriteriaBuilder = $objectManager->get(SearchCriteriaBuilder::class);
 $searchCriteria = $searchCriteriaBuilder->addFilter('sku', 'searchspring_simple%', 'like')
     ->create();
 foreach ($productRepository->getList($searchCriteria)->getItems() as $product) {
-    Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/product_image.php');
+    require __DIR__ . '/product_image.php';
     $sku = $product->getSku();
     /** @var $product Product */
     $product->setStoreId(0)

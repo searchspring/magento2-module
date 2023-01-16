@@ -9,10 +9,9 @@ use Magento\Review\Model\Review;
 use Magento\Review\Model\ReviewFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('Magento/Store/_files/core_fixturestore.php');
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_with_rating.php');
+require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/Store/_files/core_fixturestore.php';
+require __DIR__ . '/simple_products_with_rating.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var StoreManagerInterface $storeManager */

@@ -7,9 +7,8 @@ use Magento\CatalogRule\Model\Indexer\IndexBuilder;
 use Magento\CatalogRule\Model\ResourceModel\Rule\CollectionFactory;
 use Magento\CatalogRule\Model\Rule;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_rollback.php');
+require __DIR__ . '/simple_products_rollback.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var CatalogRuleRepositoryInterface $ruleRepository */
