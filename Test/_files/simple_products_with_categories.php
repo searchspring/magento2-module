@@ -2,10 +2,9 @@
 
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/categories.php');
+require __DIR__ . '/simple_products.php';
+require __DIR__ . '/categories.php';
 
 $objectManager = Bootstrap::getObjectManager();
 /** @var CategoryLinkManagementInterface $categoryLinkManagement */

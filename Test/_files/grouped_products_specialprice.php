@@ -4,9 +4,8 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\ObjectManager;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/grouped_products.php');
+require __DIR__ . '/grouped_products.php';
 /** @var ObjectManager $objectManager */
 $objectManager = Bootstrap::getObjectManager();
 $productRepository = $objectManager->get(ProductRepositoryInterface::class);

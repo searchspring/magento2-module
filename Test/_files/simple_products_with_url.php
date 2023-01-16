@@ -3,9 +3,8 @@
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
+require __DIR__ . '/simple_products.php';
 $product = Bootstrap::getObjectManager()->create(Product::class);
 $productRepository = Bootstrap::getObjectManager()->get(ProductRepositoryInterface::class);
 /** @var Product $product */

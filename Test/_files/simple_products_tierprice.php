@@ -1,9 +1,4 @@
 <?php
-/**
- *  @author Dmitry Kisten <dkisten@absoluteweb.com>
- *  @author Absolute Web Services <info@absoluteweb.com>
- *  @copyright Copyright (c) 2021, Focus Camera, Inc.
- */
 
 use Magento\Catalog\Api\Data\ProductTierPriceInterfaceFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -11,9 +6,8 @@ use Magento\Catalog\Model\Product;
 use Magento\Customer\Model\Group;
 use Magento\TestFramework\Helper\Bootstrap;
 use Magento\TestFramework\ObjectManager;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products.php');
+require __DIR__ . '/simple_products.php';
 /** @var ObjectManager $objectManager */
 $objectManager = Bootstrap::getObjectManager();
 $productRepository = $objectManager->get(ProductRepositoryInterface::class);

@@ -4,11 +4,10 @@ use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 
+require __DIR__ . '/simple_products_with_categories.php';
+require __DIR__ . '/categories_second_website.php';
 $objectManager = Bootstrap::getObjectManager();
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_with_categories.php');
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/categories_second_website.php');
 
 /** @var WebsiteRepositoryInterface $websiteRepository */
 $websiteRepository = $objectManager->get(WebsiteRepositoryInterface::class);

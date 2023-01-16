@@ -6,7 +6,6 @@ use Magento\Framework\Registry;
 use Magento\Review\Model\ResourceModel\Review\CollectionFactory;
 use Magento\Review\Model\Review;
 use Magento\Review\Model\ReviewFactory;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use Magento\TestFramework\Helper\Bootstrap;
 
 $objectManager = Bootstrap::getObjectManager();
@@ -40,4 +39,4 @@ foreach ($productRepository->getList($searchCriteria)->getItems() as $item) {
 $registry->unregister('isSecureArea');
 $registry->register('isSecureArea', $currentArea);
 
-Resolver::getInstance()->requireDataFixture('SearchSpring_Feed::Test/_files/simple_products_rollback.php');
+require __DIR__ . '/simple_products_rollback.php';
