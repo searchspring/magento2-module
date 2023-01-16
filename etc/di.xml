@@ -312,8 +312,16 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="SearchSpringFeedExecutePendingTasks" xsi:type="object">SearchSpring\Feed\Console\Command\ExecutePendingTasks</item>
+                <item name="SearchSpringFeedExecutePendingTasks" xsi:type="object">SearchSpring\Feed\Console\Command\ExecutePendingTasks\Proxy</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Console\Command\ExecutePendingTasks">
+        <arguments>
+            <argument name="state" xsi:type="object">Magento\Framework\App\State\Proxy</argument>
+            <argument name="cliOutput" xsi:type="object">SearchSpring\Feed\Model\Metric\Output\CliOutput\Proxy</argument>
+            <argument name="metricCollector" xsi:type="object">SearchSpring\Feed\Model\Metric\CollectorInterface\Proxy</argument>
         </arguments>
     </type>
 
