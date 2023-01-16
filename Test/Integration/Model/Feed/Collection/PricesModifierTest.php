@@ -44,7 +44,7 @@ class PricesModifierTest extends TestCase
      */
     public function testModify() : void
     {
-        $this->testWithoutPriceRestriction([]);
+        $this->assertWithoutPriceRestriction([]);
     }
 
     /**
@@ -71,16 +71,16 @@ class PricesModifierTest extends TestCase
      */
     public function testModifyWithIgnoreOneOrTwoPricesField() : void
     {
-        $this->testWithoutPriceRestriction(['ignoreFields' => ['final_price']]);
-        $this->testWithoutPriceRestriction(['ignoreFields' => ['regular_price']]);
-        $this->testWithoutPriceRestriction(['ignoreFields' => ['max_price']]);
-        $this->testWithoutPriceRestriction(['ignoreFields' => ['max_price', 'regular_price']]);
+        $this->assertWithoutPriceRestriction(['ignoreFields' => ['final_price']]);
+        $this->assertWithoutPriceRestriction(['ignoreFields' => ['regular_price']]);
+        $this->assertWithoutPriceRestriction(['ignoreFields' => ['max_price']]);
+        $this->assertWithoutPriceRestriction(['ignoreFields' => ['max_price', 'regular_price']]);
     }
 
     /**
      * @param array $payload
      */
-    private function testWithoutPriceRestriction(array $payload) : void
+    private function assertWithoutPriceRestriction(array $payload) : void
     {
         $specification = $this->specificationBuilder->build($payload);
         $collection = $this->getCollection();
