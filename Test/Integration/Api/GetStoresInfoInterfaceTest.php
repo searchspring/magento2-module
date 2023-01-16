@@ -28,7 +28,7 @@ class GetStoresInfoInterfaceTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
      */
     public function testExecute() : void
     {
@@ -38,8 +38,8 @@ class GetStoresInfoInterfaceTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
-     * @magentoDataFixture Magento/Store/_files/second_store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/second_store.php
      */
     public function testExecuteWithMultiStore() : void
     {

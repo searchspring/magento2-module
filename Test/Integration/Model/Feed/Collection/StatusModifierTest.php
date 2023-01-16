@@ -60,7 +60,7 @@ class StatusModifierTest extends TestCase
         $this->assertEquals(Status::STATUS_DISABLED, (int) $disabledProduct->getStatus());
         $enabledSkus = ['searchspring_simple_1', 'searchspring_simple_2'];
         foreach ($collection as $item) {
-            $this->assertTrue(in_array($item->getSku(), $enabledSkus));
+            $this->assertTrue(in_array($item->getSku(), $enabledSkus), 'sku: ' . $item->getSku());
         }
     }
 

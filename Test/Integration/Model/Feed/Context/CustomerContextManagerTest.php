@@ -46,7 +46,7 @@ class CustomerContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/customer.php
      */
     public function testSetContextFromSpecification() : void
     {
@@ -70,7 +70,7 @@ class CustomerContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/customer.php
      */
     public function testSetContextFromSpecificationWithInvalidCustomerId() : void
     {
@@ -81,7 +81,7 @@ class CustomerContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/customer.php
      */
     public function testResetContext() : void
     {

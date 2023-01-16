@@ -33,7 +33,7 @@ class CustomerValidatorTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/customer.php
      *
      * @return void
      */

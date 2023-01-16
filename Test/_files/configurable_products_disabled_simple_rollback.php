@@ -35,7 +35,7 @@ foreach ($productRepository->getList($searchCriteria)->getItems() as $product) {
         //Product already removed
     }
 }
-require __DIR__ . '/../../../../../../dev/tests/integration/testsuite/Magento/ConfigurableProduct/_files/configurable_attribute_first_rollback.php';
+require __DIR__ . '/configurable_attribute_first_rollback.php';
 
 $registry->unregister('isSecureArea');
 $registry->register('isSecureArea', false);

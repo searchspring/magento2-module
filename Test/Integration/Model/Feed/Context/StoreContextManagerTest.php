@@ -77,7 +77,7 @@ class StoreContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
      */
     public function testSetContextFromSpecificationWithNotDefaultStore() : void
     {
@@ -87,7 +87,7 @@ class StoreContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/multiple_websites_with_store_groups_stores.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/multiple_websites_with_store_groups_stores.php
      */
     public function testSetContextFromSpecificationWithStoreFromDifferentWebsite() : void
     {
@@ -97,7 +97,7 @@ class StoreContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
      */
     public function testResetContext() : void
     {
@@ -107,7 +107,7 @@ class StoreContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
      */
     public function testResetContextWithEmptyStore() : void
     {
@@ -122,7 +122,7 @@ class StoreContextManagerTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/multiple_websites_with_store_groups_stores.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/multiple_websites_with_store_groups_stores.php
      */
     public function testResetContextWithStoreFromDifferentWebsite() : void
     {

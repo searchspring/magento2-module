@@ -36,7 +36,7 @@ class StoreValidatorTest extends TestCase
 
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/store.php
      */
     public function testValidate() : void
     {
@@ -73,7 +73,7 @@ class StoreValidatorTest extends TestCase
     }
     /**
      * @magentoAppIsolation enabled
-     * @magentoDataFixture Magento/Store/_files/inactive_store.php
+     * @magentoDataFixture SearchSpring_Feed::Test/_files/inactive_store.php
      */
     public function testValidateWithDeactivatedStoreCode() : void
     {
