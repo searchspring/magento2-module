@@ -8,6 +8,8 @@ use SearchSpring\Feed\Model\Feed\DataProvider\SaleableProvider;
 
 class SaleableProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $saleableProvider;
+
     public function setUp(): void
     {
         $this->saleableProvider = new SaleableProvider();

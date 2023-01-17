@@ -41,6 +41,8 @@ class ExecuteTaskTest extends \PHPUnit\Framework\TestCase
      */
     private $loggerMock;
 
+    private $executeTask;
+
     public function setUp(): void
     {
         $this->executorPoolMock = $this->createMock(ExecutorPool::class);

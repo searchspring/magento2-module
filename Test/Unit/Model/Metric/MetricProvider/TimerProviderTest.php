@@ -7,6 +7,10 @@ use SearchSpring\Feed\Model\Metric\MetricProvider\TimerProvider;
 
 class TimerProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $dateTimeMock;
+
+    private $timerProvider;
+
     public function setUp(): void
     {
         $this->dateTimeMock = $this->createMock(DateTime::class);

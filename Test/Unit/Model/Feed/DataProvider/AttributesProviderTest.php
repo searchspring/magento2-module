@@ -12,6 +12,14 @@ use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 
 class AttributesProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $systemFieldsListMock;
+
+    private $valueProcessorMock;
+
+    private $attributesProviderMock;
+
+    private $attributesProvider;
+
     public function setUp(): void
     {
         $this->systemFieldsListMock = $this->createMock(SystemFieldsList::class);

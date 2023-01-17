@@ -8,6 +8,10 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Price\ProviderResolver;
 
 class ProviderResolverTest extends \PHPUnit\Framework\TestCase
 {
+    private $basePriceProviderMock;
+
+    private $providerResolver;
+
     public function setUp(): void
     {
         $this->basePriceProviderMock = $this->createMock(BasePriceProvider::class);

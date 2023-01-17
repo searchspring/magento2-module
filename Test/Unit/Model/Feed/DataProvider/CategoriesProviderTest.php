@@ -11,6 +11,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Category\GetCategoriesByProductIds
 
 class CategoriesProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $collectionBuilderMock;
+
+    private $getCategoriesByProductIdsMock;
+
+    private $categoriesProvider;
+
     public function setUp(): void
     {
         $this->collectionBuilderMock = $this->createMock(CollectionBuilder::class);

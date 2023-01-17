@@ -33,6 +33,8 @@ class ExecutePendingTasksTest extends \PHPUnit\Framework\TestCase
      */
     private $loggerMock;
 
+    private $executePendingTasks;
+
     /**
      * @return void
      */

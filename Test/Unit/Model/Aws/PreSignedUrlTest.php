@@ -11,6 +11,12 @@ use SearchSpring\Feed\Model\Aws\PreSignedUrl;
 
 class PreSignedUrlTest extends TestCase
 {
+    private $clientMock;
+
+    private $appConfigMock;
+
+    private $preSignedUrl;
+
     public function setUp(): void
     {
         $this->clientMock = $this->createMock(ClientInterface::class);

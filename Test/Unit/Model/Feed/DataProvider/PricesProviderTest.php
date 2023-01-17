@@ -21,6 +21,8 @@ class PricesProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $priceProviderResolverMock;
 
+    private $pricesProvider;
+
     public function setUp(): void
     {
         $this->jsonMock = $this->createMock(Json::class);

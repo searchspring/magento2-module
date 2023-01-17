@@ -15,6 +15,18 @@ use SearchSpring\Feed\Model\Feed\Collection\StockModifier;
 
 class CollectionProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $storeModifierMock;
+
+    private $statusModifierMock;
+
+    private $visibilityModifierMock;
+
+    private $stockModifierMock;
+
+    private $attributesModifierMock;
+
+    private $pricesModifierMock;
+
     public function setUp(): void
     {
         $this->storeModifierMock = $this->createMock(StoreModifier::class);

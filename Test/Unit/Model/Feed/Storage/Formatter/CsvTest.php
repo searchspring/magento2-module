@@ -19,6 +19,8 @@ class CsvTest extends \PHPUnit\Framework\TestCase
      */
     private $fieldsProviderMock;
 
+    private $csv;
+
     public function setUp(): void
     {
         $this->jsonMock = $this->createMock(JsonSerializer::class);

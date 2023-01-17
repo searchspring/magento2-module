@@ -7,6 +7,10 @@ use SearchSpring\Feed\Model\Feed\CollectionConfig;
 
 class CollectionConfigTest extends \PHPUnit\Framework\TestCase
 {
+    private $appConfigMock;
+
+    private $collectionConfig;
+
     public function setUp(): void
     {
         $this->appConfigMock = $this->createMock(AppConfigInterface::class);

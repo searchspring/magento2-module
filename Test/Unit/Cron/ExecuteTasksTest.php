@@ -7,7 +7,12 @@ use SearchSpring\Feed\Cron\ExecuteTasks;
 
 class ExecuteTasksTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var ExecutePendingTasksInterface
+     */
     private $executePendingTaskInterfaceMock;
+
+    private $executeTasks;
 
     public function setUp(): void
     {

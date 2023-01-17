@@ -52,6 +52,8 @@ class FieldsProviderTest extends \PHPUnit\Framework\TestCase
      */
     private $storeManagerMock;
 
+    private $fieldsProvider;
+
     public function setUp(): void
     {
         $this->attributesProviderMock = $this->createMock(AttributesProviderInterface::class);

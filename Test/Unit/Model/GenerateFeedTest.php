@@ -52,6 +52,10 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
      */
     private $afterLoadProcessorPoolMock;
 
+    private $appConfigMock;
+
+    private $generateFeed;
+
     /**
      * @return void
      */

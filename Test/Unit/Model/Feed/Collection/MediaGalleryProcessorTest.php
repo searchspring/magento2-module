@@ -9,6 +9,8 @@ use SearchSpring\Feed\Model\Feed\Collection\MediaGalleryProcessor;
 
 class MediaGalleryProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    private $mediaGalleryProcessor;
+
     public function setUp(): void
     {
         $this->mediaGalleryProcessor = new MediaGalleryProcessor();

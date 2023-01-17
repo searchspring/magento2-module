@@ -18,6 +18,8 @@ class BoolValidatorTest extends \PHPUnit\Framework\TestCase
         'includeOutOfStock',
     ];
 
+    private $boolValidator;
+
     /**
      * @return void
      */

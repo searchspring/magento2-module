@@ -20,14 +20,18 @@ class OptionsProviderTest extends \PHPUnit\Framework\TestCase
      * @var MetadataPool
      */
     private $metadataPoolMock;
+
     /**
      * @var OptionCollectionFactory
      */
     private $optionCollectionFactoryMock;
+
     /**
      * @var StoreManagerInterface
      */
     private $storeManagerMock;
+
+    private $optionsProvider;
 
     public function setUp(): void
     {

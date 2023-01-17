@@ -20,6 +20,20 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 
 class GroupedProductsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $childAttributesProviderMock;
+
+    private $storeManagerMock;
+
+    private $getChildCollectionMock;
+
+    private $metadataPoolMock;
+
+    private $getChildProductsDataMock;
+
+    private $valueProcessorMock;
+
+    private $groupedProductsProvider;
+
     public function setUp(): void
     {
         $this->childAttributesProviderMock = $this->createMock(ChildAttributesProvider::class);

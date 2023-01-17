@@ -11,6 +11,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\MediaGalleryProvider;
 
 class MediaGalleryProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $imageHelperMock;
+
+    private $jsonMock;
+
+    private $mediaGalleryProvider;
+
     public function setUp(): void
     {
         $this->imageHelperMock = $this->createMock(Image::class);

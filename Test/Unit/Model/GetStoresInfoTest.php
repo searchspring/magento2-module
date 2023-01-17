@@ -31,6 +31,8 @@ class GetStoresInfoTest extends \PHPUnit\Framework\TestCase
      */
     private $scopeConfigMock;
 
+    private $getStoresInfoModel;
+
     /**
      * @return void
      */

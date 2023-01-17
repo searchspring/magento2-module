@@ -12,6 +12,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\DataProvider;
 
 class ConfigurableProductsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $getChildProductsDataMock;
+
+    private $providerMock;
+
+    private $configurableProductsProvider;
+
     public function setUp(): void
     {
         $this->getChildProductsDataMock = $this->createMock(GetChildProductsData::class);

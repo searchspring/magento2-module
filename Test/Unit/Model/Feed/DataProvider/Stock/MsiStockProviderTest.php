@@ -18,6 +18,22 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider;
 
 class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $storeManagerMock;
+
+    private $websiteRepositoryMock;
+
+    private $productResourceMock;
+
+    private $legacyStockItemCriteriaFactoryMock;
+
+    private $legacyStockItemRepositoryMock;
+
+    private $stockConfigurationMock;
+
+    private $typeManagerMock;
+
+    private $msiStockProvider;
+
     public function setUp(): void
     {
         $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);

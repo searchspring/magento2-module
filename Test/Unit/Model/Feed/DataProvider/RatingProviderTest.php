@@ -15,6 +15,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\RatingProvider;
 
 class RatingProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $collectionFactoryMock;
+
+    private $storeManagerMock;
+
+    private $ratingProvider;
+
     public function setUp(): void
     {
         $this->collectionFactoryMock = $this->createMock(SummaryCollectionFactory::class);

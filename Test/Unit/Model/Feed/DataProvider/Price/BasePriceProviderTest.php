@@ -13,6 +13,10 @@ use Magento\Framework\Pricing\Price\PriceInterface;
 
 class BasePriceProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $typeMock;
+
+    private $basePriceProvider;
+
     public function setUp(): void
     {
         $this->typeMock = $this->createMock(Type::class);

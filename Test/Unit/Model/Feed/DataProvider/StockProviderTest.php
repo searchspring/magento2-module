@@ -11,6 +11,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\StockProvider;
 
 class StockProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $stockResolverMock;
+
+    private $storeManagerMock;
+
+    private $stockProvider;
+
     public function setUp(): void
     {
         $this->stockResolverMock = $this->createMock(StockResolverInterface::class);

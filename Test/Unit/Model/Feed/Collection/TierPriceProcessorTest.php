@@ -8,6 +8,8 @@ use SearchSpring\Feed\Model\Feed\Collection\TierPriceProcessor;
 
 class TierPriceProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    private $tierPriceProcessor;
+
     public function setUp(): void
     {
         $this->tierPriceProcessor = new TierPriceProcessor();

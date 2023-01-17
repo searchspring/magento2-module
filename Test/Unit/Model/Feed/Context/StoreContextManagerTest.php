@@ -11,6 +11,12 @@ use SearchSpring\Feed\Model\Feed\Context\StoreContextManager;
 
 class StoreContextManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private $storeManagerMock;
+
+    private $emulationMock;
+
+    private $storeContextManager;
+
     public function setUp(): void
     {
         $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);

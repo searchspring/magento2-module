@@ -9,6 +9,10 @@ use SearchSpring\Feed\Model\Feed\Collection\PricesModifier;
 
 class PricesModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $collectionProcessorMock;
+
+    private $pricesModifier;
+
     public function setUp(): void
     {
         $this->collectionProcessorMock = $this->createMock(CollectionProcessor::class);

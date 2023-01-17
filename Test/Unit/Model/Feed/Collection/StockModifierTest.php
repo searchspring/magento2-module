@@ -9,6 +9,10 @@ use SearchSpring\Feed\Model\Feed\Collection\StockModifier;
 
 class StockModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $statusMock;
+
+    private $stockModifier;
+
     public function setUp(): void
     {
         $this->statusMock = $this->createMock(Status::class);

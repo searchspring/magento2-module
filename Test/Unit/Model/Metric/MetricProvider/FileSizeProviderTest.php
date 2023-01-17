@@ -6,6 +6,8 @@ use SearchSpring\Feed\Model\Metric\MetricProvider\FileSizeProvider;
 
 class FileSizeProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $fileSizeProvider;
+
     public function setUp(): void
     {
         $this->fileSizeProvider = new FileSizeProvider();

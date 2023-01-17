@@ -10,6 +10,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetAttributesCollecti
 
 class GetAttributesCollectionTest extends \PHPUnit\Framework\TestCase
 {
+    private $joinProcessorMock;
+
+    private $attributeCollectionFactoryMock;
+
+    private $getAttributesCollection;
+
     public function setUp(): void
     {
         $this->joinProcessorMock = $this->createMock(JoinProcessorInterface::class);

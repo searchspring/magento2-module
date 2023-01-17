@@ -8,6 +8,8 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
 
 class ValueProcessorTest extends \PHPUnit\Framework\TestCase
 {
+    private $valueProcessor;
+
     /**
      * @return void
      */

@@ -11,6 +11,8 @@ class ChildAttributesProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $eavConfigMock;
 
+    private $childAttributesProvider;
+
     /**
      * @return void
      */

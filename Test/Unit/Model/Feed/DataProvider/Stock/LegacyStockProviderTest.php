@@ -12,6 +12,14 @@ use Magento\CatalogInventory\Api\Data\StockItemCollectionInterface;
 
 class LegacyStockProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $legacyStockItemCriteriaFactoryMock;
+
+    private $legacyStockItemRepositoryMock;
+
+    private $stockConfigurationMock;
+
+    private $legacyStockProvider;
+
     public function setUp(): void
     {
         $this->legacyStockItemCriteriaFactoryMock = $this->createMock(StockItemCriteriaInterfaceFactory::class);

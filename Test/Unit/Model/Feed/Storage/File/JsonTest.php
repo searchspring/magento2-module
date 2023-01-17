@@ -11,6 +11,14 @@ use SearchSpring\Feed\Model\Feed\Storage\File\Json;
 
 class JsonTest extends \PHPUnit\Framework\TestCase
 {
+    private $filesystemMock;
+
+    private $randomMock;
+
+    private $jsonSeriazlierMock;
+
+    private $csv;
+
     public function setUp(): void
     {
         $this->filesystemMock = $this->createMock(Filesystem::class);

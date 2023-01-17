@@ -21,6 +21,8 @@ class SpecificationBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $mediaGallerySpecificationFactoryMock;
 
+    private $specificationBuilder;
+
     /**
      * @var array
      */

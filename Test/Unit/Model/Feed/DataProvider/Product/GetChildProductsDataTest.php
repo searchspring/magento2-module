@@ -8,6 +8,10 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Product\GetChildProductsData;
 
 class GetChildProductsDataTest extends \PHPUnit\Framework\TestCase
 {
+    private $valueProcessorMock;
+
+    private $getChildProductsData;
+
     public function setUp(): void
     {
         $this->valueProcessorMock = $this->createMock(ValueProcessor::class);

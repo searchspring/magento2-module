@@ -10,6 +10,10 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\AttributesProviderInterf
 
 class AttributesModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $attributesProviderMock;
+
+    private $attributesModifier;
+
     public function setUp(): void
     {
         $this->attributesProviderMock = $this->createMock(AttributesProviderInterface::class);

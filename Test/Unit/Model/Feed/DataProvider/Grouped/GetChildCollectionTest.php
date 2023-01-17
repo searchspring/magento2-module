@@ -26,6 +26,18 @@ class GetChildCollectionTest extends \PHPUnit\Framework\TestCase
         ProductInterface::STATUS
     ];
 
+    private $linkFactoryMock;
+
+    private $statusMock;
+
+    private $collectionFactoryMock;
+
+    private $stockHelperMock;
+
+    private $configurationMock;
+
+    private $getChildCollection;
+
     public function setUp(): void
     {
         $this->linkFactoryMock = $this->createMock(LinkFactory::class);

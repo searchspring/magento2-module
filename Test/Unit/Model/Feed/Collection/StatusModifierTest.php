@@ -10,6 +10,10 @@ use SearchSpring\Feed\Model\Feed\Collection\StatusModifier;
 
 class StatusModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $statusMock;
+
+    private $statusModifier;
+
     public function setUp(): void
     {
         $this->statusMock = $this->createMock(Status::class);

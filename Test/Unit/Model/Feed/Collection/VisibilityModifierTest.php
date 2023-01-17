@@ -9,6 +9,10 @@ use SearchSpring\Feed\Model\Feed\Collection\VisibilityModifier;
 
 class VisibilityModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $visibilityMock;
+
+    private $visibilityModifier;
+
     public function setUp(): void
     {
         $this->visibilityMock = $this->createMock(Visibility::class);

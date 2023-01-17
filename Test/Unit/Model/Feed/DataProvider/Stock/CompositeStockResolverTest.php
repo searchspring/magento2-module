@@ -9,6 +9,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Stock\StockResolverInterface;
 
 class CompositeStockResolverTest extends \PHPUnit\Framework\TestCase
 {
+    private $msiStockResolver;
+
+    private $legacyStockResolver;
+
+    private $compositeStockResolver;
+
     public function setUp(): void
     {
         $this->msiStockResolver = $this->createMock(StockResolverInterface::class);

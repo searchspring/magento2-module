@@ -42,6 +42,8 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
      */
     private $uniqueCheckerPoolMock;
 
+    private $createTask;
+
     public function setUp(): void
     {
         $this->taskRepositoryMock = $this->createMock(TaskRepositoryInterface::class);

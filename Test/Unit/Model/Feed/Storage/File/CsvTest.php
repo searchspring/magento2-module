@@ -13,6 +13,14 @@ use SearchSpring\Feed\Model\Feed\Storage\File\Csv;
 
 class CsvTest extends \PHPUnit\Framework\TestCase
 {
+    private $filesystemMock;
+
+    private $randomMock;
+
+    private $fieldsProviderMock;
+
+    private $csv;
+
     public function setUp(): void
     {
         $this->filesystemMock = $this->createMock(Filesystem::class);

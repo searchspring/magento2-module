@@ -7,6 +7,10 @@ use SearchSpring\Feed\Model\Feed\Storage\File\NameGenerator;
 
 class NameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
+    private $dateTimeMock;
+
+    private $nameGenerator;
+
     public function setUp(): void
     {
         $this->dateTimeMock = $this->createMock(DateTime::class);

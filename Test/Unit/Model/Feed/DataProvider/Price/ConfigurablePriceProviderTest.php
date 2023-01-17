@@ -14,6 +14,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Product\ChildStorage;
 
 class ConfigurablePriceProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $dataProviderMock;
+
+    private $configurableOptionsProviderMock;
+
+    private $configurablePriceProvider;
+
     public function setUp(): void
     {
         $this->dataProviderMock = $this->createMock(DataProvider::class);

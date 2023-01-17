@@ -12,6 +12,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\JsonConfigProvider;
 
 class JsonConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $layoutMock;
+
+    private $dataProviderMock;
+
+    private $jsonConfigProvider;
+
     public function setUp(): void
     {
         $this->layoutMock = $this->createMock(LayoutInterface::class);

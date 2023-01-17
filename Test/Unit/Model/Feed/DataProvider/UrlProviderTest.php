@@ -8,6 +8,8 @@ use SearchSpring\Feed\Model\Feed\DataProvider\UrlProvider;
 
 class UrlProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private $urlProvider;
+
     public function setUp(): void
     {
         $this->urlProvider = new UrlProvider();

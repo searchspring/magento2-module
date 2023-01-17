@@ -8,6 +8,8 @@ class SystemFieldsListTest extends \PHPUnit\Framework\TestCase
 {
     private $testData = ['test'];
 
+    private $systemFieldsList;
+
     public function setUp(): void
     {
         $this->systemFieldsList = new SystemFieldsList($this->testData);

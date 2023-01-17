@@ -7,6 +7,8 @@ use Symfony\Component\Console\Output\OutputInterface as CliOutputInterface;
 
 class CliOutputTest extends \PHPUnit\Framework\TestCase
 {
+    private $cliOutput;
+
     public function setUp(): void
     {
         $this->cliOutput = new CliOutput();

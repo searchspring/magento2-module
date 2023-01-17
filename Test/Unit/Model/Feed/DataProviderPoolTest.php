@@ -21,6 +21,8 @@ class DataProviderPoolTest extends \PHPUnit\Framework\TestCase
         '__json_config__' => null,
     ];
 
+    private $dataProviderPool;
+
     public function setUp(): void
     {
         $this->dataProviderPool = new DataProviderPool($this->dataProviders);

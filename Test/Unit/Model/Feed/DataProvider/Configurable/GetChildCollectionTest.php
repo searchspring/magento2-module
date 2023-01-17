@@ -10,6 +10,12 @@ use SearchSpring\Feed\Model\Feed\DataProvider\Configurable\GetChildCollection;
 
 class GetChildCollectionTest extends \PHPUnit\Framework\TestCase
 {
+    private $statusMock;
+
+    private $productCollectionFactoryMock;
+
+    private $getChildCollection;
+
     public function setUp(): void
     {
         $this->statusMock = $this->createMock(Status::class);

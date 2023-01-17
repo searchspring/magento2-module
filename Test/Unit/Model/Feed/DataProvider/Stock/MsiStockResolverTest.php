@@ -14,6 +14,10 @@ class MsiStockResolverTest extends \PHPUnit\Framework\TestCase
         'Magento_InventoryCatalogApi'
     ];
 
+    private $moduleManagerMock;
+
+    private $msiStockResolver;
+
     public function setUp(): void
     {
         $this->moduleManagerMock = $this->createMock(Manager::class);

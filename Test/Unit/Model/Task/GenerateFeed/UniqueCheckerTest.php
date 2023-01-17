@@ -22,6 +22,8 @@ class UniqueCheckerTest extends TestCase
      */
     private $searchCriteriaBuilderMock;
 
+    private $uniqueChecker;
+
     /**
      * @return void
      */

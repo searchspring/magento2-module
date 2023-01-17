@@ -12,6 +12,8 @@ class CollectionBuilderTest extends \PHPUnit\Framework\TestCase
 {
     private $collectionFactoryMock;
 
+    private $collectionBuilder;
+
     /**
      * @return void
      */

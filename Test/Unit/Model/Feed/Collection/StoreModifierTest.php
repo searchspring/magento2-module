@@ -8,6 +8,8 @@ use SearchSpring\Feed\Model\Feed\Collection\StoreModifier;
 
 class StoreModifierTest extends \PHPUnit\Framework\TestCase
 {
+    private $storeModifier;
+
     public function setUp(): void
     {
         $this->storeModifier = new StoreModifier();

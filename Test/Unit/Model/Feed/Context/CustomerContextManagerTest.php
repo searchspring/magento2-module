@@ -10,6 +10,12 @@ use SearchSpring\Feed\Model\Feed\Context\CustomerContextManager;
 
 class CustomerContextManagerTest extends \PHPUnit\Framework\TestCase
 {
+    private $sessionMock;
+
+    private $customerRepositoryMock;
+
+    private $customerContextManager;
+
     public function setUp(): void
     {
         $this->sessionMock = $this->createMock(Session::class);
