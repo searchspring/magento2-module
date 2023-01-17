@@ -6,6 +6,9 @@ use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SearchSpring\Feed\Api\Data\TaskInterface;
@@ -85,7 +88,7 @@ class TaskRepositoryTest extends TestCase
 
     /**
      * @return void
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws CouldNotSaveException
      */
     public function testSave()
     {
@@ -98,6 +101,20 @@ class TaskRepositoryTest extends TestCase
             ->willReturnSelf();
 
         $this->assertSame($taskMock, $this->taskRepository->save($taskMock));
+    }
+
+    public function testSaveExceptionCase()
+    {
+        $taskMock = $this->getMockBuilder(Task::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->taskResourceMock->expects($this->once())
+            ->method('save')
+            ->willThrowException(new \Exception());
+
+        $this->expectException(CouldNotSaveException::class);
+        $this->taskRepository->save($taskMock);
     }
 
     /**
@@ -131,6 +148,36 @@ class TaskRepositoryTest extends TestCase
 
     /**
      * @return void
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function testDeleteByIdExceptionCase()
+    {
+        $taskId = 123;
+
+        $taskMock = $this->getMockBuilder(Task::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $taskMock->expects($this->any())
+            ->method('getEntityId')
+            ->willReturn($taskId);
+        $this->taskFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($taskMock);
+        $this->taskResourceMock->expects($this->once())
+            ->method('load')
+            ->with($taskMock, $taskId)
+            ->willReturnSelf();
+        $this->taskResourceMock->expects($this->once())
+            ->method('delete')
+            ->willThrowException(new \Exception());
+
+        $this->expectException(CouldNotDeleteException::class);
+        $this->taskRepository->deleteById($taskId);
+    }
+
+    /**
+     * @return void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function testGet()
@@ -149,6 +196,28 @@ class TaskRepositoryTest extends TestCase
             ->willReturn($taskId);
 
         $this->assertSame($taskMock, $this->taskRepository->get($taskId));
+    }
+    /**
+     * @return void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function testGetExceptionCase()
+    {
+        $taskId = 1;
+        $taskMock = $this->getMockBuilder(Task::class)->disableOriginalConstructor()->getMock();
+        $this->taskFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($taskMock);
+        $this->taskResourceMock->expects($this->once())
+            ->method('load')
+            ->with($taskMock, $taskId)
+            ->willReturnSelf();
+        $taskMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn(null);
+
+        $this->expectException(NoSuchEntityException::class);
+        $this->taskRepository->get($taskId);
     }
 
     public function testGetList()

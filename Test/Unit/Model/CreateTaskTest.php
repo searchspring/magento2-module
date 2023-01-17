@@ -5,6 +5,8 @@ namespace SearchSpring\Feed\Test\Unit\Model;
 use Magento\Framework\Validation\ValidationResult;
 use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Exception\UniqueTaskException;
+use SearchSpring\Feed\Exception\ValidationException;
 use SearchSpring\Feed\Model\CreateTask;
 use SearchSpring\Feed\Model\Task;
 use SearchSpring\Feed\Model\Task\TypeList;
@@ -117,5 +119,84 @@ class CreateTaskTest extends \PHPUnit\Framework\TestCase
             ->willReturn($taskMock);
 
         $this->assertSame($taskMock, $this->createTask->execute($type, $payload));
+    }
+
+    public function testExecuteExceptionCase()
+    {
+        $type = 'testType';
+        $this->expectException(\Exception::class);
+        $this->createTask->execute($type, '');
+    }
+
+    public function testExecuteValidationExceptionCase()
+    {
+        $type = 'testType';
+        $this->typeListMock->expects($this->once())
+            ->method('exist')
+            ->with($type)
+            ->willReturn(false);
+        $this->expectException(ValidationException::class);
+        $this->createTask->execute($type, []);
+    }
+
+    public function testExecuteValidationExceptionOnValidationCase()
+    {
+        $type = 'testType';
+        $validationResultMock = $this->createMock(ValidationResult::class);
+        $validatorMock = $this->createMock(ValidatorInterface::class);
+        $this->typeListMock->expects($this->once())
+            ->method('exist')
+            ->with($type)
+            ->willReturn(true);
+        $this->validatorPoolMock->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn($validatorMock);
+        $validatorMock->expects($this->once())
+            ->method('validate')
+            ->with([])
+            ->willReturn($validationResultMock);
+        $validationResultMock->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+        $validationResultMock->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['error']);
+        $this->expectException(ValidationException::class);
+        $this->createTask->execute($type, []);
+    }
+
+
+    public function testExecuteValidationExceptionOnUniqueTaskCase()
+    {
+        $type = 'testType';
+        $uniqueCheckerInterfaceMock = $this->createMock(UniqueCheckerInterface::class);
+        $validationResultMock = $this->createMock(ValidationResult::class);
+        $validatorMock = $this->createMock(ValidatorInterface::class);
+        $this->typeListMock->expects($this->once())
+            ->method('exist')
+            ->with($type)
+            ->willReturn(true);
+        $this->validatorPoolMock->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn($validatorMock);
+        $validatorMock->expects($this->once())
+            ->method('validate')
+            ->with([])
+            ->willReturn($validationResultMock);
+        $validationResultMock->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $this->uniqueCheckerPoolMock->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn($uniqueCheckerInterfaceMock);
+        $uniqueCheckerInterfaceMock->expects($this->once())
+            ->method('check')
+            ->with([])
+            ->willReturn(false);
+        $this->expectException(UniqueTaskException::class);
+        $this->createTask->execute($type, []);
     }
 }

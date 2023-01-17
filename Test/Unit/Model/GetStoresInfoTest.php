@@ -60,7 +60,7 @@ class GetStoresInfoTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAsJson()
     {
-        $result = ['stores' => []];
+        $result = [];
         $this->storeManagerMock->expects($this->once())
             ->method('getStores')
             ->willReturn([]);

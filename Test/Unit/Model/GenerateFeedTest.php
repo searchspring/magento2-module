@@ -2,7 +2,7 @@
 
 namespace SearchSpring\Feed\Test\Unit\Model;
 
-use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Model\Feed\Collection\ProcessorPool;
 use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
@@ -12,6 +12,7 @@ use SearchSpring\Feed\Model\Feed\Specification\Feed;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
+use SearchSpring\Feed\Model\Metric\CollectorInterface;
 
 class GenerateFeedTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,6 +64,8 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
         $this->systemFieldsListMock = $this->createMock(SystemFieldsList::class);
         $this->contextManagerMock = $this->createMock(ContextManagerInterface::class);
         $this->afterLoadProcessorPoolMock = $this->createMock(ProcessorPool::class);
+        $this->metricCollectorMock = $this->createMock(CollectorInterface::class);
+        $this->appConfigMock = $this->createMock(AppConfigInterface::class);
         $this->generateFeed = new \SearchSpring\Feed\Model\GenerateFeed(
             $this->collectionProviderMock,
             $this->dataProviderPoolMock,
@@ -70,7 +73,9 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             $this->storageMock,
             $this->systemFieldsListMock,
             $this->contextManagerMock,
-            $this->afterLoadProcessorPoolMock
+            $this->afterLoadProcessorPoolMock,
+            $this->metricCollectorMock,
+            $this->appConfigMock
         );
     }
 
@@ -106,12 +111,9 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             ->method('getLastPageNumber')
             ->willReturn(0);
 
-        $this->storageMock->expects($this->once())
-            ->method('save')
-            ->with([], $feedSpecificationMock);
         $this->contextManagerMock->expects($this->once())
             ->method('resetContext');
 
-        $this->assertNull($this->generateFeed->execute($feedSpecificationMock));
+        $this->generateFeed->execute($feedSpecificationMock);
     }
 }

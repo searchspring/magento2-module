@@ -4,8 +4,12 @@ namespace SearchSpring\Feed\Test\Unit\Model;
 
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterfaceFactory;
+use SearchSpring\Feed\Api\Data\TaskInterface;
+use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Exception\GenericException;
 use SearchSpring\Feed\Model\ExecuteTask;
 use SearchSpring\Feed\Model\Task;
 use SearchSpring\Feed\Model\Task\ExecutorPool;
@@ -98,5 +102,74 @@ class ExecuteTaskTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
 
         $this->assertTrue($this->executeTask->execute($taskMock));
+    }
+
+    public function testExecuteExceptionCase()
+    {
+        $type = 'type';
+        $time = '10-10-1990 12:40';
+
+        $taskErrorMock = $this->createMock(TaskErrorInterface::class);
+        $taskMock = $this->createMock(TaskInterface::class);
+        $executorMock = $this->getMockBuilder(Task\GenerateFeed\Executor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $taskMock->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
+        $this->executorPoolMock->expects($this->once())
+            ->method('get')
+            ->with($type)
+            ->willReturn($executorMock);
+        $this->dateTimeMock->expects($this->exactly(2))
+            ->method('gmtDate')
+            ->willReturn($time);
+
+        $taskMock->expects($this->once())
+            ->method('setStartedAt')
+            ->with($time)
+            ->willReturnSelf();
+
+        $taskMock->expects($this->at(2))
+            ->method('setStatus')
+            ->with(MetadataInterface::TASK_STATUS_PROCESSING)
+            ->willReturnSelf();
+
+        $this->taskRepositoryMock->expects($this->exactly(2))
+            ->method('save')
+            ->willReturn($taskMock);
+        $executorMock->expects($this->once())
+            ->method('execute')
+            ->with($taskMock)
+            ->willThrowException(new \Exception('exception message'));
+        $this->taskErrorFactoryMock->expects($this->once())
+            ->method('create')
+            ->wilLReturn($taskErrorMock);
+        $this->loggerMock->expects($this->once())
+            ->method('error')
+            ->withAnyParameters()
+            ->willReturn(0);
+        $taskErrorMock->expects($this->once())
+            ->method('setMessage')
+            ->with('exception message')
+            ->willReturnSelf();
+        $taskErrorMock->expects($this->once())
+            ->method('setCode')
+            ->with(GenericException::CODE)
+            ->willReturnSelf();
+        $taskMock->expects($this->at(3))
+            ->method('setStatus')
+            ->with(MetadataInterface::TASK_STATUS_ERROR)
+            ->willReturnSelf();
+        $taskMock->expects($this->once())
+            ->method('setError')
+            ->with($taskErrorMock)
+            ->willReturnSelf();
+        $taskMock->expects($this->once())
+            ->method('setEndedAt')
+            ->with($time)
+            ->willReturnSelf();
+
+        $this->assertSame(null, $this->executeTask->execute($taskMock));
     }
 }

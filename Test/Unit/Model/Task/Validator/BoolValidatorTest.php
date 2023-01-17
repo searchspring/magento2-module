@@ -13,7 +13,7 @@ class BoolValidatorTest extends \PHPUnit\Framework\TestCase
      */
     private $createValidationResultMock;
 
-    private array $fields = [
+    private $fields = [
         'customerId',
         'includeOutOfStock',
     ];
