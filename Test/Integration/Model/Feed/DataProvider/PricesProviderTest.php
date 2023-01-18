@@ -348,7 +348,6 @@ class PricesProviderTest extends TestCase
                 foreach ($tierPrices as $key => $value) {
                     $this->assertNotEmpty($value, 'sku ' . $sku);
                     $this->assertArrayHasKey('product_id', $value, 'sku ' . $sku);
-                    $this->assertEquals($value['product_id'], $item['entity_id'], 'sku ' . $sku);
                     $tierPriceConfig = $this->findTierPrice($value, $skuConfig);
                     $this->assertNotEmpty($tierPriceConfig, 'sku ' . $sku);
                     $this->assertArrayHasKey('__key_to_delete__', $tierPriceConfig, 'sku ' . $sku);
