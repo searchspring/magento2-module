@@ -105,7 +105,7 @@ class GenerateFeed implements GenerateFeedInterface
     {
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
-            throw new Exception((string) __('%1 is not supported format'));
+            throw new Exception((string) __('%1 is not supported format', $format));
         }
 
         $this->initialize($feedSpecification);
