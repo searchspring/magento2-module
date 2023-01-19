@@ -109,6 +109,10 @@ class GetChildCollectionTest extends \PHPUnit\Framework\TestCase
             ->method('isShowOutOfStock')
             ->willReturn(0);
 
+        $this->stockHelperMock->expects($this->once())
+            ->method('addInStockFilterToCollection')
+            ->with($collectionMock);
+
         $this->assertSame($collectionMock, $this->getChildCollection->execute([]));
     }
 }

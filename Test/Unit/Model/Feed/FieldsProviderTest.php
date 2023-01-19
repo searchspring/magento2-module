@@ -102,7 +102,7 @@ class FieldsProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $mediaGallerySpecificationMock->expects($this->once())
             ->method('getImageTypes')
-            ->willReturn(['type']);
+            ->willReturn(['type', 'type_1']);
         $feedSpecificationMock->expects($this->once())
             ->method('getStoreCode')
             ->willReturn('default');
@@ -116,7 +116,7 @@ class FieldsProviderTest extends \PHPUnit\Framework\TestCase
         $this->attributesProviderMock->expects($this->once())
             ->method('getAttributeCodes')
             ->with($feedSpecificationMock)
-            ->willReturn([]);
+            ->willReturn(['at_code1', 'at_code2']);
         $this->collectionFactoryMock->expects($this->once())
             ->method('create')
             ->willReturn($collectionMock);
@@ -145,6 +145,9 @@ class FieldsProviderTest extends \PHPUnit\Framework\TestCase
                         'swatch_json_config',
                         'media_gallery_json',
                         'cached_type',
+                        'cached_type_1',
+                        'at_code1',
+                        'at_code2',
                         'option_option_title'
                     ]
                 )

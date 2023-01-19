@@ -65,7 +65,14 @@ class GetCategoriesByProductIdsTest extends \PHPUnit\Framework\TestCase
                     'product_id' => 1,
                     'category_id' => 1,
                     'path' => 'test\path'
-                ]
+                ],
+                [
+                    'product_id' => 1,
+                    'path' => 'test\path'
+                ],
+                [
+                    'path' => 'test\path'
+                ],
             ]);
 
         $this->assertSame(

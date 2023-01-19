@@ -3,6 +3,7 @@
 namespace SearchSpring\Feed\Test\Unit\Model\Feed\DataProvider\Attribute;
 
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Framework\Exception\LocalizedException;
 use SearchSpring\Feed\Model\Feed\DataProvider\Attribute\ValueProcessor;
 
@@ -38,6 +39,29 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
             'test',
             $this->valueProcessor->getValue($attributeMock, 'test')
         );
+    }
+
+    public function testGetValueOnCache()
+    {
+        $abstractSourceMock = $this->createMock(AbstractSource::class);
+        $attributeMock = $this->getMockBuilder(Attribute::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attributeMock->expects($this->once())
+            ->method('usesSource')
+            ->willReturn(true);
+        $attributeMock->expects($this->any())
+            ->method('getAttributeCode')
+            ->willReturn('test');
+        $attributeMock->expects($this->once())
+            ->method('getSource')
+            ->willReturn($abstractSourceMock);
+        $abstractSourceMock->expects($this->once())
+            ->method('getOptionText')
+            ->willReturn('test_option_text');
+
+        $this->valueProcessor->getValue($attributeMock, 'test');
+        $this->valueProcessor->getValue($attributeMock, 'test');
     }
 
     /**

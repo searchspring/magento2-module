@@ -41,12 +41,16 @@ class CsvTest extends \PHPUnit\Framework\TestCase
         $feedSpecificationMock->expects($this->any())
             ->method('getMultiValuedSeparator')
             ->willReturn(';');
+        $this->jsonMock->expects($this->once())
+            ->method('serialize')
+            ->with([['value2'], 'value3'])
+            ->willReturn(json_encode([['value2'], 'value3']));
 
         $this->assertSame(
             [
                 [
                     'value1',
-                    '',
+                    '[["value2"],"value3"]',
                     ''
                 ],
                 [
@@ -62,7 +66,7 @@ class CsvTest extends \PHPUnit\Framework\TestCase
             ],
             $this->csv->format(
                 [
-                    ['field1' => 'value1'],
+                    ['field1' => 'value1', 'field2' => [['value2'], 'value3']],
                     ['field2' => 'value2'],
                     ['field3' => 'value3']
                 ],

@@ -151,9 +151,18 @@ class MsiStockProvider implements StockProviderInterface
     private function init() : void
     {
         // we cannot use constructor because MSI module codebase can be removed via composer
-        $this->getReservationsQuantity = ObjectManager::getInstance()->get('Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface');
-        $this->stockResolver = ObjectManager::getInstance()->get('Magento\InventorySalesApi\Api\StockResolverInterface');
-        $this->getStockItemData = ObjectManager::getInstance()->get('Magento\InventorySalesApi\Model\GetStockItemDataInterface');
+        if (is_null($this->getReservationsQuantity)) {
+            $this->getReservationsQuantity = ObjectManager::getInstance()
+                ->get('Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface');
+        }
+        if (is_null($this->stockResolver)) {
+            $this->stockResolver =
+                ObjectManager::getInstance()->get('Magento\InventorySalesApi\Api\StockResolverInterface');
+        }
+        if (is_null($this->getStockItemData)) {
+            $this->getStockItemData =
+                ObjectManager::getInstance()->get('Magento\InventorySalesApi\Model\GetStockItemDataInterface');
+        }
     }
 
     /**

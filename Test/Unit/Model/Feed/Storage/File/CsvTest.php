@@ -57,6 +57,36 @@ class CsvTest extends \PHPUnit\Framework\TestCase
         $this->csv->initialize('test', $feedSpecificationMock);
     }
 
+    public function testAppendData()
+    {
+        $feedSpecificationMock = $this->getMockForAbstractClass(FeedSpecificationInterface::class);
+        $writeFileMock = $this->createMock(Filesystem\File\WriteInterface::class);
+        $writeDirectoryMock = $this->createMock(Filesystem\Directory\WriteInterface::class);
+        $this->filesystemMock->expects($this->once())
+            ->method('getDirectoryWrite')
+            ->with(DirectoryList::VAR_DIR)
+            ->willReturn($writeDirectoryMock);
+        $writeDirectoryMock->expects($this->once())
+            ->method('isExist')
+            ->with('searchspring/test.csv')
+            ->willReturn(false);
+        $writeDirectoryMock->expects($this->once())
+            ->method('openFile')
+            ->with('searchspring/test.csv')
+            ->willReturn($writeFileMock);
+        $writeDirectoryMock->expects($this->exactly(2))
+            ->method('isFile')
+            ->willReturn(true);
+        $writeFileMock->expects($this->at(0))
+            ->method('writeCsv')
+            ->with([], ',', '"');
+        $writeFileMock->expects($this->at(1))
+            ->method('writeCsv')
+            ->with(['data'], ',', '"');
+        $this->csv->initialize('test', $feedSpecificationMock);
+        $this->csv->appendData([['data']]);
+    }
+
     public function testAppendDataExceptionCase()
     {
         $this->expectException(\Exception::class);

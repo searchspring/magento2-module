@@ -15,7 +15,7 @@ class TierPriceProcessorTest extends \PHPUnit\Framework\TestCase
         $this->tierPriceProcessor = new TierPriceProcessor();
     }
 
-    public function testProcess()
+    public function testProcessAfterLoad()
     {
         $feedSpecificationMock = $this->getMockForAbstractClass(FeedSpecificationInterface::class);
         $feedSpecificationMock->expects($this->once())
@@ -29,6 +29,23 @@ class TierPriceProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(
             $collectionMock,
             $this->tierPriceProcessor->processAfterLoad($collectionMock, $feedSpecificationMock)
+        );
+    }
+
+    public function testProcessAfterFetchItems()
+    {
+        $collectionMock = $this->createMock(Collection::class);
+        $feedSpecificationMock = $this->createMock(FeedSpecificationInterface::class);
+        $feedSpecificationMock->expects($this->once())
+            ->method('getIncludeTierPricing')
+            ->willReturn(true);
+        $collectionMock->expects($this->once())
+            ->method('setFlag')
+            ->with('tier_price_added', false);
+
+        $this->assertSame(
+            $collectionMock,
+            $this->tierPriceProcessor->processAfterFetchItems($collectionMock, $feedSpecificationMock)
         );
     }
 }

@@ -46,6 +46,16 @@ class CustomerContextManagerTest extends \PHPUnit\Framework\TestCase
         $this->customerContextManager->setContextFromSpecification($feedSpecificationMock);
     }
 
+    public function testSetContextFromSpecificationNoCustomerId()
+    {
+        $feedSpecificationMock = $this->getMockForAbstractClass(FeedSpecificationInterface::class);
+        $feedSpecificationMock->expects($this->once())
+            ->method('getCustomerId')
+            ->willReturn(null);
+
+        $this->customerContextManager->setContextFromSpecification($feedSpecificationMock);
+    }
+
     public function testResetContext()
     {
         $this->sessionMock->expects($this->once())
