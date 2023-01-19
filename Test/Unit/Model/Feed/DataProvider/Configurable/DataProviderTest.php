@@ -174,7 +174,7 @@ class DataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn('code_3');
         $this->getChildCollectionMock->expects($this->once())
             ->method('execute')
-            ->with([1 => $productMock, 2 => $productMock], [1 => 'code_1', 2 => 'code_2', 3 => 'code_3'])
+            ->with([1 => $productMock, 2 => $productMock], [1 => 'code_2', 2 => 'code_3', 0 => 'code_1'])
             ->willReturn($configurableCollectionMock);
         $configurableCollectionMock->expects($this->once())
             ->method('getItems')
@@ -280,53 +280,25 @@ class DataProviderTest extends \PHPUnit\Framework\TestCase
 
         $configurableAttributeMock->expects($this->at(0))
             ->method('__call')
-            ->with('getAttributeCode')
-            ->willReturn('conf_code_1');
-        $configurableAttributeMockSecond->expects($this->at(0))
-            ->method('__call')
-            ->with('getAttributeCode')
-            ->willReturn('conf_code_2');
-        $this->attributesProviderMock->expects($this->once())
-            ->method('getAttributes')
-            ->with($feedSpecificationMock)
-            ->willReturn([$configurableAttributeMockSpecification, $configurableAttributeMockSpecification]);
-        $configurableAttributeMockSpecification->expects($this->at(0))
-            ->method('__call')
-            ->with('getAttributeCode')
-            ->willReturn('code_3');
-        $configurableAttributeMockSpecification->expects($this->at(1))
-            ->method('__call')
-            ->with('getAttributeCode')
-            ->willReturn('code_3');
-        $configurableAttributeMockSpecification->expects($this->at(2))
-            ->method('__call')
-            ->with('getAttributeCode')
-            ->willReturn('code_3');
-
-        $configurableAttributeMock->expects($this->at(1))
-            ->method('__call')
             ->with('getProductAttribute')
             ->willReturn($abstractAttributeMock);
+        $configurableAttributeMockSecond->expects($this->at(0))
+            ->method('__call')
+            ->with('getProductAttribute')
+            ->willReturn($abstractAttributeMockSecond);
+
         $configurableAttributeMock->expects($this->any())
             ->method('getProductId')
             ->willReturn(1);
         $abstractAttributeMock->expects($this->any())
             ->method('getAttributeId')
             ->willReturn(1);
-        $configurableAttributeMockSecond->expects($this->at(1))
-            ->method('__call')
-            ->with('getProductAttribute')
-            ->willReturn($abstractAttributeMockSecond);
         $configurableAttributeMockSecond->expects($this->any())
             ->method('getProductId')
-            ->willReturn(1);
+            ->willReturn(2);
         $abstractAttributeMockSecond->expects($this->any())
             ->method('getAttributeId')
             ->willReturn(2);
-        $configurableAttributeMockSpecification->expects($this->at(3))
-            ->method('__call')
-            ->with('getProductAttribute')
-            ->willReturn($abstractAttributeMockSpecification);
         $configurableAttributeMockSpecification->expects($this->any())
             ->method('getProductId')
             ->willReturn(2);
@@ -337,8 +309,8 @@ class DataProviderTest extends \PHPUnit\Framework\TestCase
         $this->childAttributesProviderMock->expects($this->once())
             ->method('getAttributes')
             ->with($feedSpecificationMock)
-            ->willReturn([$abstractAttributeMockSpecificationSecond]);
-        $abstractAttributeMockSpecificationSecond->expects($this->any())
+            ->willReturn([$configurableAttributeMockSpecification, $configurableAttributeMockSpecification]);
+        $configurableAttributeMockSpecification->expects($this->any())
             ->method('getAttributeId')
             ->willReturn(4);
 
@@ -346,12 +318,11 @@ class DataProviderTest extends \PHPUnit\Framework\TestCase
             [
                 1 => [
                     1 => $abstractAttributeMock,
-                    2 => $abstractAttributeMockSecond,
-                    4 => $abstractAttributeMockSpecificationSecond
+                    4 => $configurableAttributeMockSpecification
                 ],
                 2 => [
-                    3 => $abstractAttributeMockSpecification,
-                    4 => $abstractAttributeMockSpecificationSecond
+                    2 => $abstractAttributeMockSecond,
+                    4 => $configurableAttributeMockSpecification
                 ]
             ],
             $this->dataProvider->getConfigurableAttributes($configurableProducts, $feedSpecificationMock)
