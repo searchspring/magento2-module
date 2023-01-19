@@ -14,6 +14,7 @@ $productRepository = Bootstrap::getObjectManager()->get(ProductRepositoryInterfa
 $currentStoreId = $storeManager->getStore()->getId();
 $secondStoreId = $storeManager->getStore('fixturestore')->getId();
 try {
+    $storeManager->setCurrentStore($secondStoreId);
     $product = $productRepository->get('searchspring_simple_1');
     $product->setStoreId($secondStoreId)
         ->setUrlKey('fixturestore-searchspring-simple-1');
