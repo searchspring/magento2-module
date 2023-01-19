@@ -208,7 +208,11 @@ class PreSignedUrlStorageTest extends \PHPUnit\Framework\TestCase
         $feedSpecificationMock->expects($this->once())
             ->method('getFormat')
             ->willReturn($testFormat);
-        $this->formatterPoolMock->expects($this->once())
+        $this->fileFactoryMock->expects($this->once())
+            ->method('isSupportedFormat')
+            ->with($testFormat)
+            ->willReturn(true);
+        $this->formatterPoolMock->expects($this->any())
             ->method('get')
             ->with($testFormat)
             ->willReturn($formatterInterfaceMock);
