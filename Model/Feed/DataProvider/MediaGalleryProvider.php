@@ -129,7 +129,7 @@ class MediaGalleryProvider implements DataProviderInterface
             $resizedImage = $imageHelper->constrainOnly(true)
                 ->keepAspectRatio(true)
                 ->keepTransparency(true)
-                ->keepFrame(true)
+                ->keepFrame(false)
                 ->resize($mediaGallerySpecification->getThumbWidth(), $mediaGallerySpecification->getThumbHeight())
                 ->getUrl();
         } else {
