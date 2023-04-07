@@ -1,6 +1,10 @@
 {
-    "name": "absolute-web/searchspring-magento-2",
+    "name": "searchspring/magento2-module",
     "type": "magento2-module",
-    "license": "[\"MIT\"]",
-    "require": {}
+    "version": "1.0.0",
+    "license": "proprietary",
+    "require": {},
+    "support": {
+        "email": "support@searchspring.com"
+    }
 }
