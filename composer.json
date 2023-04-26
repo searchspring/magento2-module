@@ -6,5 +6,11 @@
     "require": {},
     "support": {
         "email": "support@searchspring.com"
+    },
+    "autoload": {
+        "files": ["registration.php"],
+        "psr-4": {
+            "SearchSpring\\Feed\\": ""
+        }
     }
 }
