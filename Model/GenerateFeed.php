@@ -218,7 +218,7 @@ class GenerateFeed implements GenerateFeedInterface
         }
 
         if (!is_null($itemsData)) {
-            $itemsDataSize = round(mb_strlen(serialize($itemsData), '8bit') / 1024 / 1024, 4);
+            $itemsDataSize = round(mb_strlen(json_encode($itemsData), '8bit') / 1024 / 1024, 4);
             $itemsDataCount = count($itemsData);
             $data['items_data_size'] = $itemsDataSize;
             $data['items_data_count'] = $itemsDataCount;
