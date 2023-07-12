@@ -10,7 +10,9 @@
         <resources>
             <resource id="Magento_Backend::admin">
                 <resource id="SearchSpring_Feed::general" title="Searchspring" translate="title" sortOrder="900">
-                    <resource id="SearchSpring_Feed::task" title="Task" translate="title" sortOrder="10" />
+                    <resource id="SearchSpring_Feed::task" title="Products" translate="title" sortOrder="10" />
+                    <resource id="SearchSpring_Feed::customers" title="Customers" translate="title" sortOrder="20" />
+                    <resource id="SearchSpring_Feed::sales" title="Sales" translate="title" sortOrder="30" />
                 </resource>
             </resource>
         </resources>
