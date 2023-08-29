@@ -44,7 +44,7 @@ class GetSales implements GetSalesInterface
      *
      * @throws ValidationException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All")
+    public function getList(string $dateRange = "All", string $rowRange = "All") : string
     {
         $errors = [];
         if (!Utils::validateDateRange($dateRange)){
@@ -59,6 +59,7 @@ class GetSales implements GetSalesInterface
             throw new ValidationException($errors, 400);
         }
 
-        return $this->helper->getSales($dateRange, $rowRange);
+        header('Content-Type: application/json');
+        return json_encode($this->helper->getSales($dateRange, $rowRange));
     }
 }
