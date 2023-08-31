@@ -88,7 +88,7 @@ class Sale extends AbstractHelper
             ];
             $result[] = $res;
         }
-        return ['sales' => $result];
+        return $result;
     }
 
     /**

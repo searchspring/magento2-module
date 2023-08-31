@@ -64,6 +64,6 @@ class Customer extends AbstractHelper
             ];
         }
 
-        return ['customers' => $result];
+        return $result;
     }
 }
