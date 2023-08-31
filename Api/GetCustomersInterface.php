@@ -30,5 +30,5 @@ interface GetCustomersInterface
      *
      * @throws LocalizedException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All") : string;
+    public function getList(string $dateRange = "All", string $rowRange = "All");
 }
