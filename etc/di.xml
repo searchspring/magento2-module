@@ -13,6 +13,14 @@
                 type="SearchSpring\Feed\Model\Feed\Specification\Feed"/>
     <preference for="SearchSpring\Feed\Api\Data\MediaGallerySpecificationInterface"
                 type="SearchSpring\Feed\Model\Feed\Specification\MediaGallery"/>
+    <preference for="SearchSpring\Feed\Api\Data\CustomersInterface"
+                type="SearchSpring\Feed\Model\Customers"/>
+    <preference for="SearchSpring\Feed\Api\Data\CustomersDataInterface"
+                type="SearchSpring\Feed\Model\CustomersData"/>
+    <preference for="SearchSpring\Feed\Api\Data\SalesInterface"
+                type="SearchSpring\Feed\Model\Sales"/>
+    <preference for="SearchSpring\Feed\Api\Data\SalesDataInterface"
+                type="SearchSpring\Feed\Model\SalesData"/>
     <preference for="SearchSpring\Feed\Api\TaskRepositoryInterface"
                 type="SearchSpring\Feed\Model\TaskRepository"/>
     <preference for="SearchSpring\Feed\Api\CreateTaskInterface"

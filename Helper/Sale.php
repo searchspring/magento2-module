@@ -15,20 +15,30 @@ use Magento\Config\Model\Config\Backend\Admin\Custom;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Store\Model\StoresConfig;
 use Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory;
+use SearchSpring\Feed\Api\Data\SalesDataInterface;
+use SearchSpring\Feed\Api\Data\SalesDataInterfaceFactory;
 use DateTime;
 
 class Sale extends AbstractHelper
 {
     protected $storesConfig;
     protected $saleFactory;
+    protected $salesDataFactory;
 
-    public function __construct(StoresConfig $storesConfig, CollectionFactory $saleFactory)
+    public function __construct(StoresConfig $storesConfig, CollectionFactory $saleFactory, SalesDataInterfaceFactory $salesDataFactory)
     {
         $this->storesConfig = $storesConfig;
         $this->saleFactory = $saleFactory;
+        $this->salesDataFactory = $salesDataFactory;
     }
 
-    function getSales(string $dateRangeStr, string $rowRangeStr)
+    /**
+     * @param string $dateRangeStr
+     * @param string $rowRangeStr
+     *
+     * @return SalesDataInterface[]
+     */
+    function getSales(string $dateRangeStr, string $rowRangeStr): array
     {
         $result = [];
         $collection = $this->saleFactory->create();
@@ -79,14 +89,15 @@ class Sale extends AbstractHelper
             }
             $createdAt = $dt->format('Y-m-d H:i:sP');
 
-            $res = [
-                'order_id' => $orderID,
-                'customer_id' => $customerID,
-                'product_id' => $productID,
-                'quantity' => (string)$quantity,
-                'createdAt' => $createdAt,
-            ];
-            $result[] = $res;
+            $salesData = $this->salesDataFactory->create();
+
+            $salesData->setOrderId($orderID);
+            $salesData->setCustomerId($customerID);
+            $salesData->setProductId($productID);
+            $salesData->setQuantity((string)$quantity);
+            $salesData->setCreatedAt($createdAt);
+
+            $result[] = $salesData;
         }
         return $result;
     }

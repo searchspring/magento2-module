@@ -11,18 +11,28 @@
 namespace SearchSpring\Feed\Helper;
 
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
+use SearchSpring\Feed\Api\Data\CustomersDataInterface;
+use SearchSpring\Feed\Api\Data\CustomersDataInterfaceFactory;
 use Magento\Framework\App\Helper\AbstractHelper;
 
 class Customer extends AbstractHelper
 {
     protected $customerFactory;
+    protected $customersDataFactory;
 
-    public function __construct(CollectionFactory $customerFactory)
+    public function __construct(CollectionFactory $customerFactory, CustomersDataInterfaceFactory $customersDataFactory)
     {
         $this->customerFactory = $customerFactory;
+        $this->customersDataFactory = $customersDataFactory;
     }
 
-    public function getCustomers(string $dateRangeStr, string $rowRangeStr)
+    /**
+     * @param string $dateRangeStr
+     * @param string $rowRangeStr
+     *
+     * @return CustomersDataInterface[]
+     */
+    public function getCustomers(string $dateRangeStr, string $rowRangeStr): array
     {
         $result = [];
         $customerCollection = $this->customerFactory->create();
@@ -58,10 +68,12 @@ class Customer extends AbstractHelper
 
         $items = $customerCollection->getItems(); // Make query
         foreach ($items as $item) {
-            $result[] = [
-                'id' => $item->getId(),
-                'email' => $item->getEmail()
-            ];
+            $customersData = $this->customersDataFactory->create();
+
+            $customersData->setId($item->getId());
+            $customersData->setEmail($item->getEmail());
+
+            $result[] = $customersData;
         }
 
         return $result;
