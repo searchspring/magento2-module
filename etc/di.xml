@@ -31,6 +31,8 @@
                 type="SearchSpring\Feed\Model\ExecutePendingTasks"/>
     <preference for="SearchSpring\Feed\Api\GetVersionInterface"
                 type="SearchSpring\Feed\Model\GetVersion"/>
+    <preference for="SearchSpring\Feed\Api\GetApplicationLogInterface"
+                type="SearchSpring\Feed\Model\GetApplicationLog"/>
     <preference for="SearchSpring\Feed\Api\GetCustomersInterface"
                 type="SearchSpring\Feed\Model\GetCustomers"/>
     <preference for="SearchSpring\Feed\Api\GetSalesInterface"

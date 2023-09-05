@@ -95,7 +95,14 @@ class AttributesProvider implements DataProviderInterface
         $productData = $product->getData();
         $result = [];
         foreach ($productData as $key => $fieldValue) {
+            /*
+            For some reason the system fields does not show up
+            in the attribute list resulting in missing data.
+            To avoid the issue, we will include these in the
+            result without any additional processing
+            */
             if (!isset($this->attributes[$key])) {
+                $result[$key] = $fieldValue;
                 continue;
             }
             /** @var Attribute $attribute */
