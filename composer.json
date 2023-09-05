@@ -4,8 +4,7 @@
     "version": "1.2.0",
     "license": "GPL-3.0-only",
     "require": {
-        "magento/module-customer": "^103.0",
-        "ext-json": "*"
+        "magento/module-customer": "^103.0"
     },
     "support": {
         "email": "support@searchspring.com"
