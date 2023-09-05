@@ -8,10 +8,6 @@ class Sales implements SalesInterface
 {
     private $sales;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @return SalesDataInterface[]
      */

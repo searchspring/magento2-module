@@ -9,10 +9,6 @@ class Customers implements CustomersInterface
 {
     private $customers;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @return CustomersDataInterface[]
      */

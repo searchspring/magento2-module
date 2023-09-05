@@ -9,10 +9,6 @@ class CustomersData implements CustomersDataInterface
     private $id;
     private $email;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @return string
      */

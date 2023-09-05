@@ -12,10 +12,6 @@ class SalesData implements SalesDataInterface
     private $quantity;
     private $createdAt;
 
-    public function __construct()
-    {
-    }
-
     /**
      * @return string
      */
