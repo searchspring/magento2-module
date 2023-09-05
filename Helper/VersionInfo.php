@@ -37,13 +37,20 @@ class VersionInfo extends AbstractHelper
             $version = $module['setup_version'];
         }
 
+        $directory = $objectManager->get('\Magento\Framework\Filesystem\DirectoryList');
+
         $result[] = [
-            'extension' => $version,
+            'extensionVersion' => $version,
             'magento' => $this->productMetadata->getName() . '/' . $this->productMetadata->getVersion() . ' (' . $this->productMetadata->getEdition() . ')',
             'memLimit' => $this->getMemoryLimit(),
             'OSType' => php_uname($mode = "s"),
             'OSVersion' => php_uname($mode = "v"),
-            'maxExecutionTime' => ini_get("max_execution_time")
+            'maxExecutionTime' => ini_get("max_execution_time"),
+            'magentoName' => $this->productMetadata->getName(),
+            'magentoVersion' => $this->productMetadata->getVersion(),
+            'magentoEdition' => $this->productMetadata->getEdition(),
+            'magentoRootPath' => $directory->getRoot(),
+            'magentoLogPath' => $directory->getPath('log')
         ];
 
         return $result;
