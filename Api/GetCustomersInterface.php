@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Api;
 
 use Magento\Framework\Exception\LocalizedException;
+use SearchSpring\Feed\Api\Data\CustomersInterface;
 
 interface GetCustomersInterface
 {
@@ -26,9 +27,9 @@ interface GetCustomersInterface
      * @param string $dateRange
      * @param string $rowRange
      *
-     * @return array
+     * @return CustomersInterface
      *
      * @throws LocalizedException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All");
+    public function getList(string $dateRange = "All", string $rowRange = "All"): CustomersInterface;
 }

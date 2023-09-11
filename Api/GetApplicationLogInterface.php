@@ -24,17 +24,38 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use SearchSpring\Feed\Api\Data\CustomerResultsInterface;
-use SearchSpring\Feed\Api\Data\SalesInterface;
 
-interface GetSalesInterface
+interface GetApplicationLogInterface
 {
     /**
-     * @param string $dateRange
-     * @param string $rowRange
+     * @param bool $compressOutput
      *
-     * @return SalesInterface
+     * @return string
      *
      * @throws LocalizedException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All"): SalesInterface;
+    public function getExtensionLog(bool $compressOutput = false) : string;
+
+    /**
+     * @return bool
+     *
+     * @throws LocalizedException
+     */
+    public function clearExtensionLog() : bool;
+
+    /**
+     * @param bool $compressOutput
+     *
+     * @return string
+     *
+     * @throws LocalizedException
+     */
+    public function getExceptionLog(bool $compressOutput = false) : string;
+
+    /**
+     * @return bool
+     *
+     * @throws LocalizedException
+     */
+    public function clearExceptionLog() : bool;
 }

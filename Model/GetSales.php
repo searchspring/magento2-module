@@ -19,6 +19,8 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model;
 
 use SearchSpring\Feed\Api\GetSalesInterface;
+use SearchSpring\Feed\Api\Data\SalesInterface;
+use SearchSpring\Feed\Api\Data\SalesInterfaceFactory;
 use SearchSpring\Feed\Exception\ValidationException;
 use SearchSpring\Feed\Helper\Sale;
 use SearchSpring\Feed\Helper\Utils;
@@ -28,23 +30,27 @@ class GetSales implements GetSalesInterface
     /** @var Sale */
     private $helper;
 
+    /** @var SalesInterfaceFactory */
+    private $salesFactory;
+
     /**
      * @param Sale $helper
      */
-    public function __construct(Sale $helper)
+    public function __construct(Sale $helper, SalesInterfaceFactory $salesFactory)
     {
         $this->helper = $helper;
+        $this->salesFactory = $salesFactory;
     }
 
     /**
      * @param string $dateRange
      * @param string $rowRange
      *
-     * @return array
+     * @return SalesInterface
      *
      * @throws ValidationException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All")
+    public function getList(string $dateRange = "All", string $rowRange = "All"): SalesInterface
     {
         $errors = [];
         if (!Utils::validateDateRange($dateRange)){
@@ -59,6 +65,9 @@ class GetSales implements GetSalesInterface
             throw new ValidationException($errors, 400);
         }
 
-        return $this->helper->getSales($dateRange, $rowRange);
+        $sales = $this->salesFactory->create();
+        $sales->setSales($this->helper->getSales($dateRange, $rowRange));
+
+        return $sales;
     }
 }

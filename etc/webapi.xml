@@ -8,6 +8,30 @@
             <resource ref="SearchSpring_Feed::general" />
         </resources>
     </route>
+    <route url="/V1/searchspring/applicationlog" method="GET">
+        <service class="SearchSpring\Feed\Api\GetApplicationLogInterface" method="getExtensionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/applicationlog/clear" method="POST">
+        <service class="SearchSpring\Feed\Api\GetApplicationLogInterface" method="clearExtensionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/exceptionlog" method="GET">
+        <service class="SearchSpring\Feed\Api\GetApplicationLogInterface" method="getExceptionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/exceptionlog/clear" method="POST">
+        <service class="SearchSpring\Feed\Api\GetApplicationLogInterface" method="clearExceptionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
     <route url="/V1/searchspring/customers" method="GET">
         <service class="SearchSpring\Feed\Api\GetCustomersInterface" method="getList" />
         <resources>

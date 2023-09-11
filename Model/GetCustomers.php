@@ -19,6 +19,8 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model;
 
 use SearchSpring\Feed\Api\GetCustomersInterface;
+use SearchSpring\Feed\Api\Data\CustomersInterface;
+use SearchSpring\Feed\Api\Data\CustomersInterfaceFactory;
 use SearchSpring\Feed\Exception\ValidationException;
 use SearchSpring\Feed\Helper\Customer;
 use SearchSpring\Feed\Helper\Utils;
@@ -28,23 +30,28 @@ class GetCustomers implements GetCustomersInterface
     /** @var Customer */
     private $helper;
 
+    /** @var CustomersInterfaceFactory */
+    private $customersFactory;
+
     /**
      * @param Customer $helper
+     * @param CustomersInterfaceFactory $customersFactory
      */
-    public function __construct(Customer $helper)
+    public function __construct(Customer $helper, CustomersInterfaceFactory $customersFactory)
     {
         $this->helper = $helper;
+        $this->customersFactory = $customersFactory;
     }
 
     /**
      * @param string $dateRange
      * @param string $rowRange
      *
-     * @return array
+     * @return CustomersInterface
      *
      * @throws ValidationException
      */
-    public function getList(string $dateRange = "All", string $rowRange = "All")
+    public function getList(string $dateRange = "All", string $rowRange = "All"): CustomersInterface
     {
         $errors = [];
         if (!Utils::validateDateRange($dateRange)){
@@ -59,6 +66,9 @@ class GetCustomers implements GetCustomersInterface
             throw new ValidationException($errors, 400);
         }
 
-        return $this->helper->getCustomers($dateRange, $rowRange);
+        $customers = $this->customersFactory->create();
+        $customers->setCustomers($this->helper->getCustomers($dateRange, $rowRange));
+
+        return $customers;
     }
 }
