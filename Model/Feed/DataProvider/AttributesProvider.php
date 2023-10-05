@@ -107,7 +107,7 @@ class AttributesProvider implements DataProviderInterface
             }
             /** @var Attribute $attribute */
             $attribute = $this->attributes[$key];
-            $result[$key] = $this->valueProcessor->getValue($attribute, $fieldValue);
+            $result[$key] = $this->valueProcessor->getValue($attribute, $fieldValue, $product);
         }
 
         return $result;

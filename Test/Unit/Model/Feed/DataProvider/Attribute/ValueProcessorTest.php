@@ -16,6 +16,7 @@
 
 namespace SearchSpring\Feed\Test\Unit\Model\Feed\DataProvider\Attribute;
 
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 use Magento\Framework\Exception\LocalizedException;
@@ -39,6 +40,9 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValue()
     {
+        $productMock = $this->getMockBuilder(Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $attributeMock = $this->getMockBuilder(Attribute::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -51,12 +55,15 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             'test',
-            $this->valueProcessor->getValue($attributeMock, 'test')
+            $this->valueProcessor->getValue($attributeMock, 'test', $productMock)
         );
     }
 
     public function testGetValueOnCache()
     {
+        $productMock = $this->getMockBuilder(Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $abstractSourceMock = $this->createMock(AbstractSource::class);
         $attributeMock = $this->getMockBuilder(Attribute::class)
             ->disableOriginalConstructor()
@@ -74,8 +81,8 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('getOptionText')
             ->willReturn('test_option_text');
 
-        $this->valueProcessor->getValue($attributeMock, 'test');
-        $this->valueProcessor->getValue($attributeMock, 'test');
+        $this->valueProcessor->getValue($attributeMock, 'test', $productMock);
+        $this->valueProcessor->getValue($attributeMock, 'test', $productMock);
     }
 
     /**
@@ -84,6 +91,9 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValueException()
     {
+        $productMock = $this->getMockBuilder(Product::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $attributeMock = $this->getMockBuilder(Attribute::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -102,6 +112,6 @@ class ValueProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(\Exception::class);
 
-        $this->valueProcessor->getValue($attributeMock, $attributeMock);
+        $this->valueProcessor->getValue($attributeMock, $attributeMock, $productMock);
     }
 }
