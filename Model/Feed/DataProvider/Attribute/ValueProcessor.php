@@ -19,7 +19,9 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Attribute;
 
 use Exception;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Eav\Model\Entity\Attribute\Source\SpecificSourceInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 
@@ -35,7 +37,7 @@ class ValueProcessor
      * @throws LocalizedException
      * @throws Exception
      */
-    public function getValue(Attribute $attribute, $value)
+    public function getValue(Attribute $attribute, $value, Product $product)
     {
         $key = null;
         $code = $attribute->getAttributeCode();
@@ -48,7 +50,14 @@ class ValueProcessor
 
         $result = null;
         if ($this->isSourceAttribute($attribute)) {
-            $result = $attribute->getSource()->getOptionText($value);
+            $source = $attribute->getSource();
+            if ($source instanceof SpecificSourceInterface) {
+                $sourceClone = clone $source;
+                $sourceClone->getOptionsFor($product);
+                $result = $sourceClone->getOptionText($value);
+            } else {
+                $result = $source->getOptionText($value);
+            }
         } else {
             $result = $value;
         }
