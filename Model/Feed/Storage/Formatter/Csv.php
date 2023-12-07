@@ -84,7 +84,7 @@ class Csv implements FormatterInterface
                     if (is_array(current($value)) || is_object(current($value))) {
                         $result[] = $this->json->serialize($value);
                     } else {
-                        $result[] = implode($multiValuedSeparator, array_unique($value));
+                        $result[] = implode($multiValuedSeparator, $value);
                     }
                 } else {
                     $result[] = $value;
