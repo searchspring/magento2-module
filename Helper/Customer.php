@@ -72,6 +72,13 @@ class Customer extends AbstractHelper
 
             $customersData->setId($item->getId());
             $customersData->setEmail($item->getEmail());
+            $phoneNumber = '';
+            try {
+                $phoneNumber = $item->getPrimaryBillingAddress()->getTelephone();
+            } catch (\Error $e) {
+                // No phone number carry on
+            }
+            $customersData->setPhoneNumber($phoneNumber);
 
             $result[] = $customersData;
         }

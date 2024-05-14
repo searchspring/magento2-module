@@ -15,6 +15,11 @@ interface CustomersDataInterface
     public function getEmail(): string;
 
     /**
+     * @return string
+     */
+    public function getPhoneNumber(): string;
+
+    /**
      * @param string $value
      * @return null
      */
@@ -25,4 +30,10 @@ interface CustomersDataInterface
      * @return null
      */
     public function setEmail(string $value);
+
+    /**
+     * @param string $value
+     * @return null
+     */
+    public function setPhoneNumber(string $value);
 }

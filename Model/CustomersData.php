@@ -8,6 +8,7 @@ class CustomersData implements CustomersDataInterface
 {
     private $id;
     private $email;
+    private $phoneNumber;
 
     /**
      * @return string
@@ -25,6 +26,11 @@ class CustomersData implements CustomersDataInterface
         return $this->email;
     }
 
+    public function getPhoneNumber(): string
+    {
+        return $this->phoneNumber;
+    }
+
     /**
      * @param $value string
      */
@@ -39,5 +45,13 @@ class CustomersData implements CustomersDataInterface
     public function setEmail(string $value)
     {
         $this->email = $value;
+    }
+
+    /**
+     * @param $value string
+     */
+    public function setPhoneNumber(string $value)
+    {
+        $this->phoneNumber = $value;
     }
 }
