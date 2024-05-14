@@ -75,7 +75,8 @@ class Sale extends AbstractHelper
 
             $productID = $item->getData('product_id');
             $quantity = $item->getData('qty_ordered') - ($item->getData('qty_canceled') + $item->getData('qty_refunded'));
-            
+            $price = $item->getRowTotalInclTax();
+
             // This has returned "" in the wild
             $storeId = $item->getData('store_id');
 
@@ -95,6 +96,7 @@ class Sale extends AbstractHelper
             $salesData->setCustomerId($customerID);
             $salesData->setProductId($productID);
             $salesData->setQuantity((string)$quantity);
+            $salesData->setPrice($price);
             $salesData->setCreatedAt($createdAt);
 
             $result[] = $salesData;

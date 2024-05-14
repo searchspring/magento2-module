@@ -10,6 +10,7 @@ class SalesData implements SalesDataInterface
     private $customer_id;
     private $product_id;
     private $quantity;
+    private $price;
     private $createdAt;
 
     /**
@@ -53,6 +54,14 @@ class SalesData implements SalesDataInterface
     }
 
     /**
+     * @return string
+     */
+    public function getPrice(): string
+    {
+        return $this->price;
+    }
+
+    /**
      * @param string $value
      */
     public function setOrderId(string $value)
@@ -90,5 +99,13 @@ class SalesData implements SalesDataInterface
     public function setCreatedAt(string $value)
     {
         $this->createdAt = $value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setPrice(string $value)
+    {
+        $this->price = $value;
     }
 }
