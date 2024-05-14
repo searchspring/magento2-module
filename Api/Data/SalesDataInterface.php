@@ -28,6 +28,12 @@ interface SalesDataInterface
      * @return string
      * @return null
      */
+    public function getPrice(): string;
+
+    /**
+     * @return string
+     * @return null
+     */
     public function getCreatedAt(): string;
 
     /**
@@ -53,6 +59,12 @@ interface SalesDataInterface
      * @return null
      */
     public function setQuantity(string $value);
+
+    /**
+     * @param string $value
+     * @return null
+     */
+    public function setPrice(string $value);
 
     /**
      * @param string $value
