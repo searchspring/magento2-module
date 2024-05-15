@@ -89,7 +89,7 @@ interface TaskInterface extends ExtensibleDataInterface
     public function setStatus(string $status) : self;
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getPayload() : array;
 
