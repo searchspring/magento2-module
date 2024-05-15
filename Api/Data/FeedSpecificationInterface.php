@@ -27,58 +27,72 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      *
      */
     const STORE_CODE = 'store_code';
+
     /**
      *
      */
     const HIERARCHY_SEPARATOR = 'hierarchy_separator';
+
     /**
      *
      */
     const MULTI_VALUED_SEPARATOR = 'multi_valued_separator';
+
     /**
      *
      */
     const INCLUDE_URL_HIERARCHY = 'include_url_hierarchy';
+
     /**
      *
      */
     const INCLUDE_MENU_CATEGORIES = 'include_menu_categories';
+
     /**
      *
      */
     const INCLUDE_JSON_CONFIG = 'include_json_config';
+
     /**
      *
      */
     const INCLUDE_CHILD_PRICES = 'include_child_prices';
+
     /**
      *
      */
     const INCLUDE_TIER_PRICES = 'include_tier_prices';
+
     /**
      *
      */
     const CUSTOMER_ID = 'customer_id';
+
     /**
      *
      */
     const CUSTOMER = 'customer';
+
     /**
      *
      */
     const CHILD_FIELDS = 'child_fields';
+
     /**
      *
      */
     const INCLUDE_OUT_OF_STOCK = 'include_out_of_stock';
+
     /**
      *
      */
     const IGNORE_FIELDS = 'ignore_fields';
+
     /**
      *
      */
     const FORMAT = 'format';
+
     /**
      *
      */
@@ -88,6 +102,12 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      *
      */
     const PRE_SIGNED_URL = 'presigned_url';
+
+    /**
+     *
+     */
+    const COMPRESS_FILE = 'compress_file';
+
     /**
      * @return string|null
      */
@@ -261,6 +281,17 @@ interface FeedSpecificationInterface extends ExtensibleDataInterface
      * @return FeedSpecificationInterface
      */
     public function setPreSignedUrl(string $url) : self;
+
+    /**
+     * @return bool|null
+     */
+    public function getCompressFile() : ?bool;
+
+    /**
+     * @param bool $flag
+     * @return FeedSpecificationInterface
+     */
+    public function setCompressFile(bool $flag) : self;
 
     /**
      * @return \SearchSpring\Feed\Api\Data\FeedSpecificationExtensionInterface|null

@@ -329,4 +329,14 @@ class Feed extends AbstractExtensibleObject implements FeedSpecificationInterfac
     {
         return $this->setData(self::PRE_SIGNED_URL, $url);
     }
+
+    public function getCompressFile(): ?bool
+    {
+        return $this->_get(self::COMPRESS_FILE);
+    }
+
+    public function setCompressFile(bool $flag): FeedSpecificationInterface
+    {
+        return $this->setData(self::COMPRESS_FILE, $flag);
+    }
 }

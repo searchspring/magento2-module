@@ -80,14 +80,15 @@ class PreSignedUrlStorage implements StorageInterface
      * @param string $feedType
      */
     public function __construct(
-        FormatterPool $formatterPool,
-        PreSignedUrl $preSignedUrl,
-        NameGenerator $nameGenerator,
-        FileFactory $fileFactory,
+        FormatterPool      $formatterPool,
+        PreSignedUrl       $preSignedUrl,
+        NameGenerator      $nameGenerator,
+        FileFactory        $fileFactory,
         AppConfigInterface $appConfig,
-        string $type = 'aws_presigned',
-        string $feedType = 'product'
-    ) {
+        string             $type = 'aws_presigned',
+        string             $feedType = 'product'
+    )
+    {
         $this->formatterPool = $formatterPool;
         $this->preSignedUrl = $preSignedUrl;
         $this->type = $type;
@@ -114,11 +115,11 @@ class PreSignedUrlStorage implements StorageInterface
     {
         $format = $feedSpecification->getFormat();
         if (!$format) {
-            throw new Exception((string) __('format cannot be empty'));
+            throw new Exception((string)__('format cannot be empty'));
         }
 
         if (!$this->isSupportedFormat($format)) {
-            throw new Exception((string) __('%1 is not supported format', $format));
+            throw new Exception((string)__('%1 is not supported format', $format));
         }
 
         $this->initializeFile($feedSpecification);
@@ -135,11 +136,11 @@ class PreSignedUrlStorage implements StorageInterface
         $specification = $this->getSpecification();
         $format = $specification->getFormat();
         if (!$format) {
-            throw new Exception((string) __('format cannot be empty'));
+            throw new Exception((string)__('format cannot be empty'));
         }
 
         if (!$this->isSupportedFormat($format)) {
-            throw new Exception((string) __('%1 is not supported format', $format));
+            throw new Exception((string)__('%1 is not supported format', $format));
         }
 
         $formatter = $this->formatterPool->get($format);
@@ -157,17 +158,31 @@ class PreSignedUrlStorage implements StorageInterface
     {
         $file = $this->getFile();
         $file->commit();
+
+        $localFilename = $file->getAbsolutePath();
+
+        if ($this->specification->getCompressFile()) {
+            $localFilename = $localFilename . '.gz';
+
+            $fp = gzopen($localFilename, 'wb9');
+
+            gzwrite($fp, file_get_contents($file->getAbsolutePath()));
+
+            gzclose($fp);
+        }
+
         $data = [
             'type' => 'stream',
-            'file' => $file->getAbsolutePath()
+            'file' => $localFilename
         ];
 
         try {
             $this->preSignedUrl->save($this->specification, $data);
         } finally {
-            if ((!$this->appConfig->isDebug() || $this->appConfig->getValue('product_delete_file'))
-                && $deleteFile
-            ) {
+            if ((!$this->appConfig->isDebug() || $this->appConfig->getValue('product_delete_file')) && $deleteFile) {
+                if ($this->specification->getCompressFile()) // Delete .gz file as well
+                    unlink($localFilename);
+
                 $file->delete();
             }
         }
@@ -195,7 +210,7 @@ class PreSignedUrlStorage implements StorageInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @throws Exception
      */
-    private function initializeFile(FeedSpecificationInterface $feedSpecification) : void
+    private function initializeFile(FeedSpecificationInterface $feedSpecification): void
     {
         $format = $feedSpecification->getFormat();
         $file = $this->fileFactory->create($format);
@@ -209,7 +224,7 @@ class PreSignedUrlStorage implements StorageInterface
      * @return FileInterface
      * @throws Exception
      */
-    public function getFile() : FileInterface
+    public function getFile(): FileInterface
     {
         if (!$this->file) {
             throw new Exception('file is not initialized yet');
@@ -222,7 +237,7 @@ class PreSignedUrlStorage implements StorageInterface
      * @return FeedSpecificationInterface
      * @throws Exception
      */
-    private function getSpecification() : FeedSpecificationInterface
+    private function getSpecification(): FeedSpecificationInterface
     {
         if (!$this->specification) {
             throw new Exception('specification is not initialized yet');
