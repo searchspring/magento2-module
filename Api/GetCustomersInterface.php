@@ -27,7 +27,7 @@ interface GetCustomersInterface
      * @param string $dateRange
      * @param string $rowRange
      *
-     * @return CustomersInterface
+     * @return SearchSpring\Feed\Api\Data\CustomersInterface
      *
      * @throws LocalizedException
      */

@@ -28,7 +28,7 @@ use SearchSpring\Feed\Api\Data\CustomerResultsInterface;
 interface GetVersionInterface
 {
     /**
-     * @return array
+     * @return string[]
      *
      * @throws LocalizedException
      */

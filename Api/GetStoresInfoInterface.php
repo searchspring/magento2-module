@@ -26,7 +26,7 @@ interface GetStoresInfoInterface
     public function getAsHtml() : string;
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getAsJson(): array;
 }
