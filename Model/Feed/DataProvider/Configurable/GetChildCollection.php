@@ -58,9 +58,30 @@ class GetChildCollection
         array $attributeCodes = []
     ) : Collection {
         $collection = $this->collectionFactory->create();
+
+        $productIds = [];
+        $duplicateIds = []; // Array to store duplicates
+        $seenIds = []; // Array to track seen IDs
+
         foreach ($products as $product) {
-            $collection->setProductFilter($product);
+            $productId = $product->getId();
+
+            if (in_array($productId, $seenIds)) {
+                // If  already seen this ID, add it to duplicates
+                $duplicateIds[] = $productId;
+            } else {
+                // Otherwise, add it to the seen IDs and product IDs
+                $seenIds[] = $productId;
+                $productIds[] = $productId;
+            }
         }
+
+        // Log duplicates if any
+        if (!empty($duplicateIds)) {
+            $this->logger->warning('Duplicate product IDs found: ' . implode(', ', $duplicateIds));
+        }
+
+        $productIds = array_unique($productIds);
 
         $defaultAttributes = [
             ProductInterface::STATUS,
@@ -77,6 +98,10 @@ class GetChildCollection
             ProductInterface::STATUS,
             ['in' => $this->status->getVisibleStatusIds()]
         );
+
+        if (!empty($productIds)) {
+            $collection->addFieldToFilter('entity_id', ['in' => $productIds]);
+        }
 
         $collection->addPriceData();
 
