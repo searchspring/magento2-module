@@ -30,40 +30,37 @@ interface TaskRepositoryInterface
 {
     /**
      * @param int $id
-     * @return TaskInterface
+     * @return SearchSpring\Feed\Api\Data\TaskInterface
      * @throws NoSuchEntityException
-     * @return TaskInterface
      */
     public function get(int $id) : TaskInterface;
 
     /**
      * @param SearchCriteriaInterface|null $searchCriteria
-     * @return TaskSearchResultsInterface
+     * @return SearchSpring\Feed\Api\Data\TaskSearchResultsInterface
      * @throws LocalizedException
-     * @return TaskSearchResultsInterface
      */
     public function getList(SearchCriteriaInterface $searchCriteria = null) : TaskSearchResultsInterface;
 
     /**
      * @param TaskInterface $task
-     * @return TaskInterface
+     * @return SearchSpring\Feed\Api\Data\TaskInterface
      * @throws CouldNotSaveException
-     * @return TaskInterface
      */
     public function save(TaskInterface $task) : TaskInterface;
 
     /**
      * @param TaskInterface $task
-     * @throws CouldNotDeleteException
      * @return void
+     * @throws CouldNotDeleteException
      */
     public function delete(TaskInterface $task) : void;
 
     /**
      * @param int $id
+     * @return void
      * @throws CouldNotDeleteException
      * @throws NoSuchEntityException
-     * @return void
      */
     public function deleteById(int $id) : void;
 }

@@ -29,7 +29,7 @@ interface CreateTaskInterface
     /**
      * @param string $type
      * @param mixed $payload
-     * @return TaskInterface
+     * @return SearchSpring\Feed\Api\Data\TaskInterface
      * @throws CouldNotSaveException
      * @throws ValidationException
      * @throws UniqueTaskException

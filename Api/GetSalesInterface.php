@@ -32,7 +32,7 @@ interface GetSalesInterface
      * @param string $dateRange
      * @param string $rowRange
      *
-     * @return SalesInterface
+     * @return SearchSpring\Feed\Api\Data\SalesInterface
      *
      * @throws LocalizedException
      */
