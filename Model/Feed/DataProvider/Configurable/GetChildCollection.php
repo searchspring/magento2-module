@@ -23,7 +23,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\Collection;
 use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Product\CollectionFactory;
-
+use Psr\Log\LoggerInterface;
 class GetChildCollection
 {
     /**
@@ -36,16 +36,24 @@ class GetChildCollection
     private $status;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * GetChildCollection constructor.
      * @param CollectionFactory $collectionFactory
      * @param Status $status
+     * @param LoggerInterface $logger
      */
     public function __construct(
         CollectionFactory $collectionFactory,
-        Status $status
+        Status $status,
+        LoggerInterface $logger
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->status = $status;
+        $this->logger = $logger;
     }
 
     /**
