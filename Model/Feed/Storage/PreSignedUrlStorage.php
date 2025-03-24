@@ -24,10 +24,16 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\RuntimeException;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
+use SearchSpring\Feed\Api\Data\TaskInterface;
+use SearchSpring\Feed\Api\Data\TaskInterfaceFactory;
+use SearchSpring\Feed\Api\MetadataInterface;
+use SearchSpring\Feed\Api\TaskRepositoryInterface;
 use SearchSpring\Feed\Model\Aws\PreSignedUrl;
 use SearchSpring\Feed\Model\Feed\Storage\File\FileFactory;
 use SearchSpring\Feed\Model\Feed\Storage\File\NameGenerator;
 use SearchSpring\Feed\Model\Feed\StorageInterface;
+use SearchSpring\Feed\Model\TaskFactory;
+use SearchSpring\Feed\Model\TaskRepository;
 
 class PreSignedUrlStorage implements StorageInterface
 {
@@ -70,12 +76,25 @@ class PreSignedUrlStorage implements StorageInterface
     private $appConfig;
 
     /**
+     * @var TaskFactory
+     */
+    private $taskFactory;
+
+    /**
+     * @var TaskRepository
+     */
+    private $taskRepository;
+    /**
+
+    /**
      * PreSignedUrlStorage constructor.
      * @param FormatterPool $formatterPool
      * @param PreSignedUrl $preSignedUrl
      * @param NameGenerator $nameGenerator
      * @param FileFactory $fileFactory
      * @param AppConfigInterface $appConfig
+     * @param TaskInterface $task
+     * @param TaskRepositoryInterface $taskRepository
      * @param string $type
      * @param string $feedType
      */
@@ -85,6 +104,8 @@ class PreSignedUrlStorage implements StorageInterface
         NameGenerator $nameGenerator,
         FileFactory $fileFactory,
         AppConfigInterface $appConfig,
+        TaskInterface $task,
+        TaskRepositoryInterface $taskRepository,
         string $type = 'aws_presigned',
         string $feedType = 'product'
     ) {
@@ -95,6 +116,8 @@ class PreSignedUrlStorage implements StorageInterface
         $this->nameGenerator = $nameGenerator;
         $this->fileFactory = $fileFactory;
         $this->appConfig = $appConfig;
+        $this->taskFactory = $task;
+        $this->taskRepository = $taskRepository;
     }
 
     /**
@@ -127,9 +150,10 @@ class PreSignedUrlStorage implements StorageInterface
 
     /**
      * @param array $data
+     * @param $id
      * @throws Exception
      */
-    public function addData(array $data): void
+    public function addData(array $data, $id): void
     {
         $file = $this->getFile();
         $specification = $this->getSpecification();
@@ -144,22 +168,47 @@ class PreSignedUrlStorage implements StorageInterface
 
         $formatter = $this->formatterPool->get($format);
         $data = $formatter->format($data, $specification);
+
+        $task = $this->taskRepository->get($id);
+        $task->setProductCount(count($data));
+        $this->taskRepository->save($task);
+
         $file->appendData($data);
     }
 
     /**
+     * @param int $id
      * @param bool $deleteFile
      * @throws FileSystemException
      * @throws RuntimeException
      * @throws Exception
      */
-    public function commit(bool $deleteFile = true): void
+    public function commit(int $id, bool $deleteFile = true): void
     {
         $file = $this->getFile();
+        $filePath = $file->getAbsolutePath();
+
+        $urlPath = parse_url($this->specification->getPreSignedUrl(), PHP_URL_PATH);
+
+        // For json.gz,csv.gz treat as JSON/ csv format for compression
+        if (str_contains($urlPath, MetadataInterface::FORMAT_JSON_GZ) || str_contains($urlPath, MetadataInterface::FORMAT_CSV_GZ)) {
+            $gzFilePath = $filePath . '.gz';
+            $this->compressFile($filePath, $gzFilePath);
+            $filePath = $gzFilePath;  // Use the gzipped file for saving
+        }
+
         $file->commit();
+
+        // Get the file size (in bytes)
+        $fileSize = filesize($filePath);
+
+        $task = $this->taskRepository->get($id);
+        $task->setFileSize($fileSize);
+        $this->taskRepository->save($task);
+
         $data = [
             'type' => 'stream',
-            'file' => $file->getAbsolutePath()
+            'file' => $filePath,
         ];
 
         try {
@@ -171,6 +220,32 @@ class PreSignedUrlStorage implements StorageInterface
                 $file->delete();
             }
         }
+    }
+
+    /**
+     * Compress the file into GZ format
+     *
+     * @param string $sourceFile
+     * @param string $targetFile
+     * @return void
+     * @throws RuntimeException
+     */
+    private function compressFile(string $sourceFile, string $targetFile): void
+    {
+        $source = fopen($sourceFile, 'rb');
+        $destination = gzopen($targetFile, 'wb9'); // Open file for gz compression
+
+        if ($source === false || $destination === false) {
+            throw new RuntimeException('Unable to open file for compression.');
+        }
+
+        // Compress the file in chunks to avoid memory overflow
+        while (!feof($source)) {
+            gzwrite($destination, fread($source, 1024 * 512)); // 512 KB chunk size
+        }
+
+        fclose($source);
+        gzclose($destination);
     }
 
     /**

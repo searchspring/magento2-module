@@ -68,6 +68,12 @@
             <resource ref="SearchSpring_Feed::task" />
         </resources>
     </route>
+    <route url="/V1/searchspring/categorylist" method="GET">
+        <service class="SearchSpring\Feed\Api\CategoryInfoInterface" method="getAllCategories"/>
+        <resources>
+            <resource ref="SearchSpring_Feed::task" />
+        </resources>
+    </route>
     <route url="/V1/searchspring/product/:id" method="GET">
         <service class="SearchSpring\Feed\Api\ProductRepositoryInterface" method="getItem" />
         <resources>

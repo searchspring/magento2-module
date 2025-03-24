@@ -77,6 +77,8 @@
                 type="SearchSpring\Feed\Model\RequestItem"/>
     <preference for="SearchSpring\Feed\Api\ResponseItemInterface"
                 type="SearchSpring\Feed\Model\ResponseItem"/>
+    <preference for="SearchSpring\Feed\Api\CategoryInfoInterface"
+                type="SearchSpring\Feed\Model\CategoryInfo"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>

@@ -26,6 +26,7 @@ use Magento\Framework\Exception\RuntimeException;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Api\GenerateFeedInterface;
+use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Model\Feed\Collection\ProcessorPool;
 use SearchSpring\Feed\Model\Feed\CollectionConfigInterface;
 use SearchSpring\Feed\Model\Feed\CollectionProviderInterface;
@@ -115,8 +116,9 @@ class GenerateFeed implements GenerateFeedInterface
      * @param FeedSpecificationInterface $feedSpecification
      * @throws Exception
      */
-    public function execute(FeedSpecificationInterface $feedSpecification): void
+    public function execute(FeedSpecificationInterface $feedSpecification, $id): void
     {
+        $this->setPresignUrlFileFormat($feedSpecification);
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
             throw new Exception((string) __('%1 is not supported format', $format));
@@ -148,7 +150,7 @@ class GenerateFeed implements GenerateFeedInterface
                     $metricPage++;
                 }
 
-                $this->storage->addData($itemsData);
+                $this->storage->addData($itemsData, $id);
                 $itemsData = [];
                 $currentPageNumber++;
                 $this->resetDataProvidersAfterFetchItems($feedSpecification);
@@ -161,7 +163,7 @@ class GenerateFeed implements GenerateFeedInterface
             }
         }
 
-        $this->reset($feedSpecification);
+        $this->reset($feedSpecification, $id);
         return;
     }
 
@@ -183,14 +185,15 @@ class GenerateFeed implements GenerateFeedInterface
 
     /**
      * @param FeedSpecificationInterface $feedSpecification
+     * @param $id
      * @throws Exception
      */
-    private function reset(FeedSpecificationInterface $feedSpecification) : void
+    private function reset(FeedSpecificationInterface $feedSpecification, $id): void
     {
         $this->resetDataProviders($feedSpecification);
         $this->collectMetrics('Before Send File');
         try {
-            $this->storage->commit();
+            $this->storage->commit($id);
         } finally {
             $this->collectMetrics('After Send File');
             $this->metricCollector->print(
@@ -362,5 +365,29 @@ class GenerateFeed implements GenerateFeedInterface
         }
 
         return $items;
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     * @return void
+     */
+    Private function setPresignUrlFileFormat(FeedSpecificationInterface $feedSpecification): void
+    {
+        $urlPath = parse_url($feedSpecification->getPreSignedUrl(), PHP_URL_PATH);
+        $fileBaseExtension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
+        $secondExtension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
+
+        // Check if file has a "gz" extension and process the format accordingly
+        if ($fileBaseExtension === MetadataInterface::FORMAT_CSV || $fileBaseExtension === MetadataInterface::FORMAT_JSON) {
+            $feedSpecification->setFormat($fileBaseExtension); // Set format as csv or json based on URL extension
+        } elseif ($secondExtension === MetadataInterface::FORMAT_GZ) {
+            if (str_contains($urlPath, MetadataInterface::FORMAT_JSON_GZ)) {
+                $feedSpecification->setFormat(MetadataInterface::FORMAT_JSON); // For json.gz, treat as JSON format
+            } elseif (str_contains($urlPath, MetadataInterface::FORMAT_CSV_GZ)) {
+                $feedSpecification->setFormat(MetadataInterface::FORMAT_CSV); // For csv.gz, treat as CSV format
+            }
+        } else {
+            $feedSpecification->setFormat($fileBaseExtension);
+        }
     }
 }
