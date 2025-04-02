@@ -73,10 +73,6 @@
                 type="SearchSpring\Feed\Model\Aws\Client\Response"/>
     <preference for="SearchSpring\Feed\Api\ProductRepositoryInterface"
                 type="SearchSpring\Feed\Model\ProductRepository"/>
-    <preference for="SearchSpring\Feed\Api\RequestItemInterface"
-                type="SearchSpring\Feed\Model\RequestItem"/>
-    <preference for="SearchSpring\Feed\Api\ResponseItemInterface"
-                type="SearchSpring\Feed\Model\ResponseItem"/>
     <preference for="SearchSpring\Feed\Api\CategoryInfoInterface"
                 type="SearchSpring\Feed\Model\CategoryInfo"/>
 
