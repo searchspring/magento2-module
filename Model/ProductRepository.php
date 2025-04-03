@@ -4,8 +4,6 @@ namespace SearchSpring\Feed\Model;
 
 use Magento\ConfigurableProduct\Pricing\Price\ConfigurableOptionsProviderInterface;
 use SearchSpring\Feed\Api\ProductRepositoryInterface;
-use SearchSpring\Feed\Api\RequestItemInterfaceFactory;
-use SearchSpring\Feed\Api\ResponseItemInterfaceFactory;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -72,14 +70,7 @@ class ProductRepository implements ProductRepositoryInterface
      * @var CollectionFactory
      */
     private $productCollectionFactory;
-    /**
-     * @var RequestItemInterfaceFactory
-     */
-    private $requestItemFactory;
-    /**
-     * @var ResponseItemInterfaceFactory
-     */
-    private $responseItemFactory;
+
     /**
      * @var StoreManagerInterface
      */
@@ -106,8 +97,6 @@ class ProductRepository implements ProductRepositoryInterface
     /**
      * @param Action $productAction
      * @param CollectionFactory $productCollectionFactory
-     * @param RequestItemInterfaceFactory $requestItemFactory
-     * @param ResponseItemInterfaceFactory $responseItemFactory
      * @param StoreManagerInterface $storeManager
      * @param StockRegistryInterface $stockRegistry
      * @param CategoryRepositoryInterface $categoryRepository
@@ -126,8 +115,6 @@ class ProductRepository implements ProductRepositoryInterface
     public function __construct(
         Action                               $productAction,
         CollectionFactory                    $productCollectionFactory,
-        RequestItemInterfaceFactory          $requestItemFactory,
-        ResponseItemInterfaceFactory         $responseItemFactory,
         StoreManagerInterface                $storeManager,
         StockRegistryInterface               $stockRegistry,
         CategoryRepositoryInterface          $categoryRepository,
@@ -146,8 +133,6 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $this->productAction = $productAction;
         $this->productCollectionFactory = $productCollectionFactory;
-        $this->requestItemFactory = $requestItemFactory;
-        $this->responseItemFactory = $responseItemFactory;
         $this->storeManager = $storeManager;
         $this->stockRegistry = $stockRegistry;
         $this->categoryRepository = $categoryRepository;
@@ -173,17 +158,16 @@ class ProductRepository implements ProductRepositoryInterface
      */
     public function getItem(int $id): array
     {
-        // First get the raw product data array
+        // Getting the raw product data array
         $rawProductData = $this->getRawProductData($id);
 
-        // Apply field mapping
+        // Applying field mapping
         $productData = $this->applyFieldMapping($rawProductData);
 
         // Get the product object for additional data
         $product = $this->productRepository->getById($id);
 
-
-        // Add all additional fields that weren't in the original mapping
+        // Adding additional fields that weren't in the original mapping
         $productData = array_merge($productData, $this->getAdditionalProductData($product));
 
         // Handle configurable product specific data
@@ -201,12 +185,10 @@ class ProductRepository implements ProductRepositoryInterface
         }
 
         return $this->formatProductData([$productData]);
-        // return $productData;
-
     }
 
     /**
-     * Get raw product data array (as you originally had it)
+     * Getting raw product data
      */
     protected function getRawProductData(int $id): array
     {
@@ -221,7 +203,7 @@ class ProductRepository implements ProductRepositoryInterface
             throw new NoSuchEntityException(__('Product not found'));
         }
 
-        // Return as numerically indexed array as per your original format
+        // Return as numerically indexed array
         return [
             $product->getId(),
             $product->getAttributeSetId(),
@@ -430,33 +412,6 @@ class ProductRepository implements ProductRepositoryInterface
                 'value' => $attribute->getValue()
             ];
         }
-        return $attributes;
-    }
-
-    /**
-     * Get formatted custom attributes
-     */
-    protected function getCustomAttributes($product): array
-    {
-        $attributes = [];
-        foreach ($product->getCustomAttributes() as $attribute) {
-            $attr = $product->getResource()->getAttribute($attribute->getAttributeCode());
-
-            if ($attr && $attr->usesSource()) {
-                $value = $attr->getSource()->getOptionText($attribute->getValue());
-                if (is_array($value)) {
-                    $value = implode(', ', $value);
-                }
-            } else {
-                $value = $attribute->getValue();
-            }
-
-            $attributes[] = [
-                'attribute_code' => $attribute->getAttributeCode(),
-                'value' => $value,
-            ];
-        }
-
         return $attributes;
     }
 
@@ -846,7 +801,6 @@ class ProductRepository implements ProductRepositoryInterface
                 'regular_from_price' => $this->getMinRegularCombination($optionRegularPrices),
                 'regular_to_price' => $maxRegularCombination
             ],
-            // 'option_prices' => $this->getOptionPriceDetails($optionRegularPrices, $optionFinalPrices),
             'selection_prices' => $allSelectionPrices,
             'tax_adjusted' => $this->getBundleTaxAdjustedPrices($product, $minFinalCombination, $maxFinalCombination, $maxRegularCombination)
         ];
@@ -1077,60 +1031,6 @@ class ProductRepository implements ProductRepositoryInterface
         }
 
         return implode(', ', $options);
-    }
-
-    protected function getGroupedTaxAdjustedPrices($product, $finalPrices)
-    {
-        $minDisplay = !empty($displayPrices) ? min($displayPrices) : 0;
-        $maxDisplay = !empty($displayPrices) ? max($displayPrices) : 0;
-
-        return [
-            'min_price' => [
-                'incl_tax' => $this->taxHelper->getTaxPrice($product, $minDisplay, true),
-                'excl_tax' => $minDisplay
-            ],
-            'max_price' => [
-                'incl_tax' => $this->taxHelper->getTaxPrice($product, $maxDisplay, true),
-                'excl_tax' => $maxDisplay
-            ]
-        ];
-    }
-
-    /**
-     * Get tax class text
-     */
-    protected function getTaxClassText($product)
-    {
-        $taxClassId = $product->getTaxClassId();
-        $taxClasses = [
-            0 => 'None',
-            2 => 'Taxable Goods',
-            4 => 'Shipping',
-        ];
-        return $taxClasses[$taxClassId] ?? 'Unknown';
-    }
-
-    /**
-     * Get tier prices
-     */
-    protected function getTierPrices($product)
-    {
-        return $product->getTierPrice();
-    }
-
-    /**
-     * Get visibility text from code
-     */
-    protected function getVisibilityText($visibilityCode): string
-    {
-        $visibility = [
-            1 => 'Not Visible Individually',
-            2 => 'Catalog',
-            3 => 'Search',
-            4 => 'Catalog, Search',
-        ];
-
-        return $visibility[$visibilityCode] ?? 'Unknown';
     }
 }
 

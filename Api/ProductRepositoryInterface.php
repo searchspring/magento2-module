@@ -10,6 +10,7 @@ interface ProductRepositoryInterface
      * Return a filtered product.
      *
      * @param int $id
+     * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getItem(int $id);
