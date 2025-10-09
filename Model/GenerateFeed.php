@@ -138,6 +138,8 @@ class GenerateFeed implements GenerateFeedInterface
     public function execute(FeedSpecificationInterface $feedSpecification, $id): void
     {
         $this->setPresignUrlFileFormat($feedSpecification);
+        $this->logger->debug('feedSpecification ;: ' . json_encode($feedSpecification, JSON_PRETTY_PRINT));
+
         $format = $feedSpecification->getFormat();
         if (!$this->storage->isSupportedFormat($format)) {
             throw new Exception((string) __('%1 is not supported format', $format));
@@ -402,13 +404,11 @@ class GenerateFeed implements GenerateFeedInterface
         $secondExtension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
 
         // Check if file has a "gz" extension and process the format accordingly
-        if ($fileBaseExtension === MetadataInterface::FORMAT_CSV || $fileBaseExtension === MetadataInterface::FORMAT_JSON) {
-            $feedSpecification->setFormat($fileBaseExtension); // Set format as csv or json based on URL extension
+        if ($fileBaseExtension === MetadataInterface::FORMAT_JSON) {
+            $feedSpecification->setFormat($fileBaseExtension); // Set format json based on URL extension
         } elseif ($secondExtension === MetadataInterface::FORMAT_GZ) {
             if (str_contains($urlPath, MetadataInterface::FORMAT_JSON_GZ)) {
                 $feedSpecification->setFormat(MetadataInterface::FORMAT_JSON); // For json.gz, treat as JSON format
-            } elseif (str_contains($urlPath, MetadataInterface::FORMAT_CSV_GZ)) {
-                $feedSpecification->setFormat(MetadataInterface::FORMAT_CSV); // For csv.gz, treat as CSV format
             }
         } else {
             $feedSpecification->setFormat($fileBaseExtension);

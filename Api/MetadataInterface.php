@@ -24,12 +24,8 @@ interface MetadataInterface
     const TASK_STATUS_PROCESSING = 'processing';
     const TASK_STATUS_SUCCESS = 'success';
     const TASK_STATUS_ERROR = 'error';
-
     const FEED_GENERATION_TASK_CODE = 'feed_generation';
-
-    const FORMAT_CSV = 'csv';
     const FORMAT_JSON = 'json';
     const FORMAT_GZ = 'gz';
     const FORMAT_JSON_GZ = 'json.gz';
-    const FORMAT_CSV_GZ = 'csv.gz';
 }

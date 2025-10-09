@@ -51,7 +51,7 @@ class FormatValidator implements ValidatorInterface
      */
     public function __construct(
         CreateValidationResult $createValidationResult,
-        array $availableFormats = [MetadataInterface::FORMAT_CSV, MetadataInterface::FORMAT_JSON],
+        array $availableFormats = [MetadataInterface::FORMAT_JSON],
         string $field = 'format',
         bool $fieldRequired = false
     ) {

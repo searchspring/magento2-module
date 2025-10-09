@@ -226,7 +226,6 @@
     <type name="SearchSpring\Feed\Model\Feed\Storage\FormatterPool">
         <arguments>
             <argument name="formatters" xsi:type="array">
-                <item name="csv" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Csv</item>
                 <item name="json" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\Formatter\Json</item>
             </argument>
         </arguments>
@@ -234,10 +233,7 @@
 
     <type name="SearchSpring\Feed\Model\Feed\Storage\File\FileFactory">
         <arguments>
-<!--            <argument name="fileClassPool" xsi:type="array">-->
-                <argument  name="csvFile" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\File\Csv</argument>
                 <argument  name="jsonFile" xsi:type="object">SearchSpring\Feed\Model\Feed\Storage\File\Json</argument>
-<!--            </argument>-->
         </arguments>
     </type>
 

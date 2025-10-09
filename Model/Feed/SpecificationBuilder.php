@@ -76,7 +76,7 @@ class SpecificationBuilder implements SpecificationBuilderInterface
             FeedSpecificationInterface::CHILD_FIELDS => [],
             FeedSpecificationInterface::INCLUDE_OUT_OF_STOCK => false,
             FeedSpecificationInterface::IGNORE_FIELDS => [],
-            FeedSpecificationInterface::FORMAT => MetadataInterface::FORMAT_CSV,
+            FeedSpecificationInterface::FORMAT => MetadataInterface::FORMAT_JSON,
             FeedSpecificationInterface::MSI_STATUS => true,
         ],
         'media_gallery' => [
