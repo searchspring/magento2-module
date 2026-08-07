@@ -13,7 +13,7 @@ namespace SearchSpring\Feed\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem\Driver\File;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 class LogInfo extends AbstractHelper
 {
 

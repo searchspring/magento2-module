@@ -18,7 +18,7 @@ namespace SearchSpring\Feed\Test\Unit\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\Data\TaskSearchResultsInterface;
 use SearchSpring\Feed\Api\ExecuteTaskInterface;

@@ -20,7 +20,7 @@ namespace SearchSpring\Feed\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\ExecutePendingTasksInterface;
 use SearchSpring\Feed\Api\ExecuteTaskInterface;

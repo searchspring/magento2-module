@@ -26,7 +26,7 @@ use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\Collection as AbstractCollection;
 use Magento\Framework\Model\ResourceModel\Db\VersionControl\Snapshot;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Model\ResourceModel\Task as TaskResource;
 use SearchSpring\Feed\Model\ResourceModel\Task\Error\LoadErrors;
 use SearchSpring\Feed\Model\Task;

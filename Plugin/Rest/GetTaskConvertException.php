@@ -20,7 +20,7 @@ namespace SearchSpring\Feed\Plugin\Rest;
 
 use Magento\Framework\Exception\NoSuchEntityException as OriginalNoSuchEntityException;
 use Magento\Framework\Webapi\Exception;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
 use SearchSpring\Feed\Exception\NoSuchEntityException;

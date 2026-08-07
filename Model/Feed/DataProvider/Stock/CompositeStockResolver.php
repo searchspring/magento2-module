@@ -19,7 +19,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
 use Magento\Framework\Exception\NoSuchEntityException;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 
 class CompositeStockResolver implements StockResolverInterface
 {

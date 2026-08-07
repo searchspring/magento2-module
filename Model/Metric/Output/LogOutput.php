@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Metric\Output;
 
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Model\Metric\OutputInterface;
 
 class LogOutput implements OutputInterface

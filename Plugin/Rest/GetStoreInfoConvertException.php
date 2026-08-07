@@ -19,7 +19,7 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Plugin\Rest;
 
 use Magento\Framework\Webapi\Exception;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\GetStoresInfoInterface;
 use SearchSpring\Feed\Model\Webapi\ExceptionConverterInterface;
 use Throwable;
