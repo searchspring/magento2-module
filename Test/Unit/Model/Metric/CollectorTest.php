@@ -19,7 +19,7 @@ namespace SearchSpring\Feed\Test\Unit\Model\Metric;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Event\ManagerInterface;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Model\Metric\Collector;
 use SearchSpring\Feed\Model\Metric\MetricProviderInterface;

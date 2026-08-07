@@ -1,27 +1,16 @@
 <?php
-/**
- * Copyright (C) 2023 Searchspring <https://searchspring.com>
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+declare(strict_types=1);
 
 namespace SearchSpring\Feed\Test\Unit\Model\Feed\DataProvider\Stock;
 
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
+use PHPUnit\Framework\TestCase;
+use SearchSpring\Feed\Api\LoggerInterface;
+use SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider;
 use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockResolver;
 
-class MsiStockResolverTest extends \PHPUnit\Framework\TestCase
+class MsiStockResolverTest extends TestCase
 {
     private $moduleList = [
         'Magento_InventoryReservationsApi',
@@ -30,37 +19,60 @@ class MsiStockResolverTest extends \PHPUnit\Framework\TestCase
     ];
 
     private $moduleManagerMock;
-
+    private $msiStockProviderMock;
+    private $legacyStockProviderMock;
+    private $loggerMock;
     private $msiStockResolver;
 
-    /**
-     * @var MsiStockProvider
-     */
-    protected $stockProviderMock;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->moduleManagerMock = $this->createMock(Manager::class);
-        $this->stockProviderMock = $this->createMock(MsiStockProvider::class);
-        $this->msiStockResolver = new MsiStockResolver($this->moduleManagerMock,  $this->stockProviderMock ,$this->moduleList);
+        $this->msiStockProviderMock = $this->createMock(MsiStockProvider::class);
+        $this->legacyStockProviderMock = $this->createMock(LegacyStockProvider::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
+
+        $this->msiStockResolver = new MsiStockResolver(
+            $this->moduleManagerMock,
+            $this->msiStockProviderMock,
+            $this->legacyStockProviderMock,
+            $this->loggerMock,
+            $this->moduleList
+        );
     }
 
-    public function testResolve()
+    public function testResolveWithDisabledMsiPayloadReturnsLegacyProvider(): void
     {
-        $this->moduleManagerMock->expects($this->any())
+        $this->moduleManagerMock->expects($this->exactly(3))
             ->method('isEnabled')
-            ->willReturn(true);
+            ->willReturnMap([
+                [$this->moduleList[0], true],
+                [$this->moduleList[1], true],
+                [$this->moduleList[2], true]
+            ]);
 
-        $this->msiStockResolver->resolve();
+        $this->assertSame($this->legacyStockProviderMock, $this->msiStockResolver->resolve(false));
     }
 
-    public function testResolveExceptionCase()
+    public function testResolveWithEnabledMsiPayloadAndModulesReturnsMsiProvider(): void
     {
-        $this->moduleManagerMock->expects($this->any())
+        $this->moduleManagerMock->expects($this->exactly(3))
             ->method('isEnabled')
+            ->willReturnMap([
+                [$this->moduleList[0], true],
+                [$this->moduleList[1], true],
+                [$this->moduleList[2], true]
+            ]);
+
+        $this->assertSame($this->msiStockProviderMock, $this->msiStockResolver->resolve(true));
+    }
+
+    public function testResolveWithMissingModulesReturnsLegacyProvider(): void
+    {
+        $this->moduleManagerMock->expects($this->once())
+            ->method('isEnabled')
+            ->with($this->moduleList[0])
             ->willReturn(false);
-        $this->expectException(NoSuchEntityException::class);
 
-        $this->msiStockResolver->resolve();
+        $this->assertSame($this->legacyStockProviderMock, $this->msiStockResolver->resolve(true));
     }
 }

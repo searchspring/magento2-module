@@ -22,7 +22,7 @@ use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\RuntimeException;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\AppConfigInterface;
 use SearchSpring\Feed\Model\Metric\View\FormatterInterface;
 use Throwable;

@@ -37,7 +37,7 @@ use SearchSpring\Feed\Model\Feed\StorageInterface;
 use SearchSpring\Feed\Model\Feed\SystemFieldsList;
 use SearchSpring\Feed\Model\Metric\CollectorInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 
 class GenerateFeed implements GenerateFeedInterface
 {
@@ -139,6 +139,11 @@ class GenerateFeed implements GenerateFeedInterface
     {
         $this->setPresignUrlFileFormat($feedSpecification);
         $format = $feedSpecification->getFormat();
+        $this->logger->info('Product feed generation started with entity id', [
+            'method' => __METHOD__,
+            'entityId' => $id,
+            'format' => $format,
+        ]);
         if (!$this->storage->isSupportedFormat($format)) {
             throw new Exception((string) __('%1 is not supported format', $format));
         }
@@ -180,9 +185,29 @@ class GenerateFeed implements GenerateFeedInterface
                 gc_collect_cycles();
             } catch (Exception $exception) {
                 $this->storage->rollback();
+                $this->logger->error('Error fetching products details',
+                    [
+                        'method' => __METHOD__,
+                        'entityId' => $id,
+                        'currentPage' => $currentPageNumber,
+                        'format' => $format,
+                        'query' => $collection->getSelect()->__toString(),
+                        'message' => $exception,
+                        'trace' => $exception->getTraceAsString(),
+                    ]
+                );
                 throw $exception;
             }
         }
+
+        $this->logger->info('Product feed generation completed successfully',
+            [
+                'method' => __METHOD__,
+                'entityId' => $id,
+                'query' => $collection->getSelect()->__toString(),
+                'format' => $format,
+            ]
+        );
 
         $task = $this->taskRepository->get($id);
         $task->setProductCount($productCount);

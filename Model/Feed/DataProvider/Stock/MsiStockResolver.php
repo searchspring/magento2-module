@@ -18,10 +18,9 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Model\Feed\DataProvider\Stock;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 
 class MsiStockResolver implements StockResolverInterface
 {
@@ -34,27 +33,43 @@ class MsiStockResolver implements StockResolverInterface
      * @var LoggerInterface
      */
     private $logger;
-
+    /**
+     * @var MsiStockProvider
+     */
+    private $msiStockProvider;
+    /**
+     * @var LegacyStockProvider
+     */
+    private $legacyStockProvider;
 
     private $moduleList = [
         'Magento_InventoryReservationsApi',
         'Magento_InventorySalesApi',
         'Magento_InventoryCatalogApi'
     ];
+    /**
+     * @var bool|null
+     */
+    private $isMsiEnabledCache = null;
 
     /**
      * MsiStockResolver constructor.
      * @param Manager $moduleManager
+     * @param MsiStockProvider $msiStockProvider
+     * @param LegacyStockProvider $legacyStockProvider
      * @param array $moduleList
      * @param LoggerInterface $logger
      */
     public function __construct(
         Manager $moduleManager,
+        MsiStockProvider $msiStockProvider,
+        LegacyStockProvider $legacyStockProvider,
         LoggerInterface $logger,
-        array $moduleList = [],
-
+        array $moduleList = []
     ) {
         $this->moduleManager = $moduleManager;
+        $this->msiStockProvider = $msiStockProvider;
+        $this->legacyStockProvider = $legacyStockProvider;
         $this->logger = $logger;
         $this->moduleList = array_merge($this->moduleList, $moduleList);
     }
@@ -66,48 +81,48 @@ class MsiStockResolver implements StockResolverInterface
      */
     public function resolve(bool $isMsiEnabled): StockProviderInterface
     {
-        if (!empty($isMsiEnabled) && $this->isMsiEnabled()) {
+        $isInventoryModulesEnabled = $this->isInventoryModulesEnabled();
+        if ($isInventoryModulesEnabled) {
             $this->logger->info(
                 'MSI Check',
                 [
                     'method' => __METHOD__,
                     'isMsiEnabledViaPayload' => $isMsiEnabled,
-                    'isMsiModuleEnabled' => $this->isMsiEnabled(),
-                    'message' => 'MSI is enabled via payload and MSI module is enabled. Using MsiStockProvider for stock resolution.'
+                    'isInventoryModulesEnabled' => $isInventoryModulesEnabled,
+                    'message' => 'MSI is enabled via payload and MSI modules are enabled. Using MsiStockProvider for stock resolution.'
                 ]
             );
-            return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider');
-        } else {
-            $this->logger->info(
-                'MSI Check',
-                [
-                    'method' => __METHOD__,
-                    'isMsiEnabledViaPayload' => $isMsiEnabled,
-                    'isMsiModuleEnabled' => $this->isMsiEnabled(),
-                    'message' => 'MSI is disabled via payload or MSI modules are not installed. Using LegacyStockProvider for stock resolution.'
-                ]
-            );
-            return ObjectManager::getInstance()->get('\SearchSpring\Feed\Model\Feed\DataProvider\Stock\LegacyStockProvider');
+            return $this->msiStockProvider;
         }
+        $this->logger->info(
+            'MSI Check',
+            [
+                'method' => __METHOD__,
+                'isMsiEnabledViaPayload' => $isMsiEnabled,
+                'isInventoryModulesEnabled' => $isInventoryModulesEnabled,
+                'message' => 'MSI is disabled via payload or MSI modules are not installed. Using LegacyStockProvider for stock resolution.'
+            ]
+        );
+        return $this->legacyStockProvider;
     }
 
     /**
      * @return bool
      */
-    private function isMsiEnabled() : bool
+    private function isInventoryModulesEnabled(): bool
     {
-        $moduleExists = true;
+        if ($this->isMsiEnabledCache !== null) {
+            return $this->isMsiEnabledCache;
+        }
+
         foreach ($this->moduleList as $moduleName) {
             if (!$this->moduleManager->isEnabled($moduleName)) {
-                $moduleExists = false;
-                break;
+                $this->isMsiEnabledCache = false;
+                return false;
             }
         }
 
-        if (!$moduleExists) {
-            return false;
-        }
-
+        $this->isMsiEnabledCache = true;
         return true;
     }
 }

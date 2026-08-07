@@ -21,7 +21,7 @@ namespace SearchSpring\Feed\Model;
 use Exception;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
-use Psr\Log\LoggerInterface;
+use SearchSpring\Feed\Api\LoggerInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterface;
 use SearchSpring\Feed\Api\Data\TaskErrorInterfaceFactory;
 use SearchSpring\Feed\Api\Data\TaskInterface;

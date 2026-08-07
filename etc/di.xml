@@ -51,6 +51,8 @@
                 type="SearchSpring\Feed\Model\Metric\View\DefaultFormatter"/>
     <preference for="SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface"
                 type="SearchSpring\Feed\Model\Feed\SpecificationBuilder"/>
+    <preference for="SearchSpring\Feed\Api\LoggerInterface"
+                type="SearchSpring\Feed\Logger\SearchSpringLogger"/>
     <preference for="SearchSpring\Feed\Model\Feed\CollectionProviderInterface"
                 type="SearchSpring\Feed\Model\Feed\CollectionProvider"/>
     <preference for="SearchSpring\Feed\Model\Feed\CollectionConfigInterface"
@@ -312,23 +314,34 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="SearchSpringFeedBaseLogHandler" type="Magento\Framework\Logger\Handler\Base">
+    <type name="SearchSpring\Feed\Logger\Handler">
         <arguments>
-            <argument name="fileName" xsi:type="string">/var/log/searchspring_feed.log</argument>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Logger\SearchSpringLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">searchspring_feed</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SearchSpringFeedSafeLogHandler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SearchSpringFeedLogger" type="SearchSpring\Feed\Logger\SearchSpringLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">searchspring_feed</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SearchSpringFeedSafeLogHandler</item>
+            </argument>
         </arguments>
     </virtualType>
 
-    <virtualType name="SearchSpringFeedSystemLogHandler" type="Magento\Framework\Logger\Handler\System">
-        <arguments>
-            <argument name="fileName" xsi:type="string">/var/log/searchspring_feed.log</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="SearchSpringFeedLogger" type="Magento\Framework\Logger\Monolog">
+    <virtualType name="SearchSpringFeedSafeLogHandler" type="Monolog\Handler\WhatFailureGroupHandler">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="debug" xsi:type="object">SearchSpringFeedBaseLogHandler</item>
-                <item name="system" xsi:type="object">SearchSpringFeedSystemLogHandler</item>
+                <item name="system" xsi:type="object">SearchSpring\Feed\Logger\Handler</item>
             </argument>
         </arguments>
     </virtualType>
@@ -364,6 +377,36 @@
     </type>
 
     <type name="SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Feed\DataProvider\Stock\CompositeStockResolver">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Metric\Collector">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\Metric\Output\LogOutput">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\ResourceModel\Task\Collection">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>
