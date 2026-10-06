@@ -153,7 +153,24 @@ class GenerateFeed implements GenerateFeedInterface
             throw new Exception((string) __('%1 is not supported format', $format));
         }
 
-        $this->initialize($feedSpecification);
+        try {
+            $this->initialize($feedSpecification);
+            $this->generate($feedSpecification, $id);
+        } finally {
+            // also after a failure: a context processor can fail after another one started (e.g. store emulation
+            // started, then the task customer no longer exists), and the feed can fail on any page or on commit
+            $this->restoreEnvironment();
+        }
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     * @param int|string $id
+     * @return void
+     * @throws Exception
+     */
+    private function generate(FeedSpecificationInterface $feedSpecification, $id): void
+    {
         $this->dataProviderTimings = [];
         $this->logPageDetails = $this->appConfig->isDebug();
         $this->logger->info('Feed data providers', [
@@ -220,7 +237,6 @@ class GenerateFeed implements GenerateFeedInterface
         $task->setProductCount($productCount);
         $this->taskRepository->save($task);
         $this->reset($feedSpecification, $id);
-        return;
     }
 
     /**
@@ -259,6 +275,15 @@ class GenerateFeed implements GenerateFeedInterface
         }
 
         $this->metricCollector->reset(CollectorInterface::CODE_PRODUCT_FEED);
+    }
+
+    /**
+     * Reverts initialize(), runs after success and failure
+     *
+     * @return void
+     */
+    private function restoreEnvironment(): void
+    {
         $this->contextManager->resetContext();
         if (!$this->gcStatus) {
             gc_disable();

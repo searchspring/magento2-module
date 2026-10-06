@@ -143,6 +143,7 @@ class GetFilteredLog implements GetFilteredLogInterface
      * @param string $endDate
      * @return ApplicationLogResponseInterface
      * @throws FileSystemException
+     * @throws \Magento\Framework\Exception\InputException
      */
     private function read(
         string $fileName,

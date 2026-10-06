@@ -20,9 +20,11 @@ namespace SearchSpring\Feed\Model\Task;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SortOrderBuilderFactory;
+use Magento\Store\Model\StoreManagerInterface;
 use SearchSpring\Feed\Api\Data\TaskInterface;
 use SearchSpring\Feed\Api\MetadataInterface;
 use SearchSpring\Feed\Api\TaskRepositoryInterface;
+use SearchSpring\Feed\Model\Feed\SpecificationBuilderInterface;
 
 /**
  * Finds the most relevant previous task to reuse its payload, e.g. to rebuild the feed specification.
@@ -30,9 +32,9 @@ use SearchSpring\Feed\Api\TaskRepositoryInterface;
 class TaskPayloadProvider
 {
     /**
-     * Number of latest tasks scanned while searching for a store specific payload.
+     * Number of tasks loaded per page while searching for a store specific task.
      */
-    private const SCAN_LIMIT = 50;
+    private const PAGE_SIZE = 100;
 
     /**
      * @var TaskRepositoryInterface
@@ -46,25 +48,39 @@ class TaskPayloadProvider
      * @var SortOrderBuilderFactory
      */
     private $sortOrderBuilderFactory;
+    /**
+     * @var SpecificationBuilderInterface
+     */
+    private $specificationBuilder;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @param TaskRepositoryInterface $taskRepository
      * @param SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory
      * @param SortOrderBuilderFactory $sortOrderBuilderFactory
+     * @param SpecificationBuilderInterface $specificationBuilder
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         TaskRepositoryInterface $taskRepository,
         SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        SortOrderBuilderFactory $sortOrderBuilderFactory
+        SortOrderBuilderFactory $sortOrderBuilderFactory,
+        SpecificationBuilderInterface $specificationBuilder,
+        StoreManagerInterface $storeManager
     ) {
         $this->taskRepository = $taskRepository;
         $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
         $this->sortOrderBuilderFactory = $sortOrderBuilderFactory;
+        $this->specificationBuilder = $specificationBuilder;
+        $this->storeManager = $storeManager;
     }
 
     /**
-     * Latest task for the store, successful tasks preferred.
-     * Falls back to the latest task of any store when the store has no task.
+     * Latest successful task of the store, otherwise the latest task of the store.
+     * Only when the store has no task at all, the latest task of any store is returned.
      *
      * @param string $storeCode
      * @param string $taskType
@@ -74,39 +90,62 @@ class TaskPayloadProvider
         string $storeCode,
         string $taskType = MetadataInterface::FEED_GENERATION_TASK_CODE
     ): ?TaskInterface {
-        $tasks = $this->getLatestTasks($taskType);
-        $storeTasks = array_filter($tasks, static function (TaskInterface $task) use ($storeCode) {
-            return ($task->getPayload()['store'] ?? null) === $storeCode;
-        });
+        $latestTask = null;
+        $latestStoreTask = null;
+        $page = 1;
+        // the total count bounds the loop, a collection returns its last page again for a page past the end
+        do {
+            $searchResults = $this->taskRepository->getList($this->createSearchCriteria($taskType, $page));
+            foreach ($searchResults->getItems() as $task) {
+                $latestTask = $latestTask ?? $task;
+                if ($this->getStoreCode($task->getPayload()) !== $storeCode) {
+                    continue;
+                }
 
-        foreach ($storeTasks as $task) {
-            if ($task->getStatus() === MetadataInterface::TASK_STATUS_SUCCESS) {
-                return $task;
+                if ($task->getStatus() === MetadataInterface::TASK_STATUS_SUCCESS) {
+                    return $task;
+                }
+                $latestStoreTask = $latestStoreTask ?? $task;
             }
+        } while ($page++ * self::PAGE_SIZE < $searchResults->getTotalCount());
+
+        return $latestStoreTask ?? $latestTask;
+    }
+
+    /**
+     * Store code the feed is generated for, with the same defaults as the feed generation:
+     * SpecificationBuilder defaults a missing store to "default", an empty store means the current store.
+     *
+     * @param array $payload
+     * @return string
+     */
+    public function getStoreCode(array $payload): string
+    {
+        $storeCode = $this->specificationBuilder->build($payload)->getStoreCode();
+        if ($storeCode === null || $storeCode === '') {
+            $storeCode = (string) $this->storeManager->getDefaultStoreView()->getCode();
         }
 
-        $task = reset($storeTasks) ?: reset($tasks);
-        return $task instanceof TaskInterface ? $task : null;
+        return $storeCode;
     }
 
     /**
      * @param string $taskType
-     * @return TaskInterface[]
+     * @param int $page
+     * @return \Magento\Framework\Api\SearchCriteriaInterface
      */
-    private function getLatestTasks(string $taskType): array
+    private function createSearchCriteria(string $taskType, int $page)
     {
         $sortOrder = $this->sortOrderBuilderFactory->create()
             ->setField(TaskInterface::ENTITY_ID)
             ->setDescendingDirection()
             ->create();
 
-        $searchCriteria = $this->searchCriteriaBuilderFactory->create()
+        return $this->searchCriteriaBuilderFactory->create()
             ->addFilter(TaskInterface::TYPE, $taskType)
             ->addSortOrder($sortOrder)
-            ->setPageSize(self::SCAN_LIMIT)
-            ->setCurrentPage(1)
+            ->setPageSize(self::PAGE_SIZE)
+            ->setCurrentPage($page)
             ->create();
-
-        return array_values($this->taskRepository->getList($searchCriteria)->getItems());
     }
 }

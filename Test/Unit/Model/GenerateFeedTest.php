@@ -432,7 +432,58 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             ->method('commit');
         $this->taskRepositoryMock->expects($this->never())
             ->method('save');
+        $this->contextManagerMock->expects($this->once())
+            ->method('resetContext');
         $this->expectException(\Exception::class);
+        $this->generateFeed->execute($feedSpecificationMock, 1);
+    }
+
+    public function testExecuteResetsPartialContextWhenContextSetupFails()
+    {
+        $feedSpecificationMock = $this->getMockBuilder(Feed::class)->disableOriginalConstructor()->getMock();
+        $feedSpecificationMock->method('getPreSignedUrl')->willReturn('https://example.com/path/to/file.json');
+        $feedSpecificationMock->method('getFormat')->willReturn('json');
+        $feedSpecificationMock->method('getIgnoreFields')->willReturn([]);
+        $this->storageMock->method('isSupportedFormat')->willReturn(true);
+        $this->storageMock->method('getAdditionalData')->willReturn([]);
+        $this->dataProviderPoolMock->method('get')->willReturn([]);
+        // e.g. store emulation started, then the customer of the task does not exist anymore
+        $this->contextManagerMock->expects($this->once())
+            ->method('setContextFromSpecification')
+            ->willThrowException(new \Magento\Framework\Exception\NoSuchEntityException(__('No such customer')));
+        $this->contextManagerMock->expects($this->once())
+            ->method('resetContext');
+        $this->storageMock->expects($this->never())
+            ->method('initiate');
+        $this->collectionProviderMock->expects($this->never())
+            ->method('getCollection');
+
+        $this->expectException(\Magento\Framework\Exception\NoSuchEntityException::class);
+        $this->generateFeed->execute($feedSpecificationMock, 1);
+    }
+
+    public function testExecuteResetsContextWhenCommitFails()
+    {
+        $collectionMock = $this->getMockBuilder(Collection::class)->disableOriginalConstructor()->getMock();
+        $collectionMock->method('getLastPageNumber')->willReturn(1);
+        $collectionMock->method('getItems')->willReturn([]);
+        $feedSpecificationMock = $this->getMockBuilder(Feed::class)->disableOriginalConstructor()->getMock();
+        $feedSpecificationMock->method('getPreSignedUrl')->willReturn('https://example.com/path/to/file.json');
+        $feedSpecificationMock->method('getFormat')->willReturn('json');
+        $feedSpecificationMock->method('getIgnoreFields')->willReturn([]);
+        $this->storageMock->method('isSupportedFormat')->willReturn(true);
+        $this->storageMock->method('getAdditionalData')->willReturn([]);
+        $this->collectionProviderMock->method('getCollection')->willReturn($collectionMock);
+        $this->dataProviderPoolMock->method('get')->willReturn([]);
+        $this->afterLoadProcessorPoolMock->method('getAll')->willReturn([]);
+        $this->taskRepositoryMock->method('get')->willReturn($this->createMock(TaskInterface::class));
+        $this->storageMock->expects($this->once())
+            ->method('commit')
+            ->willThrowException(new \RuntimeException('upload failed'));
+        $this->contextManagerMock->expects($this->once())
+            ->method('resetContext');
+
+        $this->expectExceptionMessage('upload failed');
         $this->generateFeed->execute($feedSpecificationMock, 1);
     }
 
@@ -452,6 +503,8 @@ class GenerateFeedTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
         $this->storageMock->expects($this->never())
             ->method('initiate');
+        $this->contextManagerMock->expects($this->never())
+            ->method('resetContext');
         $this->expectExceptionMessage('format is not supported format');
         $this->expectException(\Exception::class);
         $this->generateFeed->execute($feedSpecificationMock, 1);

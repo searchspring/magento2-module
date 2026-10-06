@@ -36,6 +36,7 @@ interface GetFilteredLogInterface
      * @param string $startDate Date/datetime (e.g. 2026-01-01 or 2026-01-01T10:00:00); lines on or after.
      * @param string $endDate Date/datetime; lines on or before. A plain date includes the whole day.
      * @return \SearchSpring\Feed\Api\Data\ApplicationLogResponseInterface
+     * @throws \Magento\Framework\Exception\InputException when a date cannot be parsed
      */
     public function getExtensionLog(
         bool $compressOutput = false,
@@ -58,6 +59,7 @@ interface GetFilteredLogInterface
      * @param string $startDate Date/datetime (e.g. 2026-01-01 or 2026-01-01T10:00:00); lines on or after.
      * @param string $endDate Date/datetime; lines on or before. A plain date includes the whole day.
      * @return \SearchSpring\Feed\Api\Data\ApplicationLogResponseInterface
+     * @throws \Magento\Framework\Exception\InputException when a date cannot be parsed
      */
     public function getExceptionLog(
         bool $compressOutput = false,
@@ -80,6 +82,7 @@ interface GetFilteredLogInterface
      * @param string $startDate Date/datetime (e.g. 2026-01-01 or 2026-01-01T10:00:00); lines on or after.
      * @param string $endDate Date/datetime; lines on or before. A plain date includes the whole day.
      * @return \SearchSpring\Feed\Api\Data\ApplicationLogResponseInterface
+     * @throws \Magento\Framework\Exception\InputException when a date cannot be parsed
      */
     public function getCronLog(
         bool $compressOutput = false,

@@ -142,6 +142,7 @@ class ProductInfo implements ProductInfoInterface
         $response = $this->responseFactory->create();
         $response->setProductInfo([]);
         $productIds = [$productId];
+        $messages = [];
 
         try {
             $storeCode = $this->storeManager->getStore($storeId)->getCode();
@@ -154,13 +155,14 @@ class ProductInfo implements ProductInfoInterface
             }
 
             $payload = $task->getPayload();
-            $messages = [];
-            if (($payload['store'] ?? null) !== $storeCode) {
+            $taskStoreCode = $this->taskPayloadProvider->getStoreCode($payload);
+            if ($taskStoreCode !== $storeCode) {
                 $messages[] = sprintf(
-                    'No task found for store "%s", payload of task %d (store "%s") is used with the store replaced.',
+                    'No task found for store "%s", payload of task %d (store "%s") is used with the store replaced,'
+                    . ' other settings of that task (e.g. ignoreFields, customerId) are kept.',
                     $storeCode,
                     $task->getEntityId(),
-                    $payload['store'] ?? ''
+                    $taskStoreCode
                 );
                 $payload['store'] = $storeCode;
             }
@@ -195,7 +197,8 @@ class ProductInfo implements ProductInfoInterface
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString(),
             ]);
-            $response->setProductInfo([])->setMessage($exception->getMessage());
+            $messages[] = $exception->getMessage();
+            $response->setProductInfo([])->setMessage(implode(' ', $messages));
         }
 
         return $response;
@@ -216,9 +219,11 @@ class ProductInfo implements ProductInfoInterface
         ProductInfoResponseInterface $response
     ): array {
         $dataProviders = $this->dataProviderPool->get($feedSpecification->getIgnoreFields());
-        $this->resetDataProviders($dataProviders);
-        $this->contextManager->setContextFromSpecification($feedSpecification);
         try {
+            $this->resetDataProviders($dataProviders);
+            // inside try: a context processor can fail after another one started (e.g. store emulation
+            // started, then the task customer no longer exists), finally resets the partial context
+            $this->contextManager->setContextFromSpecification($feedSpecification);
             $collection = $this->collectionProvider->getCollection($feedSpecification);
             $collection->addFieldToFilter('entity_id', ['in' => $productIds]);
             $response->setQuery($collection->getSelect()->__toString());
