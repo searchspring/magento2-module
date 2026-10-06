@@ -194,6 +194,8 @@ class LogFileReader
         $hasDateFilter = $startTs !== null || $endTs !== null;
         $hasLineRange = $startLine > 0 || $endLine > 0;
         $matchedLines = [];
+        // key of the oldest kept line, unset() does not reindex the array unlike array_shift()
+        $oldestKey = 0;
         $matchedBytes = 0;
         $matchedLineNumber = 0;
         // lines without timestamp (e.g. stack traces) follow the date match of the previous entry
@@ -242,14 +244,15 @@ class LogFileReader
                 while (count($matchedLines) > $lastLines
                     || (count($matchedLines) > 1 && $matchedBytes > self::MAX_OUTPUT_BYTES)
                 ) {
-                    $matchedBytes -= strlen(array_shift($matchedLines));
+                    $matchedBytes -= strlen($matchedLines[$oldestKey]);
+                    unset($matchedLines[$oldestKey++]);
                 }
             }
         } finally {
             $this->closeFile($handle);
         }
 
-        return $matchedLines;
+        return array_values($matchedLines);
     }
 
     /**
@@ -333,7 +336,13 @@ class LogFileReader
             return $line;
         }
 
-        return substr($line, 0, self::MAX_LINE_BYTES) . sprintf(' ... [truncated, %d bytes]', $length);
+        // cut before the lead byte of a UTF-8 character that would be split, invalid UTF-8 breaks the JSON response
+        $cut = min(self::MAX_LINE_BYTES, strlen($line));
+        while ($cut > 0 && $cut < strlen($line) && (ord($line[$cut]) & 0xC0) === 0x80) {
+            $cut--;
+        }
+
+        return substr($line, 0, $cut) . sprintf(' ... [truncated, %d bytes]', $length);
     }
 
     /**

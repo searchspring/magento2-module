@@ -164,8 +164,10 @@ class ProductInfo implements ProductInfoInterface
                     $task->getEntityId(),
                     $taskStoreCode
                 );
-                $payload['store'] = $storeCode;
             }
+            // always bind to the requested store: an empty store in the payload would otherwise make the
+            // collection use the current store of the REST request
+            $payload['store'] = $storeCode;
 
             $response->setTaskId((int) $task->getEntityId());
             $feedSpecification = $this->specificationBuilder->build($payload);
