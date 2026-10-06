@@ -86,6 +86,16 @@ class GenerateFeed implements GenerateFeedInterface
     private $taskRepository;
     private $productCount = '';
     /**
+     * Cumulative seconds per data provider key for the current task
+     *
+     * @var float[]
+     */
+    private $dataProviderTimings = [];
+    /**
+     * @var bool
+     */
+    private $logPageDetails = false;
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -143,7 +153,35 @@ class GenerateFeed implements GenerateFeedInterface
             throw new Exception((string) __('%1 is not supported format', $format));
         }
 
-        $this->initialize($feedSpecification);
+        try {
+            $this->initialize($feedSpecification);
+            $this->generate($feedSpecification, $id);
+        } finally {
+            // also after a failure: a context processor can fail after another one started (e.g. store emulation
+            // started, then the task customer no longer exists), and the feed can fail on any page or on commit
+            $this->restoreEnvironment();
+        }
+    }
+
+    /**
+     * @param FeedSpecificationInterface $feedSpecification
+     * @param int|string $id
+     * @return void
+     * @throws Exception
+     */
+    private function generate(FeedSpecificationInterface $feedSpecification, $id): void
+    {
+        $this->dataProviderTimings = [];
+        $this->logPageDetails = $this->appConfig->isDebug();
+        $this->logger->info('Feed data providers', [
+            'method' => __METHOD__,
+            'taskId' => $id,
+            'store' => $feedSpecification->getStoreCode(),
+            'dataProviders' => array_map(
+                'get_class',
+                $this->getDataProviders($feedSpecification)
+            ),
+        ]);
         $collection = $this->collectionProvider->getCollection($feedSpecification);
         $pageSize = $this->collectionConfig->getPageSize();
         $collection->setPageSize($pageSize);
@@ -159,7 +197,7 @@ class GenerateFeed implements GenerateFeedInterface
                 $collection->setCurPage($currentPageNumber);
                 $collection->load();
                 $this->processAfterLoad($collection, $feedSpecification);
-                $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification);
+                $itemsData = $this->getItemsData($collection->getItems(), $feedSpecification, $id, $currentPageNumber);
                 $productCount += count($itemsData);
                 $title = 'Products: ' . $pageSize * $metrics . ' - ' . $pageSize * ($metrics + 1);
                 $metrics++;
@@ -184,11 +222,21 @@ class GenerateFeed implements GenerateFeedInterface
             }
         }
 
+        arsort($this->dataProviderTimings);
+        $this->logger->info('Feed data providers execution time in seconds, slowest first', [
+            'method' => __METHOD__,
+            'taskId' => $id,
+            'pageCount' => $pageCount,
+            'productCount' => $productCount,
+            'timings' => array_map(function (float $seconds) {
+                return round($seconds, 4);
+            }, $this->dataProviderTimings),
+        ]);
+
         $task = $this->taskRepository->get($id);
         $task->setProductCount($productCount);
         $this->taskRepository->save($task);
         $this->reset($feedSpecification, $id);
-        return;
     }
 
     /**
@@ -227,6 +275,15 @@ class GenerateFeed implements GenerateFeedInterface
         }
 
         $this->metricCollector->reset(CollectorInterface::CODE_PRODUCT_FEED);
+    }
+
+    /**
+     * Reverts initialize(), runs after success and failure
+     *
+     * @return void
+     */
+    private function restoreEnvironment(): void
+    {
         $this->contextManager->resetContext();
         if (!$this->gcStatus) {
             gc_disable();
@@ -347,10 +404,16 @@ class GenerateFeed implements GenerateFeedInterface
     /**
      * @param Product[] $items
      * @param FeedSpecificationInterface $feedSpecification
+     * @param int|string $id
+     * @param int $pageNumber
      * @return array
      */
-    private function getItemsData(array $items, FeedSpecificationInterface $feedSpecification) : array
-    {
+    private function getItemsData(
+        array $items,
+        FeedSpecificationInterface $feedSpecification,
+        $id = null,
+        int $pageNumber = 0
+    ) : array {
         if (empty($items)) {
             return [];
         }
@@ -365,8 +428,22 @@ class GenerateFeed implements GenerateFeedInterface
 
         $this->systemFieldsList->add('product_model');
         $dataProviders = $this->getDataProviders($feedSpecification);
-        foreach ($dataProviders as $dataProvider) {
+        foreach ($dataProviders as $key => $dataProvider) {
+            $startTime = microtime(true);
             $data = $dataProvider->getData($data, $feedSpecification);
+            $seconds = microtime(true) - $startTime;
+            $this->dataProviderTimings[$key] = ($this->dataProviderTimings[$key] ?? 0.0) + $seconds;
+            if ($this->logPageDetails) {
+                $this->logger->debug('Feed data provider executed', [
+                    'method' => __METHOD__,
+                    'taskId' => $id,
+                    'page' => $pageNumber,
+                    'dataProvider' => $key,
+                    'class' => get_class($dataProvider),
+                    'seconds' => round($seconds, 4),
+                    'rows' => count($data),
+                ]);
+            }
         }
 
         $data = $this->cleanupItemsData($data);

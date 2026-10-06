@@ -19,10 +19,13 @@ declare(strict_types=1);
 namespace SearchSpring\Feed\Model;
 
 use Magento\Cron\Model\ResourceModel\Schedule\CollectionFactory as ScheduleCollectionFactory;
+use Magento\Framework\Exception\InputException;
 use SearchSpring\Feed\Api\GetCronStatusInterface;
 
 class GetCronStatus implements GetCronStatusInterface
 {
+    public const MAX_PAGE_SIZE = 200;
+
     /**
      * @var ScheduleCollectionFactory
      */
@@ -43,10 +46,20 @@ class GetCronStatus implements GetCronStatusInterface
      * @param string $status
      * @param int $currentPage
      * @param int $pageSize
+     * @param string $startDate
+     * @param string $endDate
      * @return array
+     * @throws InputException
      */
-    public function getList(string $status = '', int $currentPage = 1, int $pageSize = 20): array
-    {
+    public function getList(
+        string $status = '',
+        int $currentPage = 1,
+        int $pageSize = 20,
+        string $startDate = '',
+        string $endDate = ''
+    ): array {
+        $currentPage = max(1, $currentPage);
+        $pageSize = min(max(1, $pageSize), self::MAX_PAGE_SIZE);
         $collection = $this->scheduleCollectionFactory->create();
         
         // Filter by searchspring job code
@@ -57,6 +70,15 @@ class GetCronStatus implements GetCronStatusInterface
             $collection->addFieldToFilter('status', $status);
         }
         
+        // cron_schedule dates are stored in UTC
+        if ($startDate !== '') {
+            $collection->addFieldToFilter('scheduled_at', ['gteq' => $this->formatDate($startDate, 'startDate')]);
+        }
+        if ($endDate !== '') {
+            $endDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate) ? $endDate . ' 23:59:59' : $endDate;
+            $collection->addFieldToFilter('scheduled_at', ['lteq' => $this->formatDate($endDate, 'endDate')]);
+        }
+
         // Default ordering - latest first
         $collection->setOrder('scheduled_at', 'DESC');
         
@@ -90,5 +112,21 @@ class GetCronStatus implements GetCronStatusInterface
                 'pageSize' => $pageSize
             ]
         ];
+    }
+
+    /**
+     * @param string $date
+     * @param string $fieldName
+     * @return string
+     * @throws InputException
+     */
+    private function formatDate(string $date, string $fieldName): string
+    {
+        $timestamp = strtotime($date . (preg_match('/(Z|[+-]\d{2}:?\d{2}|UTC|GMT)$/i', $date) ? '' : ' UTC'));
+        if ($timestamp === false) {
+            throw new InputException(__('Invalid %1 "%2", use e.g. 2026-01-01 or 2026-01-01T10:00:00', $fieldName, $date));
+        }
+
+        return gmdate('Y-m-d H:i:s', $timestamp);
     }
 }

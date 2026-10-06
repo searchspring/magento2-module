@@ -85,6 +85,20 @@
                 type="SearchSpring\Feed\Model\CronStatusSearchResults"/>
     <preference for="SearchSpring\Feed\Api\GetAllTasksInterface"
                 type="SearchSpring\Feed\Model\GetAllTasks"/>
+    <preference for="SearchSpring\Feed\Api\GetFilteredLogInterface"
+                type="SearchSpring\Feed\Model\GetFilteredLog"/>
+    <preference for="SearchSpring\Feed\Api\Data\ApplicationLogResponseInterface"
+                type="SearchSpring\Feed\Model\Data\ApplicationLogResponse"/>
+    <preference for="SearchSpring\Feed\Api\GetTaskErrorsInterface"
+                type="SearchSpring\Feed\Model\GetTaskErrors"/>
+    <preference for="SearchSpring\Feed\Api\Data\TaskErrorItemInterface"
+                type="SearchSpring\Feed\Model\Data\TaskErrorItem"/>
+    <preference for="SearchSpring\Feed\Api\Data\TaskErrorListResponseInterface"
+                type="SearchSpring\Feed\Model\Data\TaskErrorListResponse"/>
+    <preference for="SearchSpring\Feed\Api\ProductInfoInterface"
+                type="SearchSpring\Feed\Model\ProductInfo"/>
+    <preference for="SearchSpring\Feed\Api\Data\ProductInfoResponseInterface"
+                type="SearchSpring\Feed\Model\Data\ProductInfoResponse"/>
 
     <type name="SearchSpring\Feed\Model\Task\TypeList">
         <arguments>
@@ -214,6 +228,7 @@
                     <item name="sortOrder" xsi:type="number">600</item>
                 </item>
             </argument>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>
     </type>
 
@@ -358,6 +373,19 @@
     </type>
 
     <type name="SearchSpring\Feed\Model\GenerateFeed">
+        <arguments>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Model\ProductInfo">
+        <arguments>
+            <argument name="afterLoadProcessorPool" xsi:type="object">SearchSpringFeedGenerateFeedAfterLoadCollectionProcessorPool</argument>
+            <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SearchSpring\Feed\Service\Log\LogFileReader">
         <arguments>
             <argument name="logger" xsi:type="object">SearchSpringFeedLogger</argument>
         </arguments>

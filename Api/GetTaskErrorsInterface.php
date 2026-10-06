@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2023 Searchspring <https://searchspring.com>
+ * Copyright (C) 2026 Searchspring <https://searchspring.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
@@ -18,24 +18,21 @@ declare(strict_types=1);
 
 namespace SearchSpring\Feed\Api;
 
-interface GetCronStatusInterface
+use SearchSpring\Feed\Api\Data\TaskErrorListResponseInterface;
+
+interface GetTaskErrorsInterface
 {
     /**
-     * Get cron status list for searchspring_task_execution
+     * Get task errors, latest task first.
      *
-     * @param string $status
      * @param int $currentPage
-     * @param int $pageSize Max 200.
-     * @param string $startDate UTC date/datetime (e.g. 2026-01-01 or 2026-01-01T10:00:00); scheduled_at on or after.
-     * @param string $endDate UTC date/datetime; scheduled_at on or before. A plain date includes the whole day.
-     * @return array
-     * @throws \Magento\Framework\Exception\InputException
+     * @param int $pageSize
+     * @param int|null $taskId
+     * @return \SearchSpring\Feed\Api\Data\TaskErrorListResponseInterface
      */
     public function getList(
-        string $status = '',
         int $currentPage = 1,
         int $pageSize = 20,
-        string $startDate = '',
-        string $endDate = ''
-    ): array;
+        ?int $taskId = null
+    ): TaskErrorListResponseInterface;
 }
