@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
  * Supports tail (last N lines), line range, keyword and date range filters.
  *
  * Size policy:
- * - at most MAX_LINES lines and MAX_OUTPUT_BYTES bytes are returned
+ * - at most MAX_LINES lines and MAX_OUTPUT_BYTES bytes are returned, counting the line breaks between lines
  * - a returned line is cut to MAX_LINE_BYTES and gets a "[truncated, N bytes]" suffix
  * - filters are applied to the first MAX_LINE_READ_BYTES of a line, the rest of the line is skipped
  * - the tail read reads at most MAX_OUTPUT_BYTES from the end of the file, an entry cut by this limit is dropped
@@ -196,6 +196,7 @@ class LogFileReader
         $matchedLines = [];
         // key of the oldest kept line, unset() does not reindex the array unlike array_shift()
         $oldestKey = 0;
+        // output size of the kept lines including the separators between them, see outputSize()
         $matchedBytes = 0;
         $matchedLineNumber = 0;
         // lines without timestamp (e.g. stack traces) follow the date match of the previous entry
@@ -230,21 +231,27 @@ class LogFileReader
                 }
 
                 $line = $this->truncate($line, $length);
-                $matchedLines[] = $line;
-                $matchedBytes += strlen($line);
+                $lineBytes = $this->outputSize($line, count($matchedLines));
                 if ($hasLineRange) {
-                    // range: keep the first lines within the limits
-                    if (count($matchedLines) >= self::MAX_LINES || $matchedBytes >= self::MAX_OUTPUT_BYTES) {
+                    // range: keep the first lines within the limits, checked before appending
+                    if (count($matchedLines) >= self::MAX_LINES
+                        || $matchedBytes + $lineBytes > self::MAX_OUTPUT_BYTES
+                    ) {
                         break;
                     }
+                    $matchedLines[] = $line;
+                    $matchedBytes += $lineBytes;
                     continue;
                 }
 
                 // tail: keep the last lines within the limits
+                $matchedLines[] = $line;
+                $matchedBytes += $lineBytes;
                 while (count($matchedLines) > $lastLines
                     || (count($matchedLines) > 1 && $matchedBytes > self::MAX_OUTPUT_BYTES)
                 ) {
-                    $matchedBytes -= strlen($matchedLines[$oldestKey]);
+                    // the oldest line is followed by a separator as more lines are kept
+                    $matchedBytes -= strlen($matchedLines[$oldestKey]) + 1;
                     unset($matchedLines[$oldestKey++]);
                 }
             }
@@ -296,6 +303,10 @@ class LogFileReader
                 $chunks[] = $chunk;
                 $lineBreakCount += substr_count($chunk, "\n");
             }
+
+            // the first captured line is complete when the read starts at the file start or after a line break
+            $firstLineComplete = $position === 0
+                || in_array($this->readByte($handle, $position - 1), ["\n", "\r"], true);
         } finally {
             $this->closeFile($handle);
         }
@@ -309,8 +320,8 @@ class LogFileReader
 
         $lines = preg_split('/\r\n|\n|\r/', $buffer) ?: [];
         unset($buffer);
-        if ($position > 0 && count($lines) <= $lastLines) {
-            // the read budget stopped the read inside the first line, it is incomplete
+        if (!$firstLineComplete) {
+            // the read budget stopped the read inside the first line
             array_shift($lines);
             if (!$lines) {
                 return [sprintf(
@@ -320,9 +331,44 @@ class LogFileReader
             }
         }
 
-        return array_map(function (string $line) {
-            return $this->truncate($line, strlen($line));
-        }, array_slice($lines, -$lastLines));
+        // truncation adds a suffix, the output budget is applied after it: keep the newest lines that fit
+        $result = [];
+        $resultBytes = 0;
+        foreach (array_reverse(array_slice($lines, -$lastLines)) as $line) {
+            $line = $this->truncate($line, strlen($line));
+            $lineBytes = $this->outputSize($line, count($result));
+            if ($resultBytes + $lineBytes > self::MAX_OUTPUT_BYTES) {
+                break;
+            }
+            $result[] = $line;
+            $resultBytes += $lineBytes;
+        }
+
+        return array_reverse($result);
+    }
+
+    /**
+     * Size a line adds to the output, including the separator compress() puts before it when lines are kept already.
+     *
+     * @param string $line
+     * @param int $keptLines
+     * @return int
+     */
+    private function outputSize(string $line, int $keptLines): int
+    {
+        return strlen($line) + ($keptLines > 0 ? 1 : 0);
+    }
+
+    /**
+     * @param resource $handle
+     * @param int $position
+     * @return string
+     * @throws FileSystemException
+     */
+    private function readByte($handle, int $position): string
+    {
+        $this->fileDriver->fileSeek($handle, $position, SEEK_SET);
+        return (string) $this->fileDriver->fileRead($handle, 1);
     }
 
     /**
