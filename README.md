@@ -215,6 +215,16 @@ Unlike `applicationlog` / `exceptionlog`, these never return the whole file (max
 GET /rest/V1/searchspring/applicationlog/filter?keyword=ERROR&startDate=2026-10-01&lastLines=200
 ```
 
+### Cron schedule (`SearchSpring_Feed::general`)
+
+```
+GET /rest/V1/searchspring/cron/status?status=error&startDate=2026-10-01&endDate=2026-10-02&currentPage=1&pageSize=50
+```
+
+Returns `cron_schedule` entries of the `searchspring_task_execution` job, latest first. All parameters are optional:
+`status` (pending, running, success, missed, error), `startDate` / `endDate` on `scheduled_at` in UTC
+(e.g. `2026-10-01` or `2026-10-01T10:00:00`, a plain `endDate` includes the whole day), `pageSize` max 200.
+
 ### Task errors (`SearchSpring_Feed::task`)
 
 ```
