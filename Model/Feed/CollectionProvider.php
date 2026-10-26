@@ -20,6 +20,8 @@ namespace SearchSpring\Feed\Model\Feed;
 
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use SearchSpring\Feed\Api\Data\FeedSpecificationInterface;
 use SearchSpring\Feed\Model\Feed\Collection\ModifierInterface;
 
@@ -33,18 +35,25 @@ class CollectionProvider implements CollectionProviderInterface
      * @var ModifierInterface[]
      */
     private $modifiers;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * CollectionProvider constructor.
      * @param CollectionFactory $collectionFactory
      * @param array $modifiers
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         CollectionFactory $collectionFactory,
-        array $modifiers = []
+        array $modifiers = [],
+        ?LoggerInterface $logger = null
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->modifiers = $modifiers;
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -62,10 +71,44 @@ class CollectionProvider implements CollectionProviderInterface
             if (!$modifier) {
                 throw new \Exception((string) __('No objectInstance for modifier %1', $key));
             }
+            $startTime = microtime(true);
             $collection = $modifier->modify($collection, $specification);
+            $this->logModifier((string) $key, $modifier, $collection, $specification, $startTime);
         }
 
         return $collection;
+    }
+
+    /**
+     * Logs the collection query after each modifier, attributes selected by addAttributeToSelect()
+     * are joined on load, so they are not part of the query yet.
+     *
+     * @param string $key
+     * @param ModifierInterface $modifier
+     * @param Collection $collection
+     * @param FeedSpecificationInterface $specification
+     * @param float $startTime
+     * @return void
+     */
+    private function logModifier(
+        string $key,
+        ModifierInterface $modifier,
+        Collection $collection,
+        FeedSpecificationInterface $specification,
+        float $startTime
+    ): void {
+        try {
+            $this->logger->info('Collection modifier applied', [
+                'method' => __METHOD__,
+                'store' => $specification->getStoreCode(),
+                'modifier' => $key,
+                'class' => get_class($modifier),
+                'seconds' => round(microtime(true) - $startTime, 4),
+                'query' => $collection->getSelect()->__toString(),
+            ]);
+        } catch (\Throwable $exception) {
+            // logging must never break the feed generation
+        }
     }
 
     /**
@@ -74,7 +117,8 @@ class CollectionProvider implements CollectionProviderInterface
      */
     private function sort(array $data)
     {
-        usort($data, function (array $a, array $b) {
+        // uasort keeps the modifier keys for logging
+        uasort($data, function (array $a, array $b) {
             return $this->getSortOrder($a) <=> $this->getSortOrder($b);
         });
 

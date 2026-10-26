@@ -25,8 +25,17 @@ interface GetCronStatusInterface
      *
      * @param string $status
      * @param int $currentPage
-     * @param int $pageSize
+     * @param int $pageSize Max 200.
+     * @param string $startDate UTC date/datetime (e.g. 2026-01-01 or 2026-01-01T10:00:00); scheduled_at on or after.
+     * @param string $endDate UTC date/datetime; scheduled_at on or before. A plain date includes the whole day.
      * @return array
+     * @throws \Magento\Framework\Exception\InputException
      */
-    public function getList(string $status = '', int $currentPage = 1, int $pageSize = 20): array;
+    public function getList(
+        string $status = '',
+        int $currentPage = 1,
+        int $pageSize = 20,
+        string $startDate = '',
+        string $endDate = ''
+    ): array;
 }

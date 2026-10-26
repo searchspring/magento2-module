@@ -92,4 +92,34 @@
             <resource ref="SearchSpring_Feed::task" />
         </resources>
     </route>
+    <route url="/V1/searchspring/applicationlog/filter" method="GET">
+        <service class="SearchSpring\Feed\Api\GetFilteredLogInterface" method="getExtensionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/exceptionlog/filter" method="GET">
+        <service class="SearchSpring\Feed\Api\GetFilteredLogInterface" method="getExceptionLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/cronlog" method="GET">
+        <service class="SearchSpring\Feed\Api\GetFilteredLogInterface" method="getCronLog" />
+        <resources>
+            <resource ref="SearchSpring_Feed::general" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/taskerrors" method="GET">
+        <service class="SearchSpring\Feed\Api\GetTaskErrorsInterface" method="getList" />
+        <resources>
+            <resource ref="SearchSpring_Feed::task" />
+        </resources>
+    </route>
+    <route url="/V1/searchspring/productinfo" method="GET">
+        <service class="SearchSpring\Feed\Api\ProductInfoInterface" method="getInfo" />
+        <resources>
+            <resource ref="SearchSpring_Feed::task" />
+        </resources>
+    </route>
 </routes>
