@@ -24,6 +24,8 @@ use Magento\CatalogInventory\Api\StockItemCriteriaInterface;
 use Magento\CatalogInventory\Api\StockItemCriteriaInterfaceFactory;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
 use Magento\CatalogInventory\Model\Stock\Item;
+use Magento\Framework\DB\Adapter\AdapterInterface;
+use Magento\Framework\DB\Select;
 use Magento\InventoryApi\Api\Data\StockInterface;
 use Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
@@ -34,6 +36,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Api\Data\WebsiteInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 use SearchSpring\Feed\Model\Feed\DataProvider\Stock\MsiStockProvider;
 
 class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
@@ -66,6 +69,9 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
      * @var GetStockItemDataInterface
      */
     private $getStockItemDataMock;
+
+    private $loggerMock;
+
     private $msiStockProvider;
 
     public function setUp(): void
@@ -80,6 +86,7 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
         $this->getReservationsQuantityMock = $this->createMock(GetReservationsQuantityInterface::class);
         $this->stockResolverMock = $this->createMock(MsiStockResolverInterface::class);
         $this->getStockItemDataMock = $this->createMock(GetStockItemDataInterface::class);
+        $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->msiStockProvider = new MsiStockProvider(
             $this->storeManagerMock,
             $this->websiteRepositoryMock,
@@ -90,7 +97,8 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
             $this->typeManagerMock,
             $this->getReservationsQuantityMock,
             $this->stockResolverMock,
-            $this->getStockItemDataMock
+            $this->getStockItemDataMock,
+            $this->loggerMock
         );
     }
 
@@ -377,6 +385,90 @@ class MsiStockProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [],
+            $this->msiStockProvider->getStock($productIds, 1)
+        );
+    }
+
+    public function testGetStockWithoutLegacyStockItemFallsBackToStoreConfig()
+    {
+        $productIds = [1, 2, 3, 4, 5];
+        $storeMock = $this->createMock(StoreInterface::class);
+        $connectionMock = $this->createMock(AdapterInterface::class);
+        $selectMock = $this->createMock(Select::class);
+        $websiteMock = $this->createMock(WebsiteInterface::class);
+        $stockMock = $this->createMock(StockInterface::class);
+        $criteriaMock = $this->createMock(StockItemCriteriaInterface::class);
+        $stockItemCollectionMock = $this->createMock(StockItemCollectionInterface::class);
+
+        $this->storeManagerMock->method('getStore')->with(1)->willReturn($storeMock);
+        $storeMock->method('getWebsiteId')->willReturn(1);
+        $this->websiteRepositoryMock->method('getById')->with(1)->willReturn($websiteMock);
+        $websiteMock->method('getCode')->willReturn('default');
+        $this->stockResolverMock->method('execute')
+            ->with(SalesChannelInterface::TYPE_WEBSITE, 'default')
+            ->willReturn($stockMock);
+        $stockMock->method('getStockId')->willReturn(1);
+        $this->productResourceMock->method('getProductsSku')->with($productIds)->willReturn([
+            ['entity_id' => 1, 'sku' => '1'],
+            ['entity_id' => 2, 'sku' => '2'],
+            ['entity_id' => 3, 'sku' => '3'],
+            ['entity_id' => 4, 'sku' => '4'],
+            ['entity_id' => 5, 'sku' => '5'],
+        ]);
+        $this->productResourceMock->method('getConnection')->willReturn($connectionMock);
+        $this->productResourceMock->method('getTable')->willReturn('catalog_product_entity');
+        $connectionMock->method('select')->willReturn($selectMock);
+        $selectMock->method('from')->willReturnSelf();
+        $selectMock->method('where')->willReturnSelf();
+        $connectionMock->expects($this->once())->method('fetchPairs')->with($selectMock)->willReturn([
+            1 => 'simple',
+            2 => 'simple',
+            3 => 'simple',
+            4 => 'simple',
+            5 => 'configurable',
+        ]);
+        $this->legacyStockItemCriteriaFactoryMock->method('create')->willReturn($criteriaMock);
+        $criteriaMock->method('setScopeFilter')->willReturnSelf();
+        $criteriaMock->method('setProductsFilter')->willReturnSelf();
+        $this->legacyStockItemRepositoryMock->method('getList')->willReturn($stockItemCollectionMock);
+        // none of the products has a cataloginventory_stock_item row
+        $stockItemCollectionMock->method('getItems')->willReturn([]);
+
+        $this->getStockItemDataMock->method('execute')->willReturnMap([
+            ['1', 1, ['quantity' => 5, 'is_salable' => true]],
+            ['2', 1, ['quantity' => 0, 'is_salable' => false]],
+            ['3', 1, null],
+            // indexed qty says salable, but a pending order reservation consumes all of it
+            ['4', 1, ['quantity' => 5, 'is_salable' => true]],
+            // composite products have no own qty, so the salable flag decides
+            ['5', 1, ['quantity' => 0, 'is_salable' => true]],
+        ]);
+        $this->getReservationsQuantityMock->method('execute')->willReturnMap([
+            ['1', 1, 0.0],
+            ['2', 1, 0.0],
+            ['3', 1, 0.0],
+            ['4', 1, -5.0],
+            ['5', 1, 0.0],
+        ]);
+        $this->typeManagerMock->method('getCompositeTypes')->willReturn(['configurable', 'bundle', 'grouped']);
+
+        $this->stockConfigurationMock->method('getManageStock')->with(1)->willReturn(true);
+        $this->stockConfigurationMock->method('getMinQty')->with(1)->willReturn(0.0);
+
+        $this->loggerMock->expects($this->once())
+            ->method('warning')
+            ->with($this->anything(), $this->callback(static function (array $context): bool {
+                return $context['productIds'] === [1, 2, 3, 4, 5];
+            }));
+
+        $this->assertSame(
+            [
+                1 => ['qty' => 5.0, 'in_stock' => true, 'is_stock_managed' => true],
+                2 => ['qty' => 0.0, 'in_stock' => false, 'is_stock_managed' => true],
+                3 => ['qty' => 0.0, 'in_stock' => false, 'is_stock_managed' => true],
+                4 => ['qty' => 0.0, 'in_stock' => false, 'is_stock_managed' => true],
+                5 => ['qty' => 0.0, 'in_stock' => true, 'is_stock_managed' => true],
+            ],
             $this->msiStockProvider->getStock($productIds, 1)
         );
     }
